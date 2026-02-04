@@ -1,4 +1,6 @@
-connection: "{{ model.connection | default('powerbi_connection') }}"
+include: "/views/*.view.lkml"
+
+connection: "{{ model.connection | default('t2l') }}"
 
 {% for exp in model.explores | default([]) %}
 explore: {{ exp.name }} {

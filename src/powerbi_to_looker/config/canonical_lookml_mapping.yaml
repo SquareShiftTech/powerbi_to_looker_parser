@@ -4,10 +4,10 @@
 # SQL dialect for generated formulas and date SQL (generic | bigquery). Default: generic.
 sql_dialect: bigquery
 
-# Optional: when sql_dialect is bigquery, use for sql_table_name (dataset.table or project.dataset.table)
-# bigquery:
-#   dataset: my_dataset
-#   project: my_project   # optional
+# When sql_dialect is bigquery, use for sql_table_name (dataset.table or project.dataset.table)
+bigquery:
+  dataset: Super_Store_Sales   # replace with your BigQuery dataset name
+  project: tableau-to-looker-migration   # optional; replace with your GCP project id or remove if not needed
 
 # Canonical data_type → LookML dimension/measure type
 dimension_types:

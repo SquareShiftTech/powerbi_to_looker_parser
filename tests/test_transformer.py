@@ -152,7 +152,8 @@ def test_build_view_with_dimension_and_measure(config):
     assert view["view_name"] == "orders"
     dim_names = [d["name"] for d in view["dimensions"]]
     assert "order_id" in dim_names or "sales" in dim_names  # base dim for sales
-    meas = [m for m in view["measures"] if m["name"] == "sales"]
+    # Measure "Sales" (sum) collides with dimension "sales" -> disambiguated to sales_sum
+    meas = [m for m in view["measures"] if m["name"] == "sales_sum"]
     assert len(meas) == 1
     assert meas[0]["sql"] == "${sales}"
 

@@ -17,6 +17,7 @@ src/powerbi_to_looker/collector/merge.py
 src/powerbi_to_looker/collector/pbix_loader.py
 src/powerbi_to_looker/collector/powerbi_collector.py
 src/powerbi_to_looker/config/__init__.py
+src/powerbi_to_looker/config/canonical_lookml_mapping.yaml
 src/powerbi_to_looker/config/loader.py
 src/powerbi_to_looker/config/powerbi_canonical_mapping.yaml
 src/powerbi_to_looker/generator/__init__.py
@@ -27,6 +28,13 @@ src/powerbi_to_looker/models/dashboard.py
 src/powerbi_to_looker/templates/model.lkml.j2
 src/powerbi_to_looker/templates/view.lkml.j2
 src/powerbi_to_looker/transformer/__init__.py
+src/powerbi_to_looker/transformer/dates.py
+src/powerbi_to_looker/transformer/dimensions.py
+src/powerbi_to_looker/transformer/formula_to_sql.py
+src/powerbi_to_looker/transformer/measures.py
+src/powerbi_to_looker/transformer/model_builder.py
 src/powerbi_to_looker/transformer/semantic_layer.py
+src/powerbi_to_looker/transformer/view_builder.py
 tests/test_collector.py
 tests/test_migration_engine.py
+tests/test_transformer.py

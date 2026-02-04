@@ -35,7 +35,7 @@ DEFAULT_CREDENTIALS = {
 }
 DEFAULT_WORKSPACE_ID = "5945fc8b-1fb7-48a5-873a-0a35ea442166"  # Powerbi-POC
 DEFAULT_REPORT_NAME = "Suprer_Store_Dashboard"
-DEFAULT_PBIX = _REPO_ROOT / "powerbi_to_looker" / "powerbi_reports" / "Suprer_Store_Dashboard.pbix"
+DEFAULT_PBIX = _REPO_ROOT / "powerbi_to_looker_parser" / "powerbi_reports" / "Suprer_Store_Dashboard.pbix"
 
 
 def _get_credentials() -> dict[str, str]:
@@ -95,7 +95,7 @@ def main() -> None:
     parser.add_argument(
         "--lookml-dir",
         type=Path,
-        default=None,
+        default=Path("lookml_output"),
         metavar="DIR",
         help="If set, run transformer + generator and write .view.lkml and model.model.lkml to DIR",
     )

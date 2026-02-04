@@ -1,6 +1,6 @@
 view: {{ view.view_name }} {
 
-  sql_table_name: {{ view.sql_table_name | default(view.view_name) }} ;;
+  sql_table_name: `{{ view.sql_table_name | default(view.view_name) }}` ;;
   {% for dim in view.dimensions %}
   dimension: {{ dim.name }} {
     type: {{ dim.type }}

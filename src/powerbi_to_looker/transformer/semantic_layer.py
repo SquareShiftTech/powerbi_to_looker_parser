@@ -12,7 +12,7 @@ from powerbi_to_looker.transformer.view_builder import build_view
 def to_lookml_terms(
     metadata: MetadataModel,
     config_path: str | None = None,
-    connection_name: str = "powerbi_connection",
+    connection_name: str = "t2l",
 ) -> dict[str, Any]:
     """Convert canonical MetadataModel to LookML semantic layer terms.
 

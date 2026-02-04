@@ -17,7 +17,7 @@ def _join_type_to_looker(join_type: str, config: dict[str, Any]) -> str:
 def build_model(
     datasource: Datasource,
     config: dict[str, Any],
-    connection_name: str = "powerbi_connection",
+    connection_name: str = "t2l",
 ) -> dict[str, Any]:
     """Build model dict with explores and joins from datasource tables and table_relationships."""
     table_names = {t.name: sanitize_name(t.name, config) for t in datasource.tables}

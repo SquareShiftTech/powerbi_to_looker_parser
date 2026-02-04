@@ -171,172 +171,18 @@
                 },
                 {
                   "name": "Customer Count",
-                  "expression": "Count(Orders[Customer_ID])",
+                  "expression": "DISTINCTCOUNT(Order_Details[Customer_ID])",
+                  "isHidden": false
+                },
+                {
+                  "name": "Total_Orders",
+                  "expression": "\nDISTINCTCOUNT ( Order_Details[Order_ID])",
                   "isHidden": false
                 }
               ],
               "source": [
                 {
                   "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Order_Details = Super_Store_Data{[Schema=\"dbo\",Item=\"Order_Details\"]}[Data]\nin\n    dbo_Order_Details"
-                }
-              ]
-            },
-            {
-              "name": "Orders",
-              "isHidden": false,
-              "storageMode": "Import",
-              "columns": [
-                {
-                  "name": "Order_ID",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Order_Date",
-                  "dataType": "DateTime",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Ship_Date",
-                  "dataType": "DateTime",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Ship_Mode",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Customer_ID",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Customer_Name",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Segment",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Country",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "City",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "State",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Postal_Code",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Region",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Product_ID",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Category",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Sub_Category",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Product_Name",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Sales",
-                  "dataType": "Double",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Quantity",
-                  "dataType": "Int64",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Discount",
-                  "dataType": "Double",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Profit",
-                  "dataType": "Double",
-                  "isHidden": false,
-                  "columnType": "Data"
-                }
-              ],
-              "measures": [
-                {
-                  "name": "Total Orders",
-                  "expression": "\nDISTINCTCOUNT ( Orders[Order_ID] )\n",
-                  "isHidden": false
-                },
-                {
-                  "name": "Sales by Year",
-                  "expression": "\nCALCULATE (\n    [Total Sales],\n    YEAR ( Orders[Order_Date] )\n)\n",
-                  "isHidden": false
-                },
-                {
-                  "name": "Sales YTD",
-                  "expression": "\nTOTALYTD (\n    [Total Sales],\n    Orders[Order_Date]\n)\n",
-                  "isHidden": false
-                },
-                {
-                  "name": "Sales PY",
-                  "expression": "\nCALCULATE (\n    [Total Sales],\n    SAMEPERIODLASTYEAR ( Orders[Order_Date] )\n)\n",
-                  "isHidden": false
-                },
-                {
-                  "name": "YoY Growth %",
-                  "expression": "\nDIVIDE ( [Total Sales] - [Sales PY], [Sales PY], 0 )\n",
-                  "isHidden": false
-                }
-              ],
-              "source": [
-                {
-                  "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Orders = Super_Store_Data{[Schema=\"dbo\",Item=\"Orders\"]}[Data]\nin\n    dbo_Orders"
                 }
               ]
             },
@@ -362,42 +208,6 @@
               "source": [
                 {
                   "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Region = Super_Store_Data{[Schema=\"dbo\",Item=\"Region\"]}[Data]\nin\n    dbo_Region"
-                }
-              ]
-            },
-            {
-              "name": "Returns",
-              "isHidden": false,
-              "storageMode": "Import",
-              "columns": [
-                {
-                  "name": "Returned",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                },
-                {
-                  "name": "Order_ID",
-                  "dataType": "String",
-                  "isHidden": false,
-                  "columnType": "Data"
-                }
-              ],
-              "measures": [
-                {
-                  "name": "Returned Orders",
-                  "expression": "\nCALCULATE (\n    DISTINCTCOUNT ( Returns[Order_ID] ),\n    Returns[Returned] = \"Yes\"\n)\n",
-                  "isHidden": false
-                },
-                {
-                  "name": "Return Rate %",
-                  "expression": "\nDIVIDE ( [Returned Orders], [Total Orders], 0 )\n",
-                  "isHidden": false
-                }
-              ],
-              "source": [
-                {
-                  "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Returns = Super_Store_Data{[Schema=\"dbo\",Item=\"Returns\"]}[Data]\nin\n    dbo_Returns"
                 }
               ]
             }
@@ -518,48 +328,12 @@
               "isActive": true
             },
             {
-              "fromTable": "Orders",
-              "fromColumn": "Order_Date",
-              "toTable": null,
-              "toColumn": null,
-              "cardinality": "M:1",
-              "crossFilteringBehavior": "Single",
-              "isActive": true
-            },
-            {
-              "fromTable": "Orders",
-              "fromColumn": "Ship_Date",
-              "toTable": null,
-              "toColumn": null,
-              "cardinality": "M:1",
-              "crossFilteringBehavior": "Single",
-              "isActive": true
-            },
-            {
-              "fromTable": "Orders",
-              "fromColumn": "Order_ID",
+              "fromTable": "Order_Details",
+              "fromColumn": "Region",
               "toTable": "Region",
-              "toColumn": "ID",
+              "toColumn": "Region",
               "cardinality": "M:1",
               "crossFilteringBehavior": "Single",
-              "isActive": true
-            },
-            {
-              "fromTable": "Orders",
-              "fromColumn": "Order_ID",
-              "toTable": "Returns",
-              "toColumn": "Order_ID",
-              "cardinality": "M:1",
-              "crossFilteringBehavior": "Single",
-              "isActive": true
-            },
-            {
-              "fromTable": "Orders",
-              "fromColumn": "Order_ID",
-              "toTable": "Order_Details",
-              "toColumn": "Order_ID",
-              "cardinality": "M:M",
-              "crossFilteringBehavior": "Both",
               "isActive": true
             }
           ]
@@ -572,7 +346,7 @@
           "name": "Suprer_Store_Dashboard",
           "datasetId": "b0eec94b-94c4-4cbb-966b-2989f24c5609",
           "createdDateTime": "2026-02-02T10:08:44.1",
-          "modifiedDateTime": "2026-02-02T13:07:07.187",
+          "modifiedDateTime": "2026-02-04T07:00:52.53",
           "modifiedBy": "ashok@squareshift.co",
           "createdBy": "ashok@squareshift.co",
           "modifiedById": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
@@ -667,11 +441,11 @@
     }
   ],
   "report_layout": {
-    "source_file": "C:\\squareshift\\powerbi\\powerbi_reports\\Suprer_Store_Dashboard.pbix",
+    "source_file": "C:\\squareshift\\powerbi\\powerbi_to_looker_parser\\powerbi_reports\\Suprer_Store_Dashboard.pbix",
     "report_level_filters": [],
     "pages": [
       {
-        "id": 161262065,
+        "id": 161557549,
         "name": "Summary",
         "ordinal": null,
         "width": 1280.0,
@@ -748,8 +522,8 @@
             "visual_type": "slicer",
             "name": "ac0eeb7e85c32ac26a2e",
             "position": {
-              "x": 1008.58,
-              "y": 100.17,
+              "x": 990.74,
+              "y": 90.57,
               "width": 247.0,
               "height": 182.5
             },
@@ -974,7 +748,7 @@
         ]
       },
       {
-        "id": 161262066,
+        "id": 161557550,
         "name": "Customer ",
         "ordinal": 1,
         "width": 1280.0,
@@ -1004,24 +778,13 @@
             "filters": []
           },
           {
-            "visual_type": "cardVisual",
-            "name": "478e0f54084cbf659816",
-            "position": {
-              "x": 9.61,
-              "y": 260.72,
-              "width": 146.83,
-              "height": 130.36
-            },
-            "filters": []
-          },
-          {
             "visual_type": "clusteredColumnChart",
             "name": "1a8a797b637a9e501428",
             "position": {
-              "x": 9.61,
-              "y": 422.64,
-              "width": 1250.09,
-              "height": 275.82
+              "x": 9.41,
+              "y": 443.79,
+              "width": 1250.69,
+              "height": 254.17
             },
             "filters": []
           },
@@ -1031,8 +794,8 @@
             "position": {
               "x": 934.65,
               "y": 106.24,
-              "width": 309.31,
-              "height": 254.17
+              "width": 325.45,
+              "height": 326.79
             },
             "filters": [
               {
@@ -1040,18 +803,18 @@
                   "Measure": {
                     "Expression": {
                       "SourceRef": {
-                        "Entity": "Orders"
+                        "Entity": "Order_Details"
                       }
                     },
-                    "Property": "Total Orders"
+                    "Property": "Total_Orders"
                   }
                 },
                 "filter": {
                   "Version": 2,
                   "From": [
                     {
-                      "Name": "o",
-                      "Entity": "Orders",
+                      "Name": "o1",
+                      "Entity": "Order_Details",
                       "Type": 0
                     }
                   ],
@@ -1064,10 +827,10 @@
                             "Measure": {
                               "Expression": {
                                 "SourceRef": {
-                                  "Source": "o"
+                                  "Source": "o1"
                                 }
                               },
-                              "Property": "Total Orders"
+                              "Property": "Total_Orders"
                             }
                           },
                           "Right": {
@@ -1093,7 +856,7 @@
               "x": 166.76,
               "y": 92.79,
               "width": 735.62,
-              "height": 313.34
+              "height": 340.24
             },
             "filters": []
           },
@@ -1107,11 +870,22 @@
               "height": 53.79
             },
             "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "9990f46c77a710c85714",
+            "position": {
+              "x": 8.07,
+              "y": 279.72,
+              "width": 150.62,
+              "height": 126.41
+            },
+            "filters": []
           }
         ]
       },
       {
-        "id": 161262067,
+        "id": 161557551,
         "name": "Sales",
         "ordinal": 2,
         "width": 1280.0,
@@ -1125,7 +899,7 @@
               "x": 34.31,
               "y": 146.83,
               "width": 581.82,
-              "height": 377.36
+              "height": 307.38
             },
             "filters": []
           },
@@ -1156,9 +930,9 @@
             "name": "e78195b220304517471b",
             "position": {
               "x": 34.31,
-              "y": 543.4,
+              "y": 467.93,
               "width": 1197.95,
-              "height": 177.02
+              "height": 252.49
             },
             "filters": []
           },
@@ -1180,7 +954,7 @@
               "x": 897.43,
               "y": 146.83,
               "width": 344.43,
-              "height": 336.19
+              "height": 307.38
             },
             "filters": []
           },
@@ -1201,11 +975,11 @@
     "slicers": [
       {
         "page_name": "Summary",
-        "page_id": 161262065,
+        "page_id": 161557549,
         "visual_name": "ac0eeb7e85c32ac26a2e",
         "position": {
-          "x": 1008.58,
-          "y": 100.17,
+          "x": 990.74,
+          "y": 90.57,
           "width": 247.0,
           "height": 182.5
         },
@@ -1297,7 +1071,7 @@
       },
       {
         "page_name": "Summary",
-        "page_id": 161262065,
+        "page_id": 161557549,
         "visual_name": "681927f0ef2498ed4b5f",
         "position": {
           "x": 28.82,
@@ -1318,7 +1092,7 @@
       },
       {
         "page_name": "Summary",
-        "page_id": 161262065,
+        "page_id": 161557549,
         "visual_name": "a075490c74709c4e779c",
         "position": {
           "x": 710.81,
@@ -1339,7 +1113,7 @@
       },
       {
         "page_name": "Summary",
-        "page_id": 161262065,
+        "page_id": 161557549,
         "visual_name": "4afac634e55f50462f39",
         "position": {
           "x": 469.3,
@@ -1380,48 +1154,12 @@
       "isActive": true
     },
     {
-      "fromTable": "Orders",
-      "fromColumn": "Order_Date",
-      "toTable": null,
-      "toColumn": null,
-      "cardinality": "M:1",
-      "crossFilteringBehavior": "Single",
-      "isActive": true
-    },
-    {
-      "fromTable": "Orders",
-      "fromColumn": "Ship_Date",
-      "toTable": null,
-      "toColumn": null,
-      "cardinality": "M:1",
-      "crossFilteringBehavior": "Single",
-      "isActive": true
-    },
-    {
-      "fromTable": "Orders",
-      "fromColumn": "Order_ID",
+      "fromTable": "Order_Details",
+      "fromColumn": "Region",
       "toTable": "Region",
-      "toColumn": "ID",
+      "toColumn": "Region",
       "cardinality": "M:1",
       "crossFilteringBehavior": "Single",
-      "isActive": true
-    },
-    {
-      "fromTable": "Orders",
-      "fromColumn": "Order_ID",
-      "toTable": "Returns",
-      "toColumn": "Order_ID",
-      "cardinality": "M:1",
-      "crossFilteringBehavior": "Single",
-      "isActive": true
-    },
-    {
-      "fromTable": "Orders",
-      "fromColumn": "Order_ID",
-      "toTable": "Order_Details",
-      "toColumn": "Order_ID",
-      "cardinality": "M:M",
-      "crossFilteringBehavior": "Both",
       "isActive": true
     }
   ],
@@ -1455,55 +1193,6 @@
       "Description": null
     },
     {
-      "TableName": "Orders",
-      "Name": "Total Orders",
-      "Expression": "\nDISTINCTCOUNT ( Orders[Order_ID] )\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
-      "TableName": "Returns",
-      "Name": "Returned Orders",
-      "Expression": "\nCALCULATE (\n    DISTINCTCOUNT ( Returns[Order_ID] ),\n    Returns[Returned] = \"Yes\"\n)\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
-      "TableName": "Returns",
-      "Name": "Return Rate %",
-      "Expression": "\nDIVIDE ( [Returned Orders], [Total Orders], 0 )\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
-      "TableName": "Orders",
-      "Name": "Sales by Year",
-      "Expression": "\nCALCULATE (\n    [Total Sales],\n    YEAR ( Orders[Order_Date] )\n)\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
-      "TableName": "Orders",
-      "Name": "Sales YTD",
-      "Expression": "\nTOTALYTD (\n    [Total Sales],\n    Orders[Order_Date]\n)\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
-      "TableName": "Orders",
-      "Name": "Sales PY",
-      "Expression": "\nCALCULATE (\n    [Total Sales],\n    SAMEPERIODLASTYEAR ( Orders[Order_Date] )\n)\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
-      "TableName": "Orders",
-      "Name": "YoY Growth %",
-      "Expression": "\nDIVIDE ( [Total Sales] - [Sales PY], [Sales PY], 0 )\n",
-      "DisplayFolder": null,
-      "Description": null
-    },
-    {
       "TableName": "Order_Details",
       "Name": "Product Rank",
       "Expression": "\nRANKX (\n    ALL ( Order_Details[Product_Name] ),\n    [Total Sales],\n    ,\n    DESC\n)\n",
@@ -1513,7 +1202,14 @@
     {
       "TableName": "Order_Details",
       "Name": "Customer Count",
-      "Expression": "Count(Orders[Customer_ID])",
+      "Expression": "DISTINCTCOUNT(Order_Details[Customer_ID])",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Total_Orders",
+      "Expression": "\nDISTINCTCOUNT ( Order_Details[Order_ID])",
       "DisplayFolder": null,
       "Description": null
     }
@@ -1524,16 +1220,8 @@
       "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Order_Details = Super_Store_Data{[Schema=\"dbo\",Item=\"Order_Details\"]}[Data]\nin\n    dbo_Order_Details"
     },
     {
-      "TableName": "Orders",
-      "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Orders = Super_Store_Data{[Schema=\"dbo\",Item=\"Orders\"]}[Data]\nin\n    dbo_Orders"
-    },
-    {
       "TableName": "Region",
       "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Region = Super_Store_Data{[Schema=\"dbo\",Item=\"Region\"]}[Data]\nin\n    dbo_Region"
-    },
-    {
-      "TableName": "Returns",
-      "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Returns = Super_Store_Data{[Schema=\"dbo\",Item=\"Returns\"]}[Data]\nin\n    dbo_Returns"
     }
   ],
   "rls": []

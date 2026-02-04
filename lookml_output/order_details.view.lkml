@@ -1,6 +1,6 @@
 view: order_details {
 
-  sql_table_name: dbo.Order_Details ;;
+  sql_table_name: `tableau-to-looker-migration.Super_Store_Sales.Order_Details` ;;
   dimension: order_id {
     type: string
     sql: ${TABLE}.Order_ID ;;
@@ -110,35 +110,35 @@ view: order_details {
     sql: ${TABLE}.Profit ;;
     label: "Profit"
   }
-  measure: region_id {
+  measure: region_id_sum {
     type: sum
     sql: ${region_id} ;;
     label: "Region_ID"
     value_format: "#,##0.00"
     format: "decimal_2"
   }
-  measure: sales {
+  measure: sales_sum {
     type: sum
     sql: ${sales} ;;
     label: "Sales"
     value_format: "#,##0.00"
     format: "decimal_2"
   }
-  measure: quantity {
+  measure: quantity_sum {
     type: sum
     sql: ${quantity} ;;
     label: "Quantity"
     value_format: "#,##0.00"
     format: "decimal_2"
   }
-  measure: discount {
+  measure: discount_sum {
     type: sum
     sql: ${discount} ;;
     label: "Discount"
     value_format: "#,##0.00"
     format: "decimal_2"
   }
-  measure: profit {
+  measure: profit_sum {
     type: sum
     sql: ${profit} ;;
     label: "Profit"
@@ -147,21 +147,21 @@ view: order_details {
   }
   measure: total_sales {
     type: sum
-    sql: ${sales} ;;
+    sql: ${sales_sum} ;;
     label: "Total Sales"
     value_format: "#,##0.00"
     format: "decimal_2"
   }
   measure: total_profit {
     type: sum
-    sql: ${profit} ;;
+    sql: ${profit_sum} ;;
     label: "Total Profit"
     value_format: "#,##0.00"
     format: "decimal_2"
   }
   measure: total_quantity {
     type: sum
-    sql: ${quantity} ;;
+    sql: ${quantity_sum} ;;
     label: "Total Quantity"
     value_format: "#,##0.00"
     format: "decimal_2"
@@ -187,9 +187,16 @@ view: order_details {
 )"
   }
   measure: customer_count {
-    type: count
+    type: count_distinct
     sql: ${customer_id} ;;
     label: "Customer Count"
+    value_format: "#,##0.00"
+    format: "decimal_2"
+  }
+  measure: total_orders {
+    type: count_distinct
+    sql: ${order_id} ;;
+    label: "Total_Orders"
     value_format: "#,##0.00"
     format: "decimal_2"
   }

@@ -61,11 +61,11 @@ def build_view(
         dims.append(field_to_dimension(base_field, config, primary_key=False))
         dimension_names.add(base_name)
 
+    # All names in this view (dimensions + measures as we add them); used to avoid collisions
+    used_names: set[str] = set(dimension_names)
     # Name map: display name -> LookML field name (for formula_to_sql refs like [Total Sales])
+    # Measures get their final name in the loop below (with agg suffix when colliding)
     name_map: dict[str, str] = {d["label"]: d["name"] for d in dims}
-    for f in fields:
-        if f.field_type == "measure":
-            name_map[f.name] = sanitize_name(f.name, config)
 
     # Measures (calculated ones may get sql/type from formula_to_sql)
     for f in fields:
@@ -75,6 +75,17 @@ def build_view(
         if base_dim and base_dim not in dimension_names:
             base_dim = None
         m = field_to_measure(f, config, base_dimension_name=base_dim)
+        # Disambiguate measure name when it collides with a dimension or prior measure (suffix = LookML type, e.g. _sum, _count)
+        candidate = m["name"]
+        if candidate in used_names:
+            candidate = m["name"] + "_" + m["type"]
+            n = 2
+            while candidate in used_names:
+                candidate = m["name"] + "_" + m["type"] + "_" + str(n)
+                n += 1
+        m["name"] = candidate
+        used_names.add(candidate)
+        name_map[f.name] = candidate
         if f.formula:
             sql, mtype = dax_to_lookml_sql(f.formula, name_map, config)
             if sql:

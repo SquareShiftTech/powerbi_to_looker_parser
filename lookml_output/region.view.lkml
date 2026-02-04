@@ -1,6 +1,6 @@
 view: region {
 
-  sql_table_name: dbo.Region ;;
+  sql_table_name: `tableau-to-looker-migration.Super_Store_Sales.Region` ;;
   dimension: region {
     type: string
     sql: ${TABLE}.Region ;;
@@ -11,7 +11,7 @@ view: region {
     sql: ${TABLE}.ID ;;
     label: "ID"
   }
-  measure: id {
+  measure: id_sum {
     type: sum
     sql: ${id} ;;
     label: "ID"
