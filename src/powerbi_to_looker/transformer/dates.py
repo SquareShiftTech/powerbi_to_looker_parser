@@ -13,13 +13,12 @@ def is_date_field(data_type: str) -> bool:
 
 
 def get_date_info(data_type: str, config: dict[str, Any]) -> dict[str, Any] | None:
-    """Return LookML date_info (datetype, timeframes) from config when data_type is date/datetime."""
+    """Return LookML date_info (timeframes only) for dimension_group when data_type is date/datetime."""
     if not is_date_field(data_type):
         return None
     handling = config.get("date_handling") or {}
     return {
-        "datetype": handling.get("datetype", "date"),
-        "timeframes": handling.get("timeframes") or ["day", "week", "month", "quarter", "year"],
+        "timeframes": handling.get("timeframes") or ["raw", "date", "week", "month", "quarter", "year", "month_name", "month_num"],
     }
 
 

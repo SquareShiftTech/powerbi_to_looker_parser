@@ -85,7 +85,9 @@ def build_view(
                 n += 1
         m["name"] = candidate
         used_names.add(candidate)
-        name_map[f.name] = candidate
+        # Prefer dimension in name_map so formulas like [Quantity] resolve to ${quantity} not ${quantity_sum}
+        if f.name not in name_map:
+            name_map[f.name] = candidate
         if f.formula:
             sql, mtype = dax_to_lookml_sql(f.formula, name_map, config)
             if sql:

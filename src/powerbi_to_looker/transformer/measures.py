@@ -16,7 +16,6 @@ def field_to_measure(
     measure_types = config.get("measure_types") or {}
     measures_defaults = config.get("measures") or {}
     value_format = measures_defaults.get("value_format", "#,##0.00")
-    fmt = measures_defaults.get("format", "decimal_2")
     reuse_base = measures_defaults.get("reuse_base_dimension", True)
 
     name = sanitize_name(field.name, config)
@@ -45,7 +44,6 @@ def field_to_measure(
         "type": lookml_measure_type,
         "sql": sql,
         "value_format": value_format,
-        "format": fmt,
     }
     if field.formula:
         out["description"] = f"DAX: {field.formula.strip()[:200]}"

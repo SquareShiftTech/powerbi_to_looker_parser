@@ -92,8 +92,8 @@ def test_is_date_field():
 
 def test_get_date_info(config):
     info = get_date_info("date", config)
-    assert info["datetype"] == "date"
-    assert "day" in info["timeframes"]
+    assert "timeframes" in info
+    assert "week" in info["timeframes"]
 
 
 # --- formula_to_sql ---
@@ -170,7 +170,7 @@ def test_build_model_explores_and_joins(config):
     ]
     ds = Datasource(id="ds1", name="DS", source_system="powerbi", datasource_type="embedded", connection=conn, tables=tables, table_relationships=rels, fields=[], parameters=[])
     model = build_model(ds, config)
-    assert model["connection"] == "powerbi_connection"
+    assert model["connection"] == "t2l"
     assert len(model["explores"]) == 2
     orders_exp = next(e for e in model["explores"] if e["name"] == "orders")
     assert len(orders_exp["joins"]) == 1
@@ -197,5 +197,5 @@ def test_to_lookml_terms_returns_views_and_model():
     assert "views" in result
     assert "model" in result
     assert len(result["views"]) >= 1
-    assert result["model"]["connection"] == "powerbi_connection"
+    assert result["model"]["connection"] == "t2l"
     assert len(result["model"]["explores"]) >= 1

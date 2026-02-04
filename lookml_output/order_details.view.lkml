@@ -6,19 +6,17 @@ view: order_details {
     sql: ${TABLE}.Order_ID ;;
     label: "Order_ID"
   }
-  dimension: order_date {
+  dimension_group: order_date {
     type: time
+    timeframes: [raw, date, week, month, quarter, year, month_name, month_num]
     sql: DATE(${TABLE}.Order_Date) ;;
     label: "Order_Date"
-    datetype: date
-    timeframes: [day, week, month, quarter, year]
   }
-  dimension: ship_date {
+  dimension_group: ship_date {
     type: time
+    timeframes: [raw, date, week, month, quarter, year, month_name, month_num]
     sql: DATE(${TABLE}.Ship_Date) ;;
     label: "Ship_Date"
-    datetype: date
-    timeframes: [day, week, month, quarter, year]
   }
   dimension: ship_mode {
     type: string
@@ -115,70 +113,60 @@ view: order_details {
     sql: ${region_id} ;;
     label: "Region_ID"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: sales_sum {
     type: sum
     sql: ${sales} ;;
     label: "Sales"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: quantity_sum {
     type: sum
     sql: ${quantity} ;;
     label: "Quantity"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: discount_sum {
     type: sum
     sql: ${discount} ;;
     label: "Discount"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: profit_sum {
     type: sum
     sql: ${profit} ;;
     label: "Profit"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: total_sales {
     type: sum
-    sql: ${sales_sum} ;;
+    sql: ${sales} ;;
     label: "Total Sales"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: total_profit {
     type: sum
-    sql: ${profit_sum} ;;
+    sql: ${profit} ;;
     label: "Total Profit"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: total_quantity {
     type: sum
-    sql: ${quantity_sum} ;;
+    sql: ${quantity} ;;
     label: "Total Quantity"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: profit_margin__ {
     type: number
     sql: IFNULL(SAFE_DIVIDE(${total_profit}, ${total_sales}), 0) ;;
     label: "Profit Margin %"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: product_rank {
     type: sum
     sql: NULL ;;
     label: "Product Rank"
     value_format: "#,##0.00"
-    format: "decimal_2"
     description: "DAX: RANKX (
     ALL ( Order_Details[Product_Name] ),
     [Total Sales],
@@ -191,13 +179,11 @@ view: order_details {
     sql: ${customer_id} ;;
     label: "Customer Count"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
   measure: total_orders {
     type: count_distinct
     sql: ${order_id} ;;
     label: "Total_Orders"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
 }

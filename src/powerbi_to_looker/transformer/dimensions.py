@@ -43,9 +43,11 @@ def field_to_dimension(
     if is_date_field(field.data_type):
         sql = dimension_sql_for_date(source_col, field.name, config)
         date_info = get_date_info(field.data_type, config)
+        is_dimension_group = True
     else:
         sql = f"${{TABLE}}.{source_col}" if source_col else f"${{TABLE}}.id"
         date_info = None
+        is_dimension_group = False
 
     out = {
         "name": name,
@@ -53,8 +55,9 @@ def field_to_dimension(
         "type": lookml_type,
         "sql": sql,
     }
-    if primary_key:
+    if primary_key and not is_dimension_group:
         out["primary_key"] = "yes"
     if date_info:
         out["date_info"] = date_info
+        out["dimension_group"] = True
     return out

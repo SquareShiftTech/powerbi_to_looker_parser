@@ -16,6 +16,5 @@ view: region {
     sql: ${id} ;;
     label: "ID"
     value_format: "#,##0.00"
-    format: "decimal_2"
   }
 }

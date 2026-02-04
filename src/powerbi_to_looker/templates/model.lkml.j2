@@ -4,13 +4,11 @@ connection: "{{ model.connection | default('t2l') }}"
 
 {% for exp in model.explores | default([]) %}
 explore: {{ exp.name }} {
-  view: {{ exp.view }}
   {% if exp.get('label') %}
   label: "{{ exp.label | replace('"', '\\"') }}"
   {% endif %}
   {% for join in exp.get('joins') or [] %}
   join: {{ join.name }} {
-    view: {{ join.view }}
     type: {{ join.type }}
     sql_on: {{ join.sql_on }} ;;
     {% if join.get('relationship') %}

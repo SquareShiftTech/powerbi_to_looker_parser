@@ -42,4 +42,4 @@ def test_migrate_file_from_dict_via_temp_json():
         out_dir = Path(tmp) / "out"
         result = engine.migrate_file(str(json_path), str(out_dir))
         assert len(result["files_written"]) >= 2
-        assert (out_dir / "model.model.lkml").exists()
+        assert (out_dir / "power_bi_looker.model.lkml").exists()

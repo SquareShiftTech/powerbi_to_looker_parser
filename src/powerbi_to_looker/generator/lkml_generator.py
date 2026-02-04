@@ -37,11 +37,11 @@ def generate(lookml_terms: dict[str, Any], output_dir: str) -> list[str]:
         path.write_text(content, encoding="utf-8")
         files_written.append(str(path))
 
-    # One .model.lkml for the model
+    # One .model.lkml for the model (named power_bi_looker to match LookML convention)
     model_data = lookml_terms.get("model") or {}
     template = env.get_template("model.lkml.j2")
     content = template.render(model=model_data)
-    path = out / "model.model.lkml"
+    path = out / "power_bi_looker.model.lkml"
     path.write_text(content, encoding="utf-8")
     files_written.append(str(path))
 

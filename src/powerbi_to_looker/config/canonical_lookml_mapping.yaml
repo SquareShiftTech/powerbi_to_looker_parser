@@ -35,15 +35,17 @@ join_types:
   FULL: full_outer
   default: left_outer
 
-# Date/datetime handling
+# Date/datetime handling (dimension_group for time fields)
 date_handling:
-  datetype: date          # date | datetime
   timeframes:
-    - day
+    - raw
+    - date
     - week
     - month
     - quarter
     - year
+    - month_name
+    - month_num
   # SQL wrapper for date dimension sql (e.g. "DATE(%s)" for BigQuery). Use null for generic.
   sql_wrapper: "DATE(%s)"
 

@@ -2,6 +2,16 @@ view: {{ view.view_name }} {
 
   sql_table_name: `{{ view.sql_table_name | default(view.view_name) }}` ;;
   {% for dim in view.dimensions %}
+  {% if dim.get('dimension_group') %}
+  dimension_group: {{ dim.name }} {
+    type: {{ dim.type }}
+    timeframes: [{% for tf in dim.date_info.timeframes | default([]) %}{{ tf }}{% if not loop.last %}, {% endif %}{% endfor %}]
+    sql: {{ dim.sql }} ;;
+    {% if dim.get('label') %}
+    label: "{{ dim.label | replace('"', '\\"') }}"
+    {% endif %}
+  }
+  {% else %}
   dimension: {{ dim.name }} {
     type: {{ dim.type }}
     sql: {{ dim.sql }} ;;
@@ -11,11 +21,8 @@ view: {{ view.view_name }} {
     {% if dim.get('primary_key') %}
     primary_key: yes
     {% endif %}
-    {% if dim.get('date_info') %}
-    datetype: {{ dim.date_info.datetype | default('date') }}
-    timeframes: [{% for tf in dim.date_info.timeframes | default([]) %}{{ tf }}{% if not loop.last %}, {% endif %}{% endfor %}]
-    {% endif %}
   }
+  {% endif %}
   {% endfor %}
   {% for m in view.measures %}
   measure: {{ m.name }} {
