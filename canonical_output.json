@@ -1,0 +1,781 @@
+{
+  "metadata_version": "1.0",
+  "source_system": "powerbi",
+  "extracted_at": "2026-02-04T04:50:16.318516Z",
+  "datasources": [
+    {
+      "id": "b0eec94b-94c4-4cbb-966b-2989f24c5609",
+      "name": "Suprer_Store_Dashboard",
+      "source_system": "powerbi",
+      "datasource_type": "embedded",
+      "connection": {
+        "type": "direct_query",
+        "server": "sql-server-powerbi.database.windows.net",
+        "database": "Super_Store_Data",
+        "schema": "dbo"
+      },
+      "tables": [
+        {
+          "id": "Order_Details",
+          "name": "Order_Details",
+          "schema": null,
+          "table_name": "Order_Details"
+        },
+        {
+          "id": "Orders",
+          "name": "Orders",
+          "schema": null,
+          "table_name": "Orders"
+        },
+        {
+          "id": "Region",
+          "name": "Region",
+          "schema": null,
+          "table_name": "Region"
+        },
+        {
+          "id": "Returns",
+          "name": "Returns",
+          "schema": null,
+          "table_name": "Returns"
+        }
+      ],
+      "table_relationships": [
+        {
+          "from_table": "Orders",
+          "to_table": "Region",
+          "join_type": "LEFT",
+          "on_columns": [
+            {
+              "from": "Order_ID",
+              "to": "ID"
+            }
+          ]
+        },
+        {
+          "from_table": "Orders",
+          "to_table": "Returns",
+          "join_type": "LEFT",
+          "on_columns": [
+            {
+              "from": "Order_ID",
+              "to": "Order_ID"
+            }
+          ]
+        },
+        {
+          "from_table": "Orders",
+          "to_table": "Order_Details",
+          "join_type": "LEFT",
+          "on_columns": [
+            {
+              "from": "Order_ID",
+              "to": "Order_ID"
+            }
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "id": "Order_Details.Order_ID",
+          "name": "Order_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Order_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Order_Date",
+          "name": "Order_Date",
+          "field_type": "dimension",
+          "data_type": "datetime",
+          "source_table": "Order_Details",
+          "source_column": "Order_Date",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Ship_Date",
+          "name": "Ship_Date",
+          "field_type": "dimension",
+          "data_type": "datetime",
+          "source_table": "Order_Details",
+          "source_column": "Ship_Date",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Ship_Mode",
+          "name": "Ship_Mode",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Ship_Mode",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Customer_ID",
+          "name": "Customer_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Customer_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Customer_Name",
+          "name": "Customer_Name",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Customer_Name",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Segment",
+          "name": "Segment",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Segment",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Country",
+          "name": "Country",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Country",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.City",
+          "name": "City",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "City",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.State",
+          "name": "State",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "State",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Postal_Code",
+          "name": "Postal_Code",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Postal_Code",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Region",
+          "name": "Region",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Region",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Region_ID",
+          "name": "Region_ID",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": "Region_ID",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Product_ID",
+          "name": "Product_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Product_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Category",
+          "name": "Category",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Category",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Sub_Category",
+          "name": "Sub_Category",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Sub_Category",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Product_Name",
+          "name": "Product_Name",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Order_Details",
+          "source_column": "Product_Name",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Sales",
+          "name": "Sales",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": "Sales",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Quantity",
+          "name": "Quantity",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": "Quantity",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Discount",
+          "name": "Discount",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": "Discount",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Profit",
+          "name": "Profit",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": "Profit",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Order_Details.Total Sales",
+          "name": "Total Sales",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nSUM ( Order_Details[Sales] )\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Total Profit",
+          "name": "Total Profit",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nSUM ( Order_Details[Profit] )\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Total Quantity",
+          "name": "Total Quantity",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nSUM ( Order_Details[Quantity] )\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Profit Margin %",
+          "name": "Profit Margin %",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nDIVIDE ( [Total Profit], [Total Sales], 0 )\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Product Rank",
+          "name": "Product Rank",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nRANKX (\n    ALL ( Order_Details[Product_Name] ),\n    [Total Sales],\n    ,\n    DESC\n)\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Customer Count",
+          "name": "Customer Count",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "COUNT",
+          "formula": "Count(Orders[Customer_ID])",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Orders.Order_ID",
+          "name": "Order_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Order_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Order_Date",
+          "name": "Order_Date",
+          "field_type": "dimension",
+          "data_type": "datetime",
+          "source_table": "Orders",
+          "source_column": "Order_Date",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Ship_Date",
+          "name": "Ship_Date",
+          "field_type": "dimension",
+          "data_type": "datetime",
+          "source_table": "Orders",
+          "source_column": "Ship_Date",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Ship_Mode",
+          "name": "Ship_Mode",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Ship_Mode",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Customer_ID",
+          "name": "Customer_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Customer_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Customer_Name",
+          "name": "Customer_Name",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Customer_Name",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Segment",
+          "name": "Segment",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Segment",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Country",
+          "name": "Country",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Country",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.City",
+          "name": "City",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "City",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.State",
+          "name": "State",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "State",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Postal_Code",
+          "name": "Postal_Code",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Postal_Code",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Region",
+          "name": "Region",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Region",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Product_ID",
+          "name": "Product_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Product_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Category",
+          "name": "Category",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Category",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Sub_Category",
+          "name": "Sub_Category",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Sub_Category",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Product_Name",
+          "name": "Product_Name",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Orders",
+          "source_column": "Product_Name",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Sales",
+          "name": "Sales",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": "Sales",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Quantity",
+          "name": "Quantity",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": "Quantity",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Discount",
+          "name": "Discount",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": "Discount",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Profit",
+          "name": "Profit",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": "Profit",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Orders.Total Orders",
+          "name": "Total Orders",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": null,
+          "aggregation": "COUNT",
+          "formula": "\nDISTINCTCOUNT ( Orders[Order_ID] )\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Orders.Sales by Year",
+          "name": "Sales by Year",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nCALCULATE (\n    [Total Sales],\n    YEAR ( Orders[Order_Date] )\n)\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Orders.Sales YTD",
+          "name": "Sales YTD",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nTOTALYTD (\n    [Total Sales],\n    Orders[Order_Date]\n)\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Orders.Sales PY",
+          "name": "Sales PY",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nCALCULATE (\n    [Total Sales],\n    SAMEPERIODLASTYEAR ( Orders[Order_Date] )\n)\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Orders.YoY Growth %",
+          "name": "YoY Growth %",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Orders",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nDIVIDE ( [Total Sales] - [Sales PY], [Sales PY], 0 )\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Region.ID",
+          "name": "ID",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Region",
+          "source_column": "ID",
+          "aggregation": "SUM",
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Region.Region",
+          "name": "Region",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Region",
+          "source_column": "Region",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Returns.Returned",
+          "name": "Returned",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Returns",
+          "source_column": "Returned",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Returns.Order_ID",
+          "name": "Order_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Returns",
+          "source_column": "Order_ID",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Returns.Returned Orders",
+          "name": "Returned Orders",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Returns",
+          "source_column": null,
+          "aggregation": "COUNT",
+          "formula": "\nCALCULATE (\n    DISTINCTCOUNT ( Returns[Order_ID] ),\n    Returns[Returned] = \"Yes\"\n)\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Returns.Return Rate %",
+          "name": "Return Rate %",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Returns",
+          "source_column": null,
+          "aggregation": "SUM",
+          "formula": "\nDIVIDE ( [Returned Orders], [Total Orders], 0 )\n",
+          "depends_on": null,
+          "is_calculated": true
+        }
+      ],
+      "parameters": [],
+      "extended_properties": null
+    }
+  ],
+  "cross_datasource_relationships": []
+}

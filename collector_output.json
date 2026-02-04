@@ -1,0 +1,1540 @@
+{
+  "workspace_id": "5945fc8b-1fb7-48a5-873a-0a35ea442166",
+  "workspace_name": "Powerbi-POC",
+  "report_name": "Suprer_Store_Dashboard",
+  "workspaces": [
+    {
+      "id": "5945fc8b-1fb7-48a5-873a-0a35ea442166",
+      "name": "Powerbi-POC",
+      "datasets": [
+        {
+          "id": "b0eec94b-94c4-4cbb-966b-2989f24c5609",
+          "name": "Suprer_Store_Dashboard",
+          "tables": [
+            {
+              "name": "Order_Details",
+              "isHidden": false,
+              "storageMode": "Import",
+              "columns": [
+                {
+                  "name": "Order_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Order_Date",
+                  "dataType": "DateTime",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Ship_Date",
+                  "dataType": "DateTime",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Ship_Mode",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Customer_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Customer_Name",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Segment",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Country",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "City",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "State",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Postal_Code",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Region",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Region_ID",
+                  "dataType": "Int64",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Product_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Category",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Sub_Category",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Product_Name",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Sales",
+                  "dataType": "Double",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Quantity",
+                  "dataType": "Int64",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Discount",
+                  "dataType": "Double",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Profit",
+                  "dataType": "Double",
+                  "isHidden": false,
+                  "columnType": "Data"
+                }
+              ],
+              "measures": [
+                {
+                  "name": "Total Sales",
+                  "expression": "\nSUM ( Order_Details[Sales] )\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Total Profit",
+                  "expression": "\nSUM ( Order_Details[Profit] )\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Total Quantity",
+                  "expression": "\nSUM ( Order_Details[Quantity] )\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Profit Margin %",
+                  "expression": "\nDIVIDE ( [Total Profit], [Total Sales], 0 )\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Product Rank",
+                  "expression": "\nRANKX (\n    ALL ( Order_Details[Product_Name] ),\n    [Total Sales],\n    ,\n    DESC\n)\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Customer Count",
+                  "expression": "Count(Orders[Customer_ID])",
+                  "isHidden": false
+                }
+              ],
+              "source": [
+                {
+                  "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Order_Details = Super_Store_Data{[Schema=\"dbo\",Item=\"Order_Details\"]}[Data]\nin\n    dbo_Order_Details"
+                }
+              ]
+            },
+            {
+              "name": "Orders",
+              "isHidden": false,
+              "storageMode": "Import",
+              "columns": [
+                {
+                  "name": "Order_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Order_Date",
+                  "dataType": "DateTime",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Ship_Date",
+                  "dataType": "DateTime",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Ship_Mode",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Customer_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Customer_Name",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Segment",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Country",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "City",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "State",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Postal_Code",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Region",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Product_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Category",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Sub_Category",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Product_Name",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Sales",
+                  "dataType": "Double",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Quantity",
+                  "dataType": "Int64",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Discount",
+                  "dataType": "Double",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Profit",
+                  "dataType": "Double",
+                  "isHidden": false,
+                  "columnType": "Data"
+                }
+              ],
+              "measures": [
+                {
+                  "name": "Total Orders",
+                  "expression": "\nDISTINCTCOUNT ( Orders[Order_ID] )\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Sales by Year",
+                  "expression": "\nCALCULATE (\n    [Total Sales],\n    YEAR ( Orders[Order_Date] )\n)\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Sales YTD",
+                  "expression": "\nTOTALYTD (\n    [Total Sales],\n    Orders[Order_Date]\n)\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Sales PY",
+                  "expression": "\nCALCULATE (\n    [Total Sales],\n    SAMEPERIODLASTYEAR ( Orders[Order_Date] )\n)\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "YoY Growth %",
+                  "expression": "\nDIVIDE ( [Total Sales] - [Sales PY], [Sales PY], 0 )\n",
+                  "isHidden": false
+                }
+              ],
+              "source": [
+                {
+                  "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Orders = Super_Store_Data{[Schema=\"dbo\",Item=\"Orders\"]}[Data]\nin\n    dbo_Orders"
+                }
+              ]
+            },
+            {
+              "name": "Region",
+              "isHidden": false,
+              "storageMode": "Import",
+              "columns": [
+                {
+                  "name": "ID",
+                  "dataType": "Int64",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Region",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                }
+              ],
+              "measures": [],
+              "source": [
+                {
+                  "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Region = Super_Store_Data{[Schema=\"dbo\",Item=\"Region\"]}[Data]\nin\n    dbo_Region"
+                }
+              ]
+            },
+            {
+              "name": "Returns",
+              "isHidden": false,
+              "storageMode": "Import",
+              "columns": [
+                {
+                  "name": "Returned",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Order_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                }
+              ],
+              "measures": [
+                {
+                  "name": "Returned Orders",
+                  "expression": "\nCALCULATE (\n    DISTINCTCOUNT ( Returns[Order_ID] ),\n    Returns[Returned] = \"Yes\"\n)\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Return Rate %",
+                  "expression": "\nDIVIDE ( [Returned Orders], [Total Orders], 0 )\n",
+                  "isHidden": false
+                }
+              ],
+              "source": [
+                {
+                  "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Returns = Super_Store_Data{[Schema=\"dbo\",Item=\"Returns\"]}[Data]\nin\n    dbo_Returns"
+                }
+              ]
+            }
+          ],
+          "configuredBy": "ashok@squareshift.co",
+          "configuredById": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
+          "isEffectiveIdentityRequired": false,
+          "isEffectiveIdentityRolesRequired": false,
+          "targetStorageMode": "PremiumFiles",
+          "createdDate": "2026-02-02T10:08:42.957",
+          "contentProviderType": "PbixInImportMode",
+          "datasourceUsages": [
+            {
+              "datasourceInstanceId": "592703da-fb09-4465-bc06-19fae08976b2"
+            }
+          ],
+          "users": [
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "narendran@squareshift.co",
+              "displayName": "Narendran",
+              "identifier": "narendran@squareshift.co",
+              "graphId": "40e69988-9f33-4d25-8e38-64ffbeaceae3",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "boopathi.jothi@squareshift.co",
+              "displayName": "Boopathi Jothi",
+              "identifier": "boopathi.jothi@squareshift.co",
+              "graphId": "001c58c8-9417-496b-bd68-08d63f4c512f",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "ashok@squareshift.co",
+              "displayName": "Ashok Harikrishnan",
+              "identifier": "ashok@squareshift.co",
+              "graphId": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "sai@squareshift.co",
+              "displayName": "KRISHNA SAI DOPPALAPUDI",
+              "identifier": "sai@squareshift.co",
+              "graphId": "9fb3f4a9-1fd6-4eed-bae9-ed3169c70ba3",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "elango@squareshift.co",
+              "displayName": "",
+              "identifier": "elango@squareshift.co",
+              "graphId": "369d7c7f-339d-4e89-b052-3e16ecabc4e4",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "mohana@squareshift.co",
+              "displayName": "Mohana Devi",
+              "identifier": "mohana@squareshift.co",
+              "graphId": "1ced2254-c131-4a5e-ace7-18c561afe02c",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "venkata@squareshift.co",
+              "displayName": "Venkata Mohan",
+              "identifier": "venkata@squareshift.co",
+              "graphId": "4c0fff44-04cd-4009-967c-e1283827e347",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": null,
+              "displayName": "powerbi-migrations",
+              "identifier": "2e82e576-53c4-4e4e-bfa2-2148160bdfc8",
+              "graphId": "2e82e576-53c4-4e4e-bfa2-2148160bdfc8",
+              "principalType": "Group",
+              "userType": null
+            },
+            {
+              "datasetUserAccessRight": "ReadWriteReshareExplore",
+              "emailAddress": "prem@squareshift.co",
+              "displayName": "Premkumar Devadoss",
+              "identifier": "prem@squareshift.co",
+              "graphId": "e05072cc-b69d-4f54-b0f2-8a955842d6d0",
+              "principalType": "User",
+              "userType": "Member"
+            }
+          ],
+          "tags": [],
+          "relationships": [
+            {
+              "fromTable": "Order_Details",
+              "fromColumn": "Order_Date",
+              "toTable": null,
+              "toColumn": null,
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
+            },
+            {
+              "fromTable": "Order_Details",
+              "fromColumn": "Ship_Date",
+              "toTable": null,
+              "toColumn": null,
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
+            },
+            {
+              "fromTable": "Orders",
+              "fromColumn": "Order_Date",
+              "toTable": null,
+              "toColumn": null,
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
+            },
+            {
+              "fromTable": "Orders",
+              "fromColumn": "Ship_Date",
+              "toTable": null,
+              "toColumn": null,
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
+            },
+            {
+              "fromTable": "Orders",
+              "fromColumn": "Order_ID",
+              "toTable": "Region",
+              "toColumn": "ID",
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
+            },
+            {
+              "fromTable": "Orders",
+              "fromColumn": "Order_ID",
+              "toTable": "Returns",
+              "toColumn": "Order_ID",
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
+            },
+            {
+              "fromTable": "Orders",
+              "fromColumn": "Order_ID",
+              "toTable": "Order_Details",
+              "toColumn": "Order_ID",
+              "cardinality": "M:M",
+              "crossFilteringBehavior": "Both",
+              "isActive": true
+            }
+          ]
+        }
+      ],
+      "reports": [
+        {
+          "reportType": "PowerBIReport",
+          "id": "8d2064da-8cd3-4e21-830d-e90f80efaae1",
+          "name": "Suprer_Store_Dashboard",
+          "datasetId": "b0eec94b-94c4-4cbb-966b-2989f24c5609",
+          "createdDateTime": "2026-02-02T10:08:44.1",
+          "modifiedDateTime": "2026-02-02T13:07:07.187",
+          "modifiedBy": "ashok@squareshift.co",
+          "createdBy": "ashok@squareshift.co",
+          "modifiedById": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
+          "createdById": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
+          "users": [
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "narendran@squareshift.co",
+              "displayName": "Narendran",
+              "identifier": "narendran@squareshift.co",
+              "graphId": "40e69988-9f33-4d25-8e38-64ffbeaceae3",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "boopathi.jothi@squareshift.co",
+              "displayName": "Boopathi Jothi",
+              "identifier": "boopathi.jothi@squareshift.co",
+              "graphId": "001c58c8-9417-496b-bd68-08d63f4c512f",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "ashok@squareshift.co",
+              "displayName": "Ashok Harikrishnan",
+              "identifier": "ashok@squareshift.co",
+              "graphId": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "sai@squareshift.co",
+              "displayName": "KRISHNA SAI DOPPALAPUDI",
+              "identifier": "sai@squareshift.co",
+              "graphId": "9fb3f4a9-1fd6-4eed-bae9-ed3169c70ba3",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "elango@squareshift.co",
+              "displayName": "",
+              "identifier": "elango@squareshift.co",
+              "graphId": "369d7c7f-339d-4e89-b052-3e16ecabc4e4",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "mohana@squareshift.co",
+              "displayName": "Mohana Devi",
+              "identifier": "mohana@squareshift.co",
+              "graphId": "1ced2254-c131-4a5e-ace7-18c561afe02c",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "venkata@squareshift.co",
+              "displayName": "Venkata Mohan",
+              "identifier": "venkata@squareshift.co",
+              "graphId": "4c0fff44-04cd-4009-967c-e1283827e347",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": null,
+              "displayName": "powerbi-migrations",
+              "identifier": "2e82e576-53c4-4e4e-bfa2-2148160bdfc8",
+              "graphId": "2e82e576-53c4-4e4e-bfa2-2148160bdfc8",
+              "principalType": "Group",
+              "userType": null
+            },
+            {
+              "reportUserAccessRight": "Owner",
+              "emailAddress": "prem@squareshift.co",
+              "displayName": "Premkumar Devadoss",
+              "identifier": "prem@squareshift.co",
+              "graphId": "e05072cc-b69d-4f54-b0f2-8a955842d6d0",
+              "principalType": "User",
+              "userType": "Member"
+            }
+          ],
+          "tags": []
+        }
+      ],
+      "dashboards": []
+    }
+  ],
+  "report_layout": {
+    "source_file": "C:\\squareshift\\powerbi\\powerbi_reports\\Suprer_Store_Dashboard.pbix",
+    "report_level_filters": [],
+    "pages": [
+      {
+        "id": 161262065,
+        "name": "Summary",
+        "ordinal": null,
+        "width": 1280.0,
+        "height": 720.0,
+        "page_level_filters": [],
+        "visuals": [
+          {
+            "visual_type": "cardVisual",
+            "name": "b9a8c68e2367137cb1d8",
+            "position": {
+              "x": 28.82,
+              "y": 282.68,
+              "width": 204.46,
+              "height": 107.03
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "shape",
+            "name": "91505a6a35c18d3c5e07",
+            "position": {
+              "x": 28.82,
+              "y": 0.0,
+              "width": 1226.76,
+              "height": 72.73
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "a223d24de4d8c039f0d0",
+            "position": {
+              "x": 251.12,
+              "y": 282.68,
+              "width": 204.46,
+              "height": 107.03
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "6f39319ea56182044673",
+            "position": {
+              "x": 487.14,
+              "y": 282.68,
+              "width": 204.46,
+              "height": 107.03
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "83a017e22c2f0d410367",
+            "position": {
+              "x": 728.65,
+              "y": 282.68,
+              "width": 204.46,
+              "height": 107.03
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "lineChart",
+            "name": "da36e9c8cbba2d9e1aa9",
+            "position": {
+              "x": 28.82,
+              "y": 404.8,
+              "width": 909.78,
+              "height": 315.61
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "slicer",
+            "name": "ac0eeb7e85c32ac26a2e",
+            "position": {
+              "x": 1008.58,
+              "y": 100.17,
+              "width": 247.0,
+              "height": 182.5
+            },
+            "filters": [
+              {
+                "name": "2019960029b5ba2edfce",
+                "expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "Region"
+                      }
+                    },
+                    "Property": "Region"
+                  }
+                },
+                "filter": {
+                  "Version": 2,
+                  "From": [
+                    {
+                      "Name": "r",
+                      "Entity": "Region",
+                      "Type": 0
+                    }
+                  ],
+                  "Where": [
+                    {
+                      "Condition": {
+                        "Not": {
+                          "Expression": {
+                            "In": {
+                              "Expressions": [
+                                {
+                                  "Column": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Source": "r"
+                                      }
+                                    },
+                                    "Property": "Region"
+                                  }
+                                }
+                              ],
+                              "Values": [
+                                [
+                                  {
+                                    "Literal": {
+                                      "Value": "null"
+                                    }
+                                  }
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "type": "Categorical",
+                "howCreated": 0,
+                "objects": {
+                  "general": [
+                    {
+                      "properties": {
+                        "isInvertedSelectionMode": {
+                          "expr": {
+                            "Literal": {
+                              "Value": "true"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "isHiddenInViewMode": false
+              }
+            ],
+            "slicer_config": {
+              "values": [
+                {
+                  "queryRef": "Region.Region",
+                  "active": true
+                }
+              ],
+              "mode": "'Basic'"
+            }
+          },
+          {
+            "visual_type": "clusteredColumnChart",
+            "name": "a87ce1488983b22eb40d",
+            "position": {
+              "x": 948.2,
+              "y": 297.77,
+              "width": 332.08,
+              "height": 422.64
+            },
+            "filters": [
+              {
+                "name": "dcf009d63a808ed5a70f",
+                "expression": {
+                  "Measure": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "Order_Details"
+                      }
+                    },
+                    "Property": "Product Rank"
+                  }
+                },
+                "filter": {
+                  "Version": 2,
+                  "From": [
+                    {
+                      "Name": "o",
+                      "Entity": "Order_Details",
+                      "Type": 0
+                    }
+                  ],
+                  "Where": [
+                    {
+                      "Condition": {
+                        "Comparison": {
+                          "ComparisonKind": 4,
+                          "Left": {
+                            "Measure": {
+                              "Expression": {
+                                "SourceRef": {
+                                  "Source": "o"
+                                }
+                              },
+                              "Property": "Product Rank"
+                            }
+                          },
+                          "Right": {
+                            "Literal": {
+                              "Value": "5L"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "type": "Advanced",
+                "howCreated": 1
+              }
+            ]
+          },
+          {
+            "visual_type": "slicer",
+            "name": "681927f0ef2498ed4b5f",
+            "position": {
+              "x": 28.82,
+              "y": 102.92,
+              "width": 355.4,
+              "height": 113.89
+            },
+            "filters": [],
+            "slicer_config": {
+              "values": [
+                {
+                  "queryRef": "Order_Details.Order_Date",
+                  "active": true
+                }
+              ],
+              "mode": "'Between'"
+            }
+          },
+          {
+            "visual_type": "slicer",
+            "name": "a075490c74709c4e779c",
+            "position": {
+              "x": 710.81,
+              "y": 100.17,
+              "width": 171.53,
+              "height": 161.92
+            },
+            "filters": [],
+            "slicer_config": {
+              "values": [
+                {
+                  "queryRef": "Order_Details.Category",
+                  "active": true
+                }
+              ],
+              "mode": "'Basic'"
+            }
+          },
+          {
+            "visual_type": "slicer",
+            "name": "4afac634e55f50462f39",
+            "position": {
+              "x": 469.3,
+              "y": 102.92,
+              "width": 170.15,
+              "height": 156.43
+            },
+            "filters": [],
+            "slicer_config": {
+              "values": [
+                {
+                  "queryRef": "Order_Details.Segment",
+                  "active": true
+                }
+              ],
+              "mode": "'Basic'"
+            }
+          },
+          {
+            "visual_type": "textbox",
+            "name": "9987d2259ffc554079e1",
+            "position": {
+              "x": 100.17,
+              "y": 12.35,
+              "width": 1063.47,
+              "height": 50.77
+            },
+            "filters": []
+          }
+        ]
+      },
+      {
+        "id": 161262066,
+        "name": "Customer ",
+        "ordinal": 1,
+        "width": 1280.0,
+        "height": 720.0,
+        "page_level_filters": [],
+        "visuals": [
+          {
+            "visual_type": "shape",
+            "name": "74d5bcb3ddd8f3519c8c",
+            "position": {
+              "x": 9.61,
+              "y": 0.0,
+              "width": 1270.67,
+              "height": 76.84
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "ff16c5c32e6520cd2768",
+            "position": {
+              "x": 9.61,
+              "y": 93.31,
+              "width": 146.83,
+              "height": 130.36
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "478e0f54084cbf659816",
+            "position": {
+              "x": 9.61,
+              "y": 260.72,
+              "width": 146.83,
+              "height": 130.36
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "clusteredColumnChart",
+            "name": "1a8a797b637a9e501428",
+            "position": {
+              "x": 9.61,
+              "y": 422.64,
+              "width": 1250.09,
+              "height": 275.82
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "tableEx",
+            "name": "b44e4c58e4db002aae7d",
+            "position": {
+              "x": 934.65,
+              "y": 106.24,
+              "width": 309.31,
+              "height": 254.17
+            },
+            "filters": [
+              {
+                "expression": {
+                  "Measure": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "Orders"
+                      }
+                    },
+                    "Property": "Total Orders"
+                  }
+                },
+                "filter": {
+                  "Version": 2,
+                  "From": [
+                    {
+                      "Name": "o",
+                      "Entity": "Orders",
+                      "Type": 0
+                    }
+                  ],
+                  "Where": [
+                    {
+                      "Condition": {
+                        "Comparison": {
+                          "ComparisonKind": 2,
+                          "Left": {
+                            "Measure": {
+                              "Expression": {
+                                "SourceRef": {
+                                  "Source": "o"
+                                }
+                              },
+                              "Property": "Total Orders"
+                            }
+                          },
+                          "Right": {
+                            "Literal": {
+                              "Value": "13L"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "type": "Advanced",
+                "howCreated": 0,
+                "isHiddenInViewMode": false
+              }
+            ]
+          },
+          {
+            "visual_type": "lineChart",
+            "name": "1960b778674faadc1e32",
+            "position": {
+              "x": 166.76,
+              "y": 92.79,
+              "width": 735.62,
+              "height": 313.34
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "textbox",
+            "name": "3f89fb5dcf34e6f04f9c",
+            "position": {
+              "x": 99.52,
+              "y": 10.76,
+              "width": 1110.83,
+              "height": 53.79
+            },
+            "filters": []
+          }
+        ]
+      },
+      {
+        "id": 161262067,
+        "name": "Sales",
+        "ordinal": 2,
+        "width": 1280.0,
+        "height": 720.0,
+        "page_level_filters": [],
+        "visuals": [
+          {
+            "visual_type": "pieChart",
+            "name": "f0e03009f06a3e3e08ac",
+            "position": {
+              "x": 34.31,
+              "y": 146.83,
+              "width": 581.82,
+              "height": 377.36
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "shape",
+            "name": "fe84611eb5e130c800ef",
+            "position": {
+              "x": 16.47,
+              "y": 6.86,
+              "width": 1250.09,
+              "height": 104.29
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "83707703efc79291ede0",
+            "position": {
+              "x": 658.66,
+              "y": 146.83,
+              "width": 204.46,
+              "height": 107.03
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "lineChart",
+            "name": "e78195b220304517471b",
+            "position": {
+              "x": 34.31,
+              "y": 543.4,
+              "width": 1197.95,
+              "height": 177.02
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "cardVisual",
+            "name": "589142eeca7f8fdcadbe",
+            "position": {
+              "x": 658.66,
+              "y": 282.68,
+              "width": 204.46,
+              "height": 107.03
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "clusteredBarChart",
+            "name": "14730c2befd2af652c6c",
+            "position": {
+              "x": 897.43,
+              "y": 146.83,
+              "width": 344.43,
+              "height": 336.19
+            },
+            "filters": []
+          },
+          {
+            "visual_type": "textbox",
+            "name": "3673a825c9596acaf692",
+            "position": {
+              "x": 45.28,
+              "y": 24.7,
+              "width": 1196.57,
+              "height": 74.1
+            },
+            "filters": []
+          }
+        ]
+      }
+    ],
+    "slicers": [
+      {
+        "page_name": "Summary",
+        "page_id": 161262065,
+        "visual_name": "ac0eeb7e85c32ac26a2e",
+        "position": {
+          "x": 1008.58,
+          "y": 100.17,
+          "width": 247.0,
+          "height": 182.5
+        },
+        "filters": [
+          {
+            "name": "2019960029b5ba2edfce",
+            "expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Region"
+                  }
+                },
+                "Property": "Region"
+              }
+            },
+            "filter": {
+              "Version": 2,
+              "From": [
+                {
+                  "Name": "r",
+                  "Entity": "Region",
+                  "Type": 0
+                }
+              ],
+              "Where": [
+                {
+                  "Condition": {
+                    "Not": {
+                      "Expression": {
+                        "In": {
+                          "Expressions": [
+                            {
+                              "Column": {
+                                "Expression": {
+                                  "SourceRef": {
+                                    "Source": "r"
+                                  }
+                                },
+                                "Property": "Region"
+                              }
+                            }
+                          ],
+                          "Values": [
+                            [
+                              {
+                                "Literal": {
+                                  "Value": "null"
+                                }
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "type": "Categorical",
+            "howCreated": 0,
+            "objects": {
+              "general": [
+                {
+                  "properties": {
+                    "isInvertedSelectionMode": {
+                      "expr": {
+                        "Literal": {
+                          "Value": "true"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "isHiddenInViewMode": false
+          }
+        ],
+        "slicer_config": {
+          "values": [
+            {
+              "queryRef": "Region.Region",
+              "active": true
+            }
+          ],
+          "mode": "'Basic'"
+        }
+      },
+      {
+        "page_name": "Summary",
+        "page_id": 161262065,
+        "visual_name": "681927f0ef2498ed4b5f",
+        "position": {
+          "x": 28.82,
+          "y": 102.92,
+          "width": 355.4,
+          "height": 113.89
+        },
+        "filters": [],
+        "slicer_config": {
+          "values": [
+            {
+              "queryRef": "Order_Details.Order_Date",
+              "active": true
+            }
+          ],
+          "mode": "'Between'"
+        }
+      },
+      {
+        "page_name": "Summary",
+        "page_id": 161262065,
+        "visual_name": "a075490c74709c4e779c",
+        "position": {
+          "x": 710.81,
+          "y": 100.17,
+          "width": 171.53,
+          "height": 161.92
+        },
+        "filters": [],
+        "slicer_config": {
+          "values": [
+            {
+              "queryRef": "Order_Details.Category",
+              "active": true
+            }
+          ],
+          "mode": "'Basic'"
+        }
+      },
+      {
+        "page_name": "Summary",
+        "page_id": 161262065,
+        "visual_name": "4afac634e55f50462f39",
+        "position": {
+          "x": 469.3,
+          "y": 102.92,
+          "width": 170.15,
+          "height": 156.43
+        },
+        "filters": [],
+        "slicer_config": {
+          "values": [
+            {
+              "queryRef": "Order_Details.Segment",
+              "active": true
+            }
+          ],
+          "mode": "'Basic'"
+        }
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "fromTable": "Order_Details",
+      "fromColumn": "Order_Date",
+      "toTable": null,
+      "toColumn": null,
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Order_Details",
+      "fromColumn": "Ship_Date",
+      "toTable": null,
+      "toColumn": null,
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Orders",
+      "fromColumn": "Order_Date",
+      "toTable": null,
+      "toColumn": null,
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Orders",
+      "fromColumn": "Ship_Date",
+      "toTable": null,
+      "toColumn": null,
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Orders",
+      "fromColumn": "Order_ID",
+      "toTable": "Region",
+      "toColumn": "ID",
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Orders",
+      "fromColumn": "Order_ID",
+      "toTable": "Returns",
+      "toColumn": "Order_ID",
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Orders",
+      "fromColumn": "Order_ID",
+      "toTable": "Order_Details",
+      "toColumn": "Order_ID",
+      "cardinality": "M:M",
+      "crossFilteringBehavior": "Both",
+      "isActive": true
+    }
+  ],
+  "dax_measures": [
+    {
+      "TableName": "Order_Details",
+      "Name": "Total Sales",
+      "Expression": "\nSUM ( Order_Details[Sales] )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Total Profit",
+      "Expression": "\nSUM ( Order_Details[Profit] )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Total Quantity",
+      "Expression": "\nSUM ( Order_Details[Quantity] )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Profit Margin %",
+      "Expression": "\nDIVIDE ( [Total Profit], [Total Sales], 0 )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Orders",
+      "Name": "Total Orders",
+      "Expression": "\nDISTINCTCOUNT ( Orders[Order_ID] )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Returns",
+      "Name": "Returned Orders",
+      "Expression": "\nCALCULATE (\n    DISTINCTCOUNT ( Returns[Order_ID] ),\n    Returns[Returned] = \"Yes\"\n)\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Returns",
+      "Name": "Return Rate %",
+      "Expression": "\nDIVIDE ( [Returned Orders], [Total Orders], 0 )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Orders",
+      "Name": "Sales by Year",
+      "Expression": "\nCALCULATE (\n    [Total Sales],\n    YEAR ( Orders[Order_Date] )\n)\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Orders",
+      "Name": "Sales YTD",
+      "Expression": "\nTOTALYTD (\n    [Total Sales],\n    Orders[Order_Date]\n)\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Orders",
+      "Name": "Sales PY",
+      "Expression": "\nCALCULATE (\n    [Total Sales],\n    SAMEPERIODLASTYEAR ( Orders[Order_Date] )\n)\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Orders",
+      "Name": "YoY Growth %",
+      "Expression": "\nDIVIDE ( [Total Sales] - [Sales PY], [Sales PY], 0 )\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Product Rank",
+      "Expression": "\nRANKX (\n    ALL ( Order_Details[Product_Name] ),\n    [Total Sales],\n    ,\n    DESC\n)\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Customer Count",
+      "Expression": "Count(Orders[Customer_ID])",
+      "DisplayFolder": null,
+      "Description": null
+    }
+  ],
+  "power_query": [
+    {
+      "TableName": "Order_Details",
+      "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Order_Details = Super_Store_Data{[Schema=\"dbo\",Item=\"Order_Details\"]}[Data]\nin\n    dbo_Order_Details"
+    },
+    {
+      "TableName": "Orders",
+      "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Orders = Super_Store_Data{[Schema=\"dbo\",Item=\"Orders\"]}[Data]\nin\n    dbo_Orders"
+    },
+    {
+      "TableName": "Region",
+      "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Region = Super_Store_Data{[Schema=\"dbo\",Item=\"Region\"]}[Data]\nin\n    dbo_Region"
+    },
+    {
+      "TableName": "Returns",
+      "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Returns = Super_Store_Data{[Schema=\"dbo\",Item=\"Returns\"]}[Data]\nin\n    dbo_Returns"
+    }
+  ],
+  "rls": []
+}

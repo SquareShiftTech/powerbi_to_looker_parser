@@ -1,0 +1,42 @@
+# Build and optionally publish powerbi-to-looker to GCP Artifact Registry.
+# Run from powerbi_to_looker/ (e.g. gcloud builds submit --config=cloudbuild.yaml .)
+substitutions:
+  _REGION: us-central1
+  _REPO_NAME: "powerbi-to-looker"
+
+steps:
+  - name: python:3.11-slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -e
+        apt-get update && apt-get install -y curl
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        export PATH="$HOME/.local/bin:/root/.cargo/bin:$PATH"
+        uv --version
+        uv sync
+        uv build
+        ls -la dist/
+
+  # Uncomment and set PROJECT_ID to publish to Artifact Registry:
+  # - name: python:3.11-slim
+  #   entrypoint: bash
+  #   args:
+  #     - -c
+  #     - |
+  #       set -e
+  #       apt-get update && apt-get install -y curl
+  #       curl -LsSf https://astral.sh/uv/install.sh | sh
+  #       curl -sSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz -o gcloud.tar.gz
+  #       tar -xf gcloud.tar.gz && ./google-cloud-sdk/install.sh --quiet --path-update=false
+  #       export PATH="$PWD/google-cloud-sdk/bin:$HOME/.local/bin:$PATH"
+  #       uv tool install twine
+  #       export TWINE_USERNAME=oauth2accesstoken
+  #       export TWINE_PASSWORD=$(gcloud auth print-access-token)
+  #       export TWINE_REPOSITORY_URL=https://${_REGION}-python.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/
+  #       ~/.local/bin/twine upload dist/*
+
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY

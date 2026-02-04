@@ -1,0 +1,17 @@
+connection: "t2l"
+
+include: "/views/*.view.lkml"
+
+explore: order_details {
+  label: "P2L"
+  join: returns {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${order_details.order_id} = ${returns.order_id} ;;
+  }
+  join: region {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${order_details.region_id} = ${region.id} ;;
+  }
+}
