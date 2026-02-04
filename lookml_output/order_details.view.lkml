@@ -9,13 +9,13 @@ view: order_details {
   dimension_group: order_date {
     type: time
     timeframes: [raw, date, week, month, quarter, year, month_name, month_num]
-    sql: DATE(${TABLE}.Order_Date) ;;
+    sql: TIMESTAMP(DATE(${TABLE}.Order_Date)) ;;
     label: "Order_Date"
   }
   dimension_group: ship_date {
     type: time
     timeframes: [raw, date, week, month, quarter, year, month_name, month_num]
-    sql: DATE(${TABLE}.Ship_Date) ;;
+    sql: TIMESTAMP(DATE(${TABLE}.Ship_Date)) ;;
     label: "Ship_Date"
   }
   dimension: ship_mode {

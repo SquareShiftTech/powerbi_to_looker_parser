@@ -1,4 +1,5 @@
-include: "/views/*.view.lkml"
+include: "*.view.lkml"
+include: "*.dashboard.lookml"
 
 connection: "{{ model.connection | default('t2l') }}"
 

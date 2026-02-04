@@ -22,6 +22,7 @@ src/powerbi_to_looker/config/loader.py
 src/powerbi_to_looker/config/powerbi_canonical_mapping.yaml
 src/powerbi_to_looker/generator/__init__.py
 src/powerbi_to_looker/generator/lkml_generator.py
+src/powerbi_to_looker/generator/dashboard_template/super_store_dashboard.dashboard.lookml
 src/powerbi_to_looker/models/__init__.py
 src/powerbi_to_looker/models/canonical.py
 src/powerbi_to_looker/models/dashboard.py

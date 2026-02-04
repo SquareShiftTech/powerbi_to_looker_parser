@@ -2,5 +2,6 @@ include README.md
 recursive-include src/powerbi_to_looker *.py
 recursive-include src/powerbi_to_looker *.j2
 recursive-include src/powerbi_to_looker/config *.yaml
+recursive-include src/powerbi_to_looker/generator/dashboard_template *.lookml
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
