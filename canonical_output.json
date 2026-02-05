@@ -1,7 +1,7 @@
 {
   "metadata_version": "1.0",
   "source_system": "powerbi",
-  "extracted_at": "2026-02-04T11:03:10.250669Z",
+  "extracted_at": "2026-02-05T14:37:03.794121Z",
   "datasources": [
     {
       "id": "b0eec94b-94c4-4cbb-966b-2989f24c5609",
@@ -26,6 +26,12 @@
           "name": "Region",
           "schema": null,
           "table_name": "Region"
+        },
+        {
+          "id": "Returns",
+          "name": "Returns",
+          "schema": null,
+          "table_name": "Returns"
         }
       ],
       "table_relationships": [
@@ -37,6 +43,17 @@
             {
               "from": "Region",
               "to": "Region"
+            }
+          ]
+        },
+        {
+          "from_table": "Order_Details",
+          "to_table": "Returns",
+          "join_type": "LEFT",
+          "on_columns": [
+            {
+              "from": "Order_ID",
+              "to": "Order_ID"
             }
           ]
         }
@@ -379,6 +396,42 @@
           "is_calculated": true
         },
         {
+          "id": "Order_Details.High Discount Flag",
+          "name": "High Discount Flag",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "COUNT",
+          "formula": "\nIF (\n    AVERAGE ( Order_Details[Discount] ) > 0.3,\n    \"High Discount\",\n    \"Normal\"\n)\n",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Total returns",
+          "name": "Total returns",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "COUNT",
+          "formula": "COUNT ( Returns[Order_ID] )",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
+          "id": "Order_Details.Avg Discount",
+          "name": "Avg Discount",
+          "field_type": "measure",
+          "data_type": "number",
+          "source_table": "Order_Details",
+          "source_column": null,
+          "aggregation": "COUNT",
+          "formula": "AVERAGE(Order_Details[Discount])",
+          "depends_on": null,
+          "is_calculated": true
+        },
+        {
           "id": "Region.ID",
           "name": "ID",
           "field_type": "measure",
@@ -397,6 +450,30 @@
           "data_type": "string",
           "source_table": "Region",
           "source_column": "Region",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Returns.Returned",
+          "name": "Returned",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Returns",
+          "source_column": "Returned",
+          "aggregation": null,
+          "formula": null,
+          "depends_on": null,
+          "is_calculated": null
+        },
+        {
+          "id": "Returns.Order_ID",
+          "name": "Order_ID",
+          "field_type": "dimension",
+          "data_type": "string",
+          "source_table": "Returns",
+          "source_column": "Order_ID",
           "aggregation": null,
           "formula": null,
           "depends_on": null,

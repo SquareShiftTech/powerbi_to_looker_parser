@@ -45,10 +45,10 @@ def generate(lookml_terms: dict[str, Any], output_dir: str) -> list[str]:
     path.write_text(content, encoding="utf-8")
     files_written.append(str(path))
 
-    # Emit bundled dashboard template (matches our model/field names)
-    _dashboard_template = Path(__file__).resolve().parent / "dashboard_template" / "super_store_dashboard.dashboard.lookml"
+    # Emit bundled dashboard template v2 only (matches our model/field names)
+    _dashboard_template = Path(__file__).resolve().parent / "dashboard_template" / "super_store_dashboard_v2.dashboard.lookml"
     if _dashboard_template.exists():
-        dashboard_out = out / "super_store_dashboard.dashboard.lookml"
+        dashboard_out = out / "super_store_dashboard_v2.dashboard.lookml"
         dashboard_out.write_text(_dashboard_template.read_text(encoding="utf-8"), encoding="utf-8")
         files_written.append(str(dashboard_out))
 

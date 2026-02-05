@@ -186,4 +186,22 @@ view: order_details {
     label: "Total_Orders"
     value_format: "#,##0.00"
   }
+  measure: high_discount_flag {
+    type: avg
+    sql: ${discount} ;;
+    label: "High Discount Flag"
+    value_format: "#,##0.00"
+  }
+  measure: total_returns {
+    type: count
+    sql: ${order_id} ;;
+    label: "Total returns"
+    value_format: "#,##0.00"
+  }
+  measure: avg_discount {
+    type: avg
+    sql: ${discount} ;;
+    label: "Avg Discount"
+    value_format: "#,##0.00"
+  }
 }

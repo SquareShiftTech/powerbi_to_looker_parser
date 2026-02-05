@@ -178,6 +178,21 @@
                   "name": "Total_Orders",
                   "expression": "\nDISTINCTCOUNT ( Order_Details[Order_ID])",
                   "isHidden": false
+                },
+                {
+                  "name": "High Discount Flag",
+                  "expression": "\nIF (\n    AVERAGE ( Order_Details[Discount] ) > 0.3,\n    \"High Discount\",\n    \"Normal\"\n)\n",
+                  "isHidden": false
+                },
+                {
+                  "name": "Total returns",
+                  "expression": "COUNT ( Returns[Order_ID] )",
+                  "isHidden": false
+                },
+                {
+                  "name": "Avg Discount",
+                  "expression": "AVERAGE(Order_Details[Discount])",
+                  "isHidden": false
                 }
               ],
               "source": [
@@ -208,6 +223,31 @@
               "source": [
                 {
                   "expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Region = Super_Store_Data{[Schema=\"dbo\",Item=\"Region\"]}[Data]\nin\n    dbo_Region"
+                }
+              ]
+            },
+            {
+              "name": "Returns",
+              "isHidden": false,
+              "storageMode": "Import",
+              "columns": [
+                {
+                  "name": "Returned",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                },
+                {
+                  "name": "Order_ID",
+                  "dataType": "String",
+                  "isHidden": false,
+                  "columnType": "Data"
+                }
+              ],
+              "measures": [],
+              "source": [
+                {
+                  "expression": "let\n    Source = Sql.Database(\"sql-server-powerbi.database.windows.net\", \"super_store_Data\"),\n    dbo_Returns = Source{[Schema=\"dbo\",Item=\"Returns\"]}[Data]\nin\n    dbo_Returns"
                 }
               ]
             }
@@ -305,6 +345,42 @@
               "graphId": "e05072cc-b69d-4f54-b0f2-8a955842d6d0",
               "principalType": "User",
               "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadReshare",
+              "emailAddress": "boopathi.jothi@squareshift.co",
+              "displayName": "Boopathi Jothi",
+              "identifier": "boopathi.jothi@squareshift.co",
+              "graphId": "001c58c8-9417-496b-bd68-08d63f4c512f",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadReshare",
+              "emailAddress": "elango@squareshift.co",
+              "displayName": "",
+              "identifier": "elango@squareshift.co",
+              "graphId": "369d7c7f-339d-4e89-b052-3e16ecabc4e4",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadReshare",
+              "emailAddress": "prem@squareshift.co",
+              "displayName": "Premkumar Devadoss",
+              "identifier": "prem@squareshift.co",
+              "graphId": "e05072cc-b69d-4f54-b0f2-8a955842d6d0",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "datasetUserAccessRight": "ReadReshare",
+              "emailAddress": null,
+              "displayName": "Whole Organization",
+              "identifier": "a812643e-dcca-45b3-bde2-ef646799d843",
+              "graphId": "a812643e-dcca-45b3-bde2-ef646799d843",
+              "principalType": "None",
+              "userType": null
             }
           ],
           "tags": [],
@@ -335,6 +411,15 @@
               "cardinality": "M:1",
               "crossFilteringBehavior": "Single",
               "isActive": true
+            },
+            {
+              "fromTable": "Order_Details",
+              "fromColumn": "Order_ID",
+              "toTable": "Returns",
+              "toColumn": "Order_ID",
+              "cardinality": "M:1",
+              "crossFilteringBehavior": "Single",
+              "isActive": true
             }
           ]
         }
@@ -342,11 +427,12 @@
       "reports": [
         {
           "reportType": "PowerBIReport",
+          "format": "PBIR",
           "id": "8d2064da-8cd3-4e21-830d-e90f80efaae1",
           "name": "Suprer_Store_Dashboard",
           "datasetId": "b0eec94b-94c4-4cbb-966b-2989f24c5609",
           "createdDateTime": "2026-02-02T10:08:44.1",
-          "modifiedDateTime": "2026-02-04T09:04:53.623",
+          "modifiedDateTime": "2026-02-05T11:05:00.847",
           "modifiedBy": "ashok@squareshift.co",
           "createdBy": "ashok@squareshift.co",
           "modifiedById": "16d8674a-9153-4c4f-8297-f1d3f34e0111",
@@ -432,6 +518,42 @@
               "graphId": "e05072cc-b69d-4f54-b0f2-8a955842d6d0",
               "principalType": "User",
               "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "ReadReshare",
+              "emailAddress": "boopathi.jothi@squareshift.co",
+              "displayName": "Boopathi Jothi",
+              "identifier": "boopathi.jothi@squareshift.co",
+              "graphId": "001c58c8-9417-496b-bd68-08d63f4c512f",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "ReadReshare",
+              "emailAddress": "elango@squareshift.co",
+              "displayName": "",
+              "identifier": "elango@squareshift.co",
+              "graphId": "369d7c7f-339d-4e89-b052-3e16ecabc4e4",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "ReadReshare",
+              "emailAddress": "prem@squareshift.co",
+              "displayName": "Premkumar Devadoss",
+              "identifier": "prem@squareshift.co",
+              "graphId": "e05072cc-b69d-4f54-b0f2-8a955842d6d0",
+              "principalType": "User",
+              "userType": "Member"
+            },
+            {
+              "reportUserAccessRight": "ReadReshare",
+              "emailAddress": null,
+              "displayName": "Whole Organization",
+              "identifier": "a812643e-dcca-45b3-bde2-ef646799d843",
+              "graphId": "a812643e-dcca-45b3-bde2-ef646799d843",
+              "principalType": "None",
+              "userType": null
             }
           ],
           "tags": []
@@ -443,696 +565,8 @@
   "report_layout": {
     "source_file": "C:\\squareshift\\powerbi\\powerbi_to_looker_parser\\powerbi_reports\\Suprer_Store_Dashboard.pbix",
     "report_level_filters": [],
-    "pages": [
-      {
-        "id": 161557549,
-        "name": "Summary",
-        "ordinal": null,
-        "width": 1280.0,
-        "height": 720.0,
-        "page_level_filters": [],
-        "visuals": [
-          {
-            "visual_type": "cardVisual",
-            "name": "b9a8c68e2367137cb1d8",
-            "position": {
-              "x": 28.82,
-              "y": 282.68,
-              "width": 204.46,
-              "height": 107.03
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "shape",
-            "name": "91505a6a35c18d3c5e07",
-            "position": {
-              "x": 28.82,
-              "y": 0.0,
-              "width": 1226.76,
-              "height": 72.73
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "a223d24de4d8c039f0d0",
-            "position": {
-              "x": 251.12,
-              "y": 282.68,
-              "width": 204.46,
-              "height": 107.03
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "6f39319ea56182044673",
-            "position": {
-              "x": 487.14,
-              "y": 282.68,
-              "width": 204.46,
-              "height": 107.03
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "83a017e22c2f0d410367",
-            "position": {
-              "x": 728.65,
-              "y": 282.68,
-              "width": 204.46,
-              "height": 107.03
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "lineChart",
-            "name": "da36e9c8cbba2d9e1aa9",
-            "position": {
-              "x": 28.82,
-              "y": 404.8,
-              "width": 909.78,
-              "height": 315.61
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "slicer",
-            "name": "ac0eeb7e85c32ac26a2e",
-            "position": {
-              "x": 990.74,
-              "y": 90.57,
-              "width": 247.0,
-              "height": 182.5
-            },
-            "filters": [
-              {
-                "name": "2019960029b5ba2edfce",
-                "expression": {
-                  "Column": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "Region"
-                      }
-                    },
-                    "Property": "Region"
-                  }
-                },
-                "filter": {
-                  "Version": 2,
-                  "From": [
-                    {
-                      "Name": "r",
-                      "Entity": "Region",
-                      "Type": 0
-                    }
-                  ],
-                  "Where": [
-                    {
-                      "Condition": {
-                        "Not": {
-                          "Expression": {
-                            "In": {
-                              "Expressions": [
-                                {
-                                  "Column": {
-                                    "Expression": {
-                                      "SourceRef": {
-                                        "Source": "r"
-                                      }
-                                    },
-                                    "Property": "Region"
-                                  }
-                                }
-                              ],
-                              "Values": [
-                                [
-                                  {
-                                    "Literal": {
-                                      "Value": "null"
-                                    }
-                                  }
-                                ]
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "type": "Categorical",
-                "howCreated": 0,
-                "objects": {
-                  "general": [
-                    {
-                      "properties": {
-                        "isInvertedSelectionMode": {
-                          "expr": {
-                            "Literal": {
-                              "Value": "true"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "isHiddenInViewMode": false
-              }
-            ],
-            "slicer_config": {
-              "values": [
-                {
-                  "queryRef": "Region.Region",
-                  "active": true
-                }
-              ],
-              "mode": "'Basic'"
-            }
-          },
-          {
-            "visual_type": "clusteredColumnChart",
-            "name": "a87ce1488983b22eb40d",
-            "position": {
-              "x": 948.2,
-              "y": 297.77,
-              "width": 332.08,
-              "height": 422.64
-            },
-            "filters": [
-              {
-                "name": "dcf009d63a808ed5a70f",
-                "expression": {
-                  "Measure": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "Order_Details"
-                      }
-                    },
-                    "Property": "Product Rank"
-                  }
-                },
-                "filter": {
-                  "Version": 2,
-                  "From": [
-                    {
-                      "Name": "o",
-                      "Entity": "Order_Details",
-                      "Type": 0
-                    }
-                  ],
-                  "Where": [
-                    {
-                      "Condition": {
-                        "Comparison": {
-                          "ComparisonKind": 4,
-                          "Left": {
-                            "Measure": {
-                              "Expression": {
-                                "SourceRef": {
-                                  "Source": "o"
-                                }
-                              },
-                              "Property": "Product Rank"
-                            }
-                          },
-                          "Right": {
-                            "Literal": {
-                              "Value": "5L"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "type": "Advanced",
-                "howCreated": 1
-              }
-            ]
-          },
-          {
-            "visual_type": "slicer",
-            "name": "681927f0ef2498ed4b5f",
-            "position": {
-              "x": 28.82,
-              "y": 102.92,
-              "width": 355.4,
-              "height": 113.89
-            },
-            "filters": [],
-            "slicer_config": {
-              "values": [
-                {
-                  "queryRef": "Order_Details.Order_Date",
-                  "active": true
-                }
-              ],
-              "mode": "'Between'"
-            }
-          },
-          {
-            "visual_type": "slicer",
-            "name": "a075490c74709c4e779c",
-            "position": {
-              "x": 710.81,
-              "y": 100.17,
-              "width": 171.53,
-              "height": 161.92
-            },
-            "filters": [],
-            "slicer_config": {
-              "values": [
-                {
-                  "queryRef": "Order_Details.Category",
-                  "active": true
-                }
-              ],
-              "mode": "'Basic'"
-            }
-          },
-          {
-            "visual_type": "slicer",
-            "name": "4afac634e55f50462f39",
-            "position": {
-              "x": 469.3,
-              "y": 102.92,
-              "width": 170.15,
-              "height": 156.43
-            },
-            "filters": [],
-            "slicer_config": {
-              "values": [
-                {
-                  "queryRef": "Order_Details.Segment",
-                  "active": true
-                }
-              ],
-              "mode": "'Basic'"
-            }
-          },
-          {
-            "visual_type": "textbox",
-            "name": "9987d2259ffc554079e1",
-            "position": {
-              "x": 100.17,
-              "y": 12.35,
-              "width": 1063.47,
-              "height": 50.77
-            },
-            "filters": []
-          }
-        ]
-      },
-      {
-        "id": 161557550,
-        "name": "Customer ",
-        "ordinal": 1,
-        "width": 1280.0,
-        "height": 720.0,
-        "page_level_filters": [],
-        "visuals": [
-          {
-            "visual_type": "shape",
-            "name": "74d5bcb3ddd8f3519c8c",
-            "position": {
-              "x": 9.61,
-              "y": 0.0,
-              "width": 1270.67,
-              "height": 76.84
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "ff16c5c32e6520cd2768",
-            "position": {
-              "x": 9.61,
-              "y": 93.31,
-              "width": 146.83,
-              "height": 130.36
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "clusteredColumnChart",
-            "name": "1a8a797b637a9e501428",
-            "position": {
-              "x": 9.41,
-              "y": 443.79,
-              "width": 1250.69,
-              "height": 254.17
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "tableEx",
-            "name": "b44e4c58e4db002aae7d",
-            "position": {
-              "x": 934.65,
-              "y": 106.24,
-              "width": 325.45,
-              "height": 326.79
-            },
-            "filters": [
-              {
-                "expression": {
-                  "Measure": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "Order_Details"
-                      }
-                    },
-                    "Property": "Total_Orders"
-                  }
-                },
-                "filter": {
-                  "Version": 2,
-                  "From": [
-                    {
-                      "Name": "o1",
-                      "Entity": "Order_Details",
-                      "Type": 0
-                    }
-                  ],
-                  "Where": [
-                    {
-                      "Condition": {
-                        "Comparison": {
-                          "ComparisonKind": 2,
-                          "Left": {
-                            "Measure": {
-                              "Expression": {
-                                "SourceRef": {
-                                  "Source": "o1"
-                                }
-                              },
-                              "Property": "Total_Orders"
-                            }
-                          },
-                          "Right": {
-                            "Literal": {
-                              "Value": "13L"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "type": "Advanced",
-                "howCreated": 0,
-                "isHiddenInViewMode": false
-              }
-            ]
-          },
-          {
-            "visual_type": "lineChart",
-            "name": "1960b778674faadc1e32",
-            "position": {
-              "x": 166.76,
-              "y": 92.79,
-              "width": 735.62,
-              "height": 340.24
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "textbox",
-            "name": "3f89fb5dcf34e6f04f9c",
-            "position": {
-              "x": 99.52,
-              "y": 10.76,
-              "width": 1110.83,
-              "height": 53.79
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "9990f46c77a710c85714",
-            "position": {
-              "x": 8.07,
-              "y": 279.72,
-              "width": 150.62,
-              "height": 126.41
-            },
-            "filters": []
-          }
-        ]
-      },
-      {
-        "id": 161557551,
-        "name": "Sales",
-        "ordinal": 2,
-        "width": 1280.0,
-        "height": 720.0,
-        "page_level_filters": [],
-        "visuals": [
-          {
-            "visual_type": "pieChart",
-            "name": "f0e03009f06a3e3e08ac",
-            "position": {
-              "x": 34.31,
-              "y": 146.83,
-              "width": 581.82,
-              "height": 307.38
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "shape",
-            "name": "fe84611eb5e130c800ef",
-            "position": {
-              "x": 16.47,
-              "y": 6.86,
-              "width": 1250.09,
-              "height": 104.29
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "83707703efc79291ede0",
-            "position": {
-              "x": 658.66,
-              "y": 146.83,
-              "width": 204.46,
-              "height": 107.03
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "lineChart",
-            "name": "e78195b220304517471b",
-            "position": {
-              "x": 34.31,
-              "y": 467.93,
-              "width": 1197.95,
-              "height": 252.49
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "cardVisual",
-            "name": "589142eeca7f8fdcadbe",
-            "position": {
-              "x": 658.66,
-              "y": 282.68,
-              "width": 204.46,
-              "height": 107.03
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "clusteredBarChart",
-            "name": "14730c2befd2af652c6c",
-            "position": {
-              "x": 897.43,
-              "y": 146.83,
-              "width": 344.43,
-              "height": 307.38
-            },
-            "filters": []
-          },
-          {
-            "visual_type": "textbox",
-            "name": "3673a825c9596acaf692",
-            "position": {
-              "x": 45.28,
-              "y": 24.7,
-              "width": 1196.57,
-              "height": 74.1
-            },
-            "filters": []
-          }
-        ]
-      }
-    ],
-    "slicers": [
-      {
-        "page_name": "Summary",
-        "page_id": 161557549,
-        "visual_name": "ac0eeb7e85c32ac26a2e",
-        "position": {
-          "x": 990.74,
-          "y": 90.57,
-          "width": 247.0,
-          "height": 182.5
-        },
-        "filters": [
-          {
-            "name": "2019960029b5ba2edfce",
-            "expression": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "Region"
-                  }
-                },
-                "Property": "Region"
-              }
-            },
-            "filter": {
-              "Version": 2,
-              "From": [
-                {
-                  "Name": "r",
-                  "Entity": "Region",
-                  "Type": 0
-                }
-              ],
-              "Where": [
-                {
-                  "Condition": {
-                    "Not": {
-                      "Expression": {
-                        "In": {
-                          "Expressions": [
-                            {
-                              "Column": {
-                                "Expression": {
-                                  "SourceRef": {
-                                    "Source": "r"
-                                  }
-                                },
-                                "Property": "Region"
-                              }
-                            }
-                          ],
-                          "Values": [
-                            [
-                              {
-                                "Literal": {
-                                  "Value": "null"
-                                }
-                              }
-                            ]
-                          ]
-                        }
-                      }
-                    }
-                  }
-                }
-              ]
-            },
-            "type": "Categorical",
-            "howCreated": 0,
-            "objects": {
-              "general": [
-                {
-                  "properties": {
-                    "isInvertedSelectionMode": {
-                      "expr": {
-                        "Literal": {
-                          "Value": "true"
-                        }
-                      }
-                    }
-                  }
-                }
-              ]
-            },
-            "isHiddenInViewMode": false
-          }
-        ],
-        "slicer_config": {
-          "values": [
-            {
-              "queryRef": "Region.Region",
-              "active": true
-            }
-          ],
-          "mode": "'Basic'"
-        }
-      },
-      {
-        "page_name": "Summary",
-        "page_id": 161557549,
-        "visual_name": "681927f0ef2498ed4b5f",
-        "position": {
-          "x": 28.82,
-          "y": 102.92,
-          "width": 355.4,
-          "height": 113.89
-        },
-        "filters": [],
-        "slicer_config": {
-          "values": [
-            {
-              "queryRef": "Order_Details.Order_Date",
-              "active": true
-            }
-          ],
-          "mode": "'Between'"
-        }
-      },
-      {
-        "page_name": "Summary",
-        "page_id": 161557549,
-        "visual_name": "a075490c74709c4e779c",
-        "position": {
-          "x": 710.81,
-          "y": 100.17,
-          "width": 171.53,
-          "height": 161.92
-        },
-        "filters": [],
-        "slicer_config": {
-          "values": [
-            {
-              "queryRef": "Order_Details.Category",
-              "active": true
-            }
-          ],
-          "mode": "'Basic'"
-        }
-      },
-      {
-        "page_name": "Summary",
-        "page_id": 161557549,
-        "visual_name": "4afac634e55f50462f39",
-        "position": {
-          "x": 469.3,
-          "y": 102.92,
-          "width": 170.15,
-          "height": 156.43
-        },
-        "filters": [],
-        "slicer_config": {
-          "values": [
-            {
-              "queryRef": "Order_Details.Segment",
-              "active": true
-            }
-          ],
-          "mode": "'Basic'"
-        }
-      }
-    ]
+    "pages": [],
+    "slicers": []
   },
   "relationships": [
     {
@@ -1158,6 +592,15 @@
       "fromColumn": "Region",
       "toTable": "Region",
       "toColumn": "Region",
+      "cardinality": "M:1",
+      "crossFilteringBehavior": "Single",
+      "isActive": true
+    },
+    {
+      "fromTable": "Order_Details",
+      "fromColumn": "Order_ID",
+      "toTable": "Returns",
+      "toColumn": "Order_ID",
       "cardinality": "M:1",
       "crossFilteringBehavior": "Single",
       "isActive": true
@@ -1212,6 +655,27 @@
       "Expression": "\nDISTINCTCOUNT ( Order_Details[Order_ID])",
       "DisplayFolder": null,
       "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "High Discount Flag",
+      "Expression": "\nIF (\n    AVERAGE ( Order_Details[Discount] ) > 0.3,\n    \"High Discount\",\n    \"Normal\"\n)\n",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Total returns",
+      "Expression": "COUNT ( Returns[Order_ID] )",
+      "DisplayFolder": null,
+      "Description": null
+    },
+    {
+      "TableName": "Order_Details",
+      "Name": "Avg Discount",
+      "Expression": "AVERAGE(Order_Details[Discount])",
+      "DisplayFolder": null,
+      "Description": null
     }
   ],
   "power_query": [
@@ -1222,6 +686,10 @@
     {
       "TableName": "Region",
       "Expression": "let\n    Source = Sql.Databases(\"sql-server-powerbi.database.windows.net\"),\n    Super_Store_Data = Source{[Name=\"Super_Store_Data\"]}[Data],\n    dbo_Region = Super_Store_Data{[Schema=\"dbo\",Item=\"Region\"]}[Data]\nin\n    dbo_Region"
+    },
+    {
+      "TableName": "Returns",
+      "Expression": "let\n    Source = Sql.Database(\"sql-server-powerbi.database.windows.net\", \"super_store_Data\"),\n    dbo_Returns = Source{[Schema=\"dbo\",Item=\"Returns\"]}[Data]\nin\n    dbo_Returns"
     }
   ],
   "rls": []

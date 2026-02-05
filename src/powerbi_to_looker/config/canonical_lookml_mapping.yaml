@@ -52,7 +52,6 @@ date_handling:
 # Measure defaults
 measures:
   value_format: "#,##0.00"
-  format: decimal_2
   reuse_base_dimension: true   # simple measures reference a dimension for sql
 
 # Naming

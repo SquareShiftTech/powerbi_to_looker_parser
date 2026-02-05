@@ -75,11 +75,23 @@ def _extract_slicer_config(single_visual: dict) -> dict:
     return config
 
 
+def _empty_layout(pbix_path: Path) -> dict:
+    """Return minimal layout when Report/Layout is missing (e.g. V1/folder format)."""
+    return {
+        "source_file": str(pbix_path.resolve()),
+        "report_level_filters": [],
+        "pages": [],
+        "slicers": [],
+    }
+
+
 def load_report_layout(pbix_path: str | Path) -> dict:
     """Extract report layout (pages, visuals, filters, slicers) from a PBIX file.
 
     Reads Report/Layout from the PBIX ZIP (UTF-16-LE JSON) and returns
     source_file, report_level_filters, pages (with visuals), and slicers.
+    If Report/Layout is missing (e.g. newer V1 folder-based format), returns
+    a minimal layout so the pipeline can continue with dataset/relationships only.
 
     Args:
         pbix_path: Path to .pbix file.
@@ -89,7 +101,7 @@ def load_report_layout(pbix_path: str | Path) -> dict:
 
     Raises:
         FileNotFoundError: If pbix_path does not exist.
-        ValueError: If file is not a valid ZIP or Layout is missing.
+        ValueError: If file is not a valid ZIP.
     """
     pbix_path = Path(pbix_path)
     if not pbix_path.exists():
@@ -103,7 +115,7 @@ def load_report_layout(pbix_path: str | Path) -> dict:
                     layout_member = name
                     break
             if not layout_member:
-                raise ValueError(f"Layout file not found in PBIX: {LAYOUT_PATH}")
+                return _empty_layout(pbix_path)
             with zf.open(layout_member) as f:
                 raw = f.read()
     except BadZipFile as e:
