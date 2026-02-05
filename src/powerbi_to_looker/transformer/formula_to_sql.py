@@ -106,7 +106,7 @@ def dax_to_lookml_sql(
     if m:
         col = (m.group(1) or m.group(2) or "").strip()
         ref = _ref_to_lookml(f"[{col}]", name_map, config)
-        return ref, "avg"
+        return ref, "average"
 
     # MIN / MAX
     min_pat = re.compile(

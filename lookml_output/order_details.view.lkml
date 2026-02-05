@@ -187,7 +187,7 @@ view: order_details {
     value_format: "#,##0.00"
   }
   measure: high_discount_flag {
-    type: avg
+    type: average
     sql: ${discount} ;;
     label: "High Discount Flag"
     value_format: "#,##0.00"
@@ -199,7 +199,7 @@ view: order_details {
     value_format: "#,##0.00"
   }
   measure: avg_discount {
-    type: avg
+    type: average
     sql: ${discount} ;;
     label: "Avg Discount"
     value_format: "#,##0.00"

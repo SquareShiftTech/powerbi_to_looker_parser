@@ -21,7 +21,7 @@ dimension_types:
 # Canonical aggregation → LookML measure type (for simple measures)
 measure_types:
   SUM: sum
-  AVG: avg
+  AVG: average
   COUNT: count
   MIN: min
   MAX: max

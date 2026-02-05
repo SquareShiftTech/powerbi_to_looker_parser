@@ -1,5 +1,6 @@
-- dashboard: super_store_dashboard_v2
-  title: Super Store Dashboard (v2)
+---
+- dashboard: executive_sales_performance_dashboard
+  title: Executive Sales Performance Dashboard
   preferred_viewer: dashboards-next
   crossfilter_enabled: true
   description: ''
@@ -16,10 +17,10 @@
   elements:
   - title: Summary
     name: Summary
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
-    fields: [order_details.total_sales]
+    fields: [order_details.sales]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -39,7 +40,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 2
     col: 0
     width: 6
@@ -47,10 +48,10 @@
     tab_name: Summary
   - title: Summary (Copy)
     name: Summary (Copy)
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
-    fields: [order_details.profit_sum]
+    fields: [order_details.profit]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -71,7 +72,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 2
     col: 6
     width: 6
@@ -79,16 +80,16 @@
     tab_name: Summary
   - title: Revenue Trend Analysis
     name: Revenue Trend Analysis
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_line
-    fields: [order_details.profit_sum, order_details.total_sales, order_details.order_date_month_name]
-    sorts: [order_details.order_date_month_name]
+    fields: [order_details.profit, order_details.sales, order_details.order_month_name]
+    sorts: [order_details.order_month_name]
     limit: 500
     column_limit: 50
     dynamic_fields:
     - category: table_calculation
-      expression: extract_months(${order_details.order_date_month})
+      expression: extract_months(${order_details.order_month})
       label: Month order
       value_format:
       value_format_name:
@@ -120,9 +121,9 @@
     y_axis_combined: true
     show_null_points: true
     interpolation: linear
-    y_axes: [{label: Total Sales and Total Profit, orientation: left, series: [{axisId: order_details.profit_sum,
-            id: order_details.profit_sum, name: Profit}, {axisId: order_details.total_sales,
-            id: order_details.total_sales, name: Sales}], showLabels: true, showValues: true,
+    y_axes: [{label: Total Sales and Total Profit, orientation: left, series: [{axisId: order_details.profit,
+            id: order_details.profit, name: Profit}, {axisId: order_details.sales,
+            id: order_details.sales, name: Sales}], showLabels: true, showValues: true,
         valueFormat: '$#,##0.00,,"M"', unpinAxis: false, tickDensity: custom, tickDensityCustom: 11,
         type: linear}]
     x_axis_label: Month
@@ -132,8 +133,8 @@
     font_size: 9px
     label_value_format: $#,##0.00,,"M"
     series_colors:
-      order_details.profit_sum: "#12239E"
-      order_details.total_sales: "#118DFF"
+      order_details.profit: "#12239E"
+      order_details.sales: "#118DFF"
     label_color: [grey]
     custom_color_enabled: true
     show_single_value_title: true
@@ -164,7 +165,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 5
     col: 0
     width: 24
@@ -172,10 +173,10 @@
     tab_name: Summary
   - title: Summary (Copy 2)
     name: Summary (Copy 2)
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
-    fields: [order_details.profit_margin__]
+    fields: [order_details.profit_margin_pct]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -196,7 +197,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 2
     col: 12
     width: 6
@@ -204,16 +205,16 @@
     tab_name: Summary
   - title: Revenue and Profit by Category
     name: Revenue and Profit by Category
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_column
-    fields: [order_details.total_sales, order_details.category, order_details.profit_sum]
-    sorts: [order_details.total_sales desc 0]
+    fields: [order_details.sales, order_details.category, order_details.profit]
+    sorts: [order_details.sales desc 0]
     limit: 500
     column_limit: 50
     dynamic_fields:
     - category: table_calculation
-      expression: extract_months(${order_details.order_date_month})
+      expression: extract_months(${order_details.order_month})
       label: Month order
       value_format:
       value_format_name:
@@ -248,9 +249,9 @@
     show_totals_labels: false
     show_silhouette: false
     totals_color: "#808080"
-    y_axes: [{label: Total Sales and Total Profit, orientation: left, series: [{axisId: order_details.profit_sum,
-            id: order_details.profit_sum, name: Profit}, {axisId: order_details.total_sales,
-            id: order_details.total_sales, name: Sales}], showLabels: true, showValues: true,
+    y_axes: [{label: Total Sales and Total Profit, orientation: left, series: [{axisId: order_details.profit,
+            id: order_details.profit, name: Profit}, {axisId: order_details.sales,
+            id: order_details.sales, name: Sales}], showLabels: true, showValues: true,
         valueFormat: '$#,##0.00,,"M"', unpinAxis: false, tickDensity: custom, tickDensityCustom: 11,
         type: linear}]
     x_axis_label: Category
@@ -260,8 +261,8 @@
     font_size: 9px
     label_value_format: $#,##0.00,,"M"
     series_colors:
-      order_details.total_sales: "#118DFF"
-      order_details.profit_sum: "#12239E"
+      order_details.sales: "#118DFF"
+      order_details.profit: "#12239E"
     label_color: [grey]
     show_null_points: true
     interpolation: linear
@@ -294,7 +295,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 18
     col: 0
     width: 13
@@ -304,7 +305,7 @@
     type: text
     title_text: ''
     subtitle_text: ''
-    body_text: '[{"type":"h1","children":[{"text":"Super Store Dashboard (v2)","bold":true,"color":"hsl(217,
+    body_text: '[{"type":"h1","children":[{"text":"Executive Sales Performance Dashboard","bold":true,"color":"hsl(217,
       65%, 32%)"}],"align":"center"}]'
     rich_content_json: '{"format":"slate"}'
     row: 0
@@ -314,10 +315,10 @@
     tab_name: Summary
   - title: Untitled
     name: Untitled
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
-    fields: [order_details.quantity_sum]
+    fields: [order_details.quantity]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -334,7 +335,7 @@
     value_format: '#,##0,"K"'
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -345,16 +346,16 @@
     tab_name: Summary
   - title: Top 5 States by Revenue Performance
     name: Top 5 States by Revenue Performance
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_funnel
-    fields: [order_details.total_sales, order_details.state]
+    fields: [order_details.sales_in_K, order_details.state]
     filters:
-      order_details.order_date_date: 2014/03/01 to 2018/01/01
+      order_details.order_date: 2014/03/01 to 2018/01/01
       order_details.region: ''
       order_details.city: ''
       order_details.segment: ''
-    sorts: [order_details.total_sales desc 0]
+    sorts: [order_details.sales_in_K desc 0]
     limit: 5
     column_limit: 50
     leftAxisLabelVisible: false
@@ -380,7 +381,7 @@
     labelOverlap: false
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -391,16 +392,16 @@
     tab_name: Summary
   - title: Regional Performance Breakdown
     name: Regional Performance Breakdown
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_grid
-    fields: [order_details.region, order_details.total_sales, order_details.profit_sum,
-      order_details.profit_sum_margin__]
+    fields: [order_details.region, order_details.sales_in_K, order_details.profit,
+      order_details.profit_margin_pct]
     filters:
       order_details.region: ''
       order_details.city: ''
       order_details.segment: ''
-    sorts: [order_details.profit_sum desc]
+    sorts: [order_details.profit desc]
     limit: 500
     column_limit: 50
     show_view_names: false
@@ -424,12 +425,12 @@
     truncate_header: false
     minimum_column_width: 75
     series_labels:
-      order_details.total_sales: Total Sales
+      order_details.sales_in_K: Total Sales
     series_cell_visualizations:
-      order_details.profit_sum:
+      order_details.profit:
         is_active: false
     conditional_formatting: [{type: along a scale..., value: !!null '', fields: [
-          order_details.profit_sum_margin__], apply_formatting_to_row: false, cell_format: {
+          order_details.profit_margin_pct], apply_formatting_to_row: false, cell_format: {
           background_color: "#4E79A7", font_color: !!null '', color_application: {
             collection_id: verizon, custom: {id: 933d19eb-1134-dd34-f951-3f099f7d346a,
               label: Custom, type: continuous, stops: [{color: "#D26565", offset: 0},
@@ -439,7 +440,7 @@
           color_application: {collection_id: verizon, options: {mirror: false, reverse: false,
               stepped: false}}, font_style: {bold: false, italic: false, strikethrough: false}},
         apply_to: selectFields}, {type: along a scale..., value: !!null '', fields: [
-          order_details.profit_sum], apply_formatting_to_row: false, cell_format: {background_color: "#4E79A7",
+          order_details.profit], apply_formatting_to_row: false, cell_format: {background_color: "#4E79A7",
           font_color: !!null '', color_application: {collection_id: verizon, custom: {
               id: 64bcd8d7-6417-b3b7-abd9-6f573c5d4de2, label: Custom, type: continuous,
               stops: [{color: "#D26565", offset: 0}, {color: "#48BC66", offset: 100}]},
@@ -448,7 +449,7 @@
           font_color: !!null '', color_application: {collection_id: verizon, options: {
               mirror: false, reverse: false, stepped: false}}, font_style: {bold: false,
             italic: false, strikethrough: false}}, apply_to: selectFields}, {type: along
-          a scale..., value: !!null '', fields: [order_details.total_sales], apply_formatting_to_row: false,
+          a scale..., value: !!null '', fields: [order_details.sales_in_K], apply_formatting_to_row: false,
         cell_format: {background_color: "#4E79A7", font_color: !!null '', color_application: {
             collection_id: verizon, custom: {id: fb521787-6c6e-e031-7dca-d21897f598cd,
               label: Custom, type: continuous, stops: [{color: "#D26565", offset: 0},
@@ -459,13 +460,13 @@
               stepped: false}}, font_style: {bold: false, italic: false, strikethrough: false}},
         apply_to: selectFields}]
     series_value_format:
-      order_details.total_sales:
+      order_details.sales_in_K:
         name: usd_0
         decimals: '0'
         format_string: "$#,##0"
         label: U.S. Dollars (0)
         label_prefix: U.S. Dollars
-      order_details.profit_sum:
+      order_details.profit:
         name: usd_0
         decimals: '0'
         format_string: "$#,##0"
@@ -499,7 +500,7 @@
     defaults_version: 1
     hidden_pivots: {}
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -510,7 +511,7 @@
     tab_name: Summary
   - title: Total Orders
     name: Total Orders
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
     fields: [order_details.total_orders]
@@ -539,7 +540,7 @@
     tab_name: Customer
   - title: Total Customers
     name: Total Customers
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
     fields: [order_details.customer_count]
@@ -568,12 +569,12 @@
     tab_name: Customer
   - title: Revenue Distribution by Segment and Region
     name: Revenue Distribution by Segment and Region
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_column
-    fields: [order_details.region, order_details.segment, order_details.total_sales]
+    fields: [order_details.region, order_details.segment, order_details.sales]
     pivots: [order_details.region]
-    sorts: [order_details.region, order_details.total_sales desc 0]
+    sorts: [order_details.region, order_details.sales desc 0]
     limit: 500
     column_limit: 50
     x_axis_gridlines: false
@@ -608,15 +609,15 @@
     font_size: 10px
     label_value_format: $#,##0.00,,"M"
     series_colors:
-      Central - order_details.total_sales: "#118DFF"
-      East - order_details.total_sales: "#12239E"
-      South - order_details.total_sales: "#E66C37"
-      West - order_details.total_sales: "#6B007B"
+      Central - order_details.sales: "#118DFF"
+      East - order_details.sales: "#12239E"
+      South - order_details.sales: "#E66C37"
+      West - order_details.sales: "#6B007B"
     label_color: [grey]
     hidden_pivots: {}
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -627,12 +628,12 @@
     tab_name: Customer
   - title: Monthly Profit and Units Sold
     name: Monthly Profit and Units Sold
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_line
-    fields: [order_details.order_date_month_name, order_details.profit_sum, order_details.quantity_sum]
-    fill_fields: [order_details.order_date_month_name]
-    sorts: [order_details.order_date_month_name]
+    fields: [order_details.order_month_name, order_details.profit, order_details.quantity]
+    fill_fields: [order_details.order_month_name]
+    sorts: [order_details.order_month_name]
     limit: 500
     column_limit: 50
     x_axis_gridlines: false
@@ -660,8 +661,8 @@
     show_null_points: true
     interpolation: linear
     y_axes: [{label: Total Profit and Total Quantity, orientation: left, series: [
-          {axisId: order_details.profit_sum, id: order_details.profit_sum, name: Profit},
-          {axisId: order_details.quantity_sum, id: order_details.quantity_sum, name: Quantity}],
+          {axisId: order_details.profit, id: order_details.profit, name: Profit},
+          {axisId: order_details.quantity, id: order_details.quantity, name: Quantity}],
         showLabels: true, showValues: true, unpinAxis: false, tickDensity: default,
         tickDensityCustom: 5, type: linear}]
     x_axis_zoom: true
@@ -669,12 +670,12 @@
     font_size: 9px
     label_value_format: '#,##0,"K"'
     series_colors:
-      order_details.profit_sum: "#118DFF"
-      order_details.quantity_sum: "#12239E"
+      order_details.profit: "#118DFF"
+      order_details.quantity: "#12239E"
     label_color: [grey]
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -697,12 +698,12 @@
     tab_name: Customer
   - title: Top Customers by Revenue
     name: Top Customers by Revenue
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_grid
-    fields: [order_details.customer_name, order_details.total_orders,
-      order_details.total_sales]
-    sorts: [order_details.total_orders desc 0]
+    fields: [total_orders_filtered.customer_name, total_orders_filtered.total_orders,
+      total_orders_filtered.sales]
+    sorts: [total_orders_filtered.total_orders desc 0]
     limit: 500
     column_limit: 50
     total: true
@@ -727,11 +728,11 @@
     truncate_header: false
     minimum_column_width: 75
     series_cell_visualizations:
-      order_details.total_orders:
+      total_orders_filtered.total_orders:
         is_active: false
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -742,15 +743,15 @@
     tab_name: Customer
   - title: Customer Segment Profitability
     name: Customer Segment Profitability
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_pie
-    fields: [order_details.segment, order_details.profit_sum]
+    fields: [order_details.segment, order_details.profit]
     filters:
       order_details.region: ''
       order_details.city: ''
       order_details.segment: ''
-    sorts: [order_details.profit_sum desc 0]
+    sorts: [order_details.profit desc 0]
     limit: 500
     column_limit: 50
     value_labels: legend
@@ -787,7 +788,7 @@
     totals_color: "#808080"
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -798,16 +799,16 @@
     tab_name: Customer
   - title: Discount Impact Analysis
     name: Discount Impact Analysis
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_scatter
-    fields: [order_details.total_sales, order_details.sub_category, order_details.profit_sum_margin__,
+    fields: [order_details.sales, order_details.sub_category, order_details.profit_margin_pct,
       order_details.avg_discount]
     filters:
       order_details.region: ''
       order_details.city: ''
       order_details.segment: ''
-    sorts: [order_details.total_sales desc]
+    sorts: [order_details.sales desc]
     limit: 500
     column_limit: 50
     x_axis_gridlines: false
@@ -874,7 +875,7 @@
         label: Quadrant 4
     custom_quadrant_point_x: 5
     custom_quadrant_point_y: 5
-    custom_x_column: order_details.total_sales
+    custom_x_column: order_details.sales
     custom_y_column: order_details.avg_discount
     custom_value_label_column: ''
     series_tooltip_options:
@@ -903,7 +904,7 @@
     defaults_version: 1
     hidden_pivots: {}
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -914,10 +915,10 @@
     tab_name: Customer
   - title: Revenue by Category
     name: Revenue by Category
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_pie
-    fields: [order_details.category, order_details.total_sales]
+    fields: [order_details.category, order_details.sales_in_K]
     sorts: [order_details.category]
     limit: 5000
     column_limit: 50
@@ -944,11 +945,11 @@
     tab_name: Sales
   - title: Regional Performance Comparison
     name: Regional Performance Comparison
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_bar
-    fields: [order_details.region, order_details.total_sales, order_details.profit_sum]
-    sorts: [order_details.total_sales desc 0]
+    fields: [order_details.region, order_details.sales, order_details.profit]
+    sorts: [order_details.sales desc 0]
     limit: 5000
     column_limit: 50
     x_axis_gridlines: false
@@ -983,13 +984,13 @@
     font_size: 12px
     label_value_format: '#,##0.00,,"M"'
     series_colors:
-      order_details.total_sales: "#118DFF"
-      order_details.profit_sum: "#12239E"
+      order_details.sales: "#118DFF"
+      order_details.profit: "#12239E"
     label_color: [grey]
     x_axis_datetime_label: ''
     defaults_version: 1
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -1000,10 +1001,10 @@
     tab_name: Sales
   - title: Summary (Copy 4)
     name: Summary (Copy 4)
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
-    fields: [order_details.total_sales]
+    fields: [order_details.sales]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -1023,7 +1024,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 2
     col: 9
     width: 6
@@ -1031,10 +1032,10 @@
     tab_name: Sales
   - title: Summary (Copy 5)
     name: Summary (Copy 5)
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: single_value
-    fields: [order_details.profit_sum]
+    fields: [order_details.profit]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -1055,7 +1056,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 5
     col: 9
     width: 6
@@ -1063,16 +1064,16 @@
     tab_name: Sales
   - title: Monthly Revenue Trend
     name: Monthly Revenue Trend
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_line
-    fields: [order_details.total_sales, order_details.order_date_month_name]
-    sorts: [order_details.order_date_month_name]
+    fields: [order_details.sales, order_details.order_month_name]
+    sorts: [order_details.order_month_name]
     limit: 500
     column_limit: 50
     dynamic_fields:
     - category: table_calculation
-      expression: extract_months(${order_details.order_date_month})
+      expression: extract_months(${order_details.order_month})
       label: Month order
       value_format:
       value_format_name:
@@ -1104,9 +1105,9 @@
     y_axis_combined: true
     show_null_points: true
     interpolation: linear
-    y_axes: [{label: Total Sales and Total Profit, orientation: left, series: [{axisId: order_details.profit_sum,
-            id: order_details.profit_sum, name: Profit}, {axisId: order_details.total_sales,
-            id: order_details.total_sales, name: Sales}], showLabels: true, showValues: true,
+    y_axes: [{label: Total Sales and Total Profit, orientation: left, series: [{axisId: order_details.profit,
+            id: order_details.profit, name: Profit}, {axisId: order_details.sales,
+            id: order_details.sales, name: Sales}], showLabels: true, showValues: true,
         valueFormat: '$#,##0.00,,"M"', unpinAxis: false, tickDensity: custom, tickDensityCustom: 11,
         type: linear}]
     x_axis_label: Month
@@ -1116,7 +1117,7 @@
     font_size: 9px
     label_value_format: $#,##0.00,,"M"
     series_colors:
-      order_details.total_sales: "#118DFF"
+      order_details.sales: "#118DFF"
     label_color: [grey]
     custom_color_enabled: true
     show_single_value_title: true
@@ -1147,7 +1148,7 @@
       Segment: order_details.segment
       Category: order_details.category
       Region: order_details.region
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
     row: 8
     col: 0
     width: 24
@@ -1167,15 +1168,15 @@
     tab_name: Sales
   - title: Geographic Sales Performance
     name: Geographic Sales Performance
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     type: looker_google_map
-    fields: [order_details.state, order_details.total_sales]
+    fields: [order_details.state, order_details.sales_in_K]
     filters:
       order_details.region: ''
       order_details.city: ''
       order_details.segment: ''
-    sorts: [order_details.total_sales desc 0]
+    sorts: [order_details.sales_in_K desc 0]
     limit: 500
     column_limit: 50
     hidden_fields: []
@@ -1232,7 +1233,7 @@
     y_axis_scale_mode: linear
     x_axis_reversed: false
     y_axis_reversed: false
-    size_by_field: order_details.total_sales
+    size_by_field: order_details.sales
     plot_size_by_field: true
     x_axis_zoom: true
     y_axis_zoom: true
@@ -1266,7 +1267,7 @@
         label: Quadrant 4
     custom_quadrant_point_x: 5
     custom_quadrant_point_y: 5
-    custom_x_column: order_details.total_sales
+    custom_x_column: order_details.sales
     custom_y_column: order_details.avg_discount
     custom_value_label_column: ''
     ordering: none
@@ -1277,7 +1278,7 @@
     defaults_version: 0
     hidden_pivots: {}
     listen:
-      Date Range: order_details.order_date_date
+      Date Range: order_details.order_date
       Region: order_details.region
       Segment: order_details.segment
       Category: order_details.category
@@ -1297,10 +1298,10 @@
       type: day_range_picker
       display: inline
       options: []
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     listens_to_filters: []
-    field: order_details.order_date_date
+    field: order_details.order_date
   - name: Segment
     title: Segment
     type: field_filter
@@ -1310,7 +1311,7 @@
     ui_config:
       type: checkboxes
       display: popover
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     listens_to_filters: []
     field: order_details.segment
@@ -1323,7 +1324,7 @@
     ui_config:
       type: checkboxes
       display: popover
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     listens_to_filters: []
     field: order_details.category
@@ -1336,7 +1337,7 @@
     ui_config:
       type: checkboxes
       display: popover
-    model: power_bi_looker
+    model: powerbi_to_looker
     explore: order_details
     listens_to_filters: []
     field: order_details.region

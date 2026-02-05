@@ -175,7 +175,7 @@
     model: power_bi_looker
     explore: order_details
     type: single_value
-    fields: [order_details.profit_sum_margin__]
+    fields: [order_details.profit_margin__]
     limit: 500
     column_limit: 50
     custom_color_enabled: true
