@@ -16,6 +16,5 @@ view: returns {
     sql: * ;;
     label: "Count"
     value_format: "#,##0"
-    format: "decimal_2"
   }
 }

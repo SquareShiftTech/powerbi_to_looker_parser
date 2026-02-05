@@ -114,7 +114,7 @@ def build_view(
             "type": "count",
             "sql": "*",
             "value_format": "#,##0",
-            "format": "decimal_2",
+           
         }]
 
     out = {
