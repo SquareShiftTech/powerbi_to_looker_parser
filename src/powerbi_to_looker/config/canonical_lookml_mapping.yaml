@@ -59,6 +59,10 @@ naming:
   max_name_length: 64
   sanitize: true              # lowercase, spaces → underscores
 
+# Map dimensions used in map charts to Looker map layer names (e.g. us_states for Geographic Sales Performance)
+dimension_map_layers:
+  state: us_states
+
 # Optional: DAX pattern → LookML (for formula_to_sql Option 2)
 # Keys are regex/pattern names; values define measure type and sql template.
 # dax_to_sql:

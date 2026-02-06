@@ -1,11 +1,11 @@
 {
   "workspace_id": "5945fc8b-1fb7-48a5-873a-0a35ea442166",
-  "workspace_name": "Powerbi-POC",
+  "workspace_name": "Orders & Sales",
   "report_name": "Suprer_Store_Dashboard",
   "workspaces": [
     {
       "id": "5945fc8b-1fb7-48a5-873a-0a35ea442166",
-      "name": "Powerbi-POC",
+      "name": "Orders & Sales",
       "datasets": [
         {
           "id": "b0eec94b-94c4-4cbb-966b-2989f24c5609",

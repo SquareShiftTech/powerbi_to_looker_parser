@@ -128,5 +128,17 @@ def dax_to_lookml_sql(
         ref = _ref_to_lookml(f"[{col}]", name_map, config)
         return ref, "max"
 
+    # RANKX ( ALL ( ... ), [Measure], , DESC ) -> RANK() OVER (ORDER BY ${measure} DESC)
+    rankx_pat = re.compile(
+        r"RANKX\s*\(\s*ALL\s*\([^)]+\)\s*,\s*\[([^\]]+)\]\s*,\s*[^,]*,?\s*(DESC|ASC)?\s*\)",
+        re.IGNORECASE | re.DOTALL,
+    )
+    m = rankx_pat.search(raw)
+    if m:
+        col = m.group(1).strip()
+        order = (m.group(2) or "DESC").strip().upper()
+        ref = _ref_to_lookml(f"[{col}]", name_map, config)
+        return f"RANK() OVER (ORDER BY {ref} {order})", "number"
+
     # Unmatched: return None so caller keeps placeholder + description
     return None, None

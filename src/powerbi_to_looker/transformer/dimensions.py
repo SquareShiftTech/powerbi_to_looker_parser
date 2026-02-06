@@ -60,4 +60,7 @@ def field_to_dimension(
     if date_info:
         out["date_info"] = date_info
         out["dimension_group"] = True
+    map_layers = config.get("dimension_map_layers") or {}
+    if name in map_layers:
+        out["map_layer_name"] = map_layers[name]
     return out

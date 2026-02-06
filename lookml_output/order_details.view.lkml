@@ -52,6 +52,7 @@ view: order_details {
     type: string
     sql: ${TABLE}.State ;;
     label: "State"
+    map_layer_name: us_states
   }
   dimension: postal_code {
     type: string
@@ -163,16 +164,10 @@ view: order_details {
     value_format: "#,##0.00"
   }
   measure: product_rank {
-    type: sum
-    sql: NULL ;;
+    type: number
+    sql: RANK() OVER (ORDER BY ${total_sales} DESC) ;;
     label: "Product Rank"
     value_format: "#,##0.00"
-    description: "DAX: RANKX (
-    ALL ( Order_Details[Product_Name] ),
-    [Total Sales],
-    ,
-    DESC
-)"
   }
   measure: customer_count {
     type: count_distinct

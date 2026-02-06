@@ -126,9 +126,20 @@ def test_formula_to_sql_sum(config):
     assert mtype == "sum"
 
 
+def test_formula_to_sql_rankx(config):
+    name_map = {"Total Sales": "total_sales"}
+    formula = "RANKX ( ALL ( Order_Details[Product_Name] ), [Total Sales], , DESC )"
+    sql, mtype = dax_to_lookml_sql(formula, name_map, config)
+    assert sql is not None
+    assert mtype == "number"
+    assert "RANK() OVER (ORDER BY" in sql
+    assert "total_sales" in sql
+    assert "DESC" in sql
+
+
 def test_formula_to_sql_unmatched_returns_none(config):
     name_map = {}
-    sql, mtype = dax_to_lookml_sql("RANKX(ALL(...), ...)", name_map, config)
+    sql, mtype = dax_to_lookml_sql("SOMEUNKNOWN( x )", name_map, config)
     assert sql is None
     assert mtype is None
 
