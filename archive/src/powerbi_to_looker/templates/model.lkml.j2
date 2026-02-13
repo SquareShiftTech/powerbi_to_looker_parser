@@ -1,0 +1,21 @@
+include: "*.view.lkml"
+include: "*.dashboard.lookml"
+
+connection: "{{ model.connection | default('t2l') }}"
+
+{% for exp in model.explores | default([]) %}
+explore: {{ exp.name }} {
+  {% if exp.get('label') %}
+  label: "{{ exp.label | replace('"', '\\"') }}"
+  {% endif %}
+  {% for join in exp.get('joins') or [] %}
+  join: {{ join.name }} {
+    type: {{ join.type }}
+    sql_on: {{ join.sql_on }} ;;
+    {% if join.get('relationship') %}
+    relationship: {{ join.relationship }}
+    {% endif %}
+  }
+  {% endfor %}
+}
+{% endfor %}

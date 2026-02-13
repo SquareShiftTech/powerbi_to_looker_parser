@@ -1,0 +1,9 @@
+<LinguisticSchema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Language="en-US" DynamicImprovement="Default" xmlns="http://schemas.microsoft.com/sqlserver/2016/01/linguisticschema">
+  <Entities>
+    <Entity Name="Summary" ConceptualEntity="3283b42c5d7c56e7b827" Source="Generated">
+      <Words>
+        <Word>Summary</Word>
+      </Words>
+    </Entity>
+  </Entities>
+</LinguisticSchema>

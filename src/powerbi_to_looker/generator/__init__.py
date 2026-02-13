@@ -1,5 +1,5 @@
-"""Generator stage: LookML terms + Jinja templates -> .lkml files."""
+"""Generator: LookML terms -> render (Jinja) -> write .lkml files."""
 
-from powerbi_to_looker.generator.lkml_generator import generate
+from powerbi_to_looker.generator.writer import write
 
-__all__ = ["generate"]
+__all__ = ["write"]

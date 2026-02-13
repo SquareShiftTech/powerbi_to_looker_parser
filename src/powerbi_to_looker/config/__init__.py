@@ -1,5 +1,1 @@
-"""Config: Power BI → canonical and canonical → LookML mapping rules (YAML)."""
-
-from powerbi_to_looker.config.loader import load_canonical_mapping, load_lookml_mapping
-
-__all__ = ["load_canonical_mapping", "load_lookml_mapping"]
+"""Config: mapping YAMLs (semantic_mapping, visualization_mapping, lookml_mapping). Load via common.yaml_loader."""

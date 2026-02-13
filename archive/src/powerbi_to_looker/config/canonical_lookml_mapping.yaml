@@ -1,0 +1,70 @@
+# Canonical → LookML mapping (transformer layer).
+# Used by transformer to produce view + model dicts. See plan/transformer_plan.md.
+
+# SQL dialect for generated formulas and date SQL (generic | bigquery). Default: generic.
+sql_dialect: bigquery
+
+# When sql_dialect is bigquery, use for sql_table_name (dataset.table or project.dataset.table)
+bigquery:
+  dataset: Super_Store_Sales   # replace with your BigQuery dataset name
+  project: tableau-to-looker-migration   # optional; replace with your GCP project id or remove if not needed
+
+# Canonical data_type → LookML dimension/measure type
+dimension_types:
+  string: string
+  number: number
+  integer: number
+  date: time
+  datetime: time
+  boolean: yesno
+
+# Canonical aggregation → LookML measure type (for simple measures)
+measure_types:
+  SUM: sum
+  AVG: average
+  COUNT: count
+  MIN: min
+  MAX: max
+  default: number   # when aggregation unknown or custom formula
+
+# Canonical join_type → Looker explore join type
+join_types:
+  LEFT: left_outer
+  INNER: inner
+  RIGHT: right_outer
+  FULL: full_outer
+  default: left_outer
+
+# Date/datetime handling (dimension_group for time fields)
+date_handling:
+  timeframes:
+    - raw
+    - date
+    - week
+    - month
+    - quarter
+    - year
+    - month_name
+    - month_num
+  # SQL wrapper for date dimension sql (e.g. "DATE(%s)" for BigQuery). Use null for generic.
+  sql_wrapper: "TIMESTAMP(DATE(%s))"
+
+# Measure defaults
+measures:
+  value_format: "#,##0.00"
+  reuse_base_dimension: true   # simple measures reference a dimension for sql
+
+# Naming
+naming:
+  max_name_length: 64
+  sanitize: true              # lowercase, spaces → underscores
+
+# Map dimensions used in map charts to Looker map layer names (e.g. us_states for Geographic Sales Performance)
+dimension_map_layers:
+  state: us_states
+
+# Optional: DAX pattern → LookML (for formula_to_sql Option 2)
+# Keys are regex/pattern names; values define measure type and sql template.
+# dax_to_sql:
+#   SUM_TABLE_COL: { type: sum, sql_from: "table_column" }
+#   DIVIDE_AB:     { type: number, sql_template: "${a} / NULLIF(${b}, 0)" }

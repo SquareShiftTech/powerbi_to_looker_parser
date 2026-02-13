@@ -1,0 +1,25 @@
+﻿table Returns
+
+	column Returned
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Returned
+
+		annotation SummarizationSetBy = Automatic
+
+	column Order_ID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Order_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Returns = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sql-server-powerbi.database.windows.net", "super_store_Data"),
+				    dbo_Returns = Source{[Schema="dbo",Item="Returns"]}[Data]
+				in
+				    dbo_Returns
+

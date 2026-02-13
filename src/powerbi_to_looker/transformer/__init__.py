@@ -1,5 +1,5 @@
-"""Transformer stage: canonical -> LookML terms (views, explores)."""
+"""Transformer: canonical in -> LookML terms out. No file I/O."""
 
-from powerbi_to_looker.transformer.semantic_layer import to_lookml_terms
+from powerbi_to_looker.transformer.orchestrator import to_lookml_terms
 
 __all__ = ["to_lookml_terms"]

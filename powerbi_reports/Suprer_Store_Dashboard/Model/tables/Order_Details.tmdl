@@ -1,0 +1,260 @@
+﻿table Order_Details
+
+	measure 'Total Sales' = ```
+			
+			SUM ( Order_Details[Sales] )
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+
+	measure 'Total Profit' = ```
+			
+			SUM ( Order_Details[Profit] )
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+
+	measure 'Total Quantity' = ```
+			
+			SUM ( Order_Details[Quantity] )
+			
+			```
+		formatString: 0
+
+	measure 'Profit Margin %' = ```
+			
+			DIVIDE ( [Total Profit], [Total Sales], 0 )
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+
+	measure 'Product Rank' = ```
+			
+			RANKX (
+			    ALL ( Order_Details[Product_Name] ),
+			    [Total Sales],
+			    ,
+			    DESC
+			)
+			
+			```
+		formatString: 0
+
+	measure 'Customer Count' = DISTINCTCOUNT(Order_Details[Customer_ID])
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Orders =
+			
+			DISTINCTCOUNT ( Order_Details[Order_ID])
+		formatString: 0
+
+	measure 'High Discount Flag' = ```
+			
+			IF (
+			    AVERAGE ( Order_Details[Discount] ) > 0.3,
+			    "High Discount",
+			    "Normal"
+			)
+			
+			```
+
+	measure 'Total returns' = COUNT ( Returns[Order_ID] )
+		formatString: 0
+
+	measure 'Avg Discount' = AVERAGE(Order_Details[Discount])
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Order_ID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Order_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Order_Date
+		dataType: dateTime
+		formatString: Long Date
+		summarizeBy: none
+		sourceColumn: Order_Date
+
+		variation Variation
+			isDefault
+			relationship: d26f166d-0d82-4614-ae40-888e19faffa5
+			defaultHierarchy: LocalDateTable_e445b263-2bd1-4fc0-9e5b-bb1e76537df0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ship_Date
+		dataType: dateTime
+		formatString: dd/mm/yy
+		summarizeBy: none
+		sourceColumn: Ship_Date
+
+		variation Variation
+			isDefault
+			relationship: 735c7148-6dc9-49f6-8187-52e701aad89d
+			defaultHierarchy: LocalDateTable_e777ba5d-bdba-4c76-b3ad-2050668211e6.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column Ship_Mode
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Ship_Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_ID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Postal_Code
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Postal_Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		dataCategory: County
+		summarizeBy: count
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = User
+
+	column Region_ID
+		dataType: int64
+		formatString: 0
+		summarizeBy: count
+		sourceColumn: Region_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_ID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub_Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Sub_Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_Name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// quanntity desc
+	column Quantity
+		dataType: int64
+		isHidden
+		isNullable: false
+		formatString: #,0.00%;-#,0.00%;#,0.00%
+		dataCategory: Barcode
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Profit
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Order_Details = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("sql-server-powerbi.database.windows.net"),
+				    Super_Store_Data = Source{[Name="Super_Store_Data"]}[Data],
+				    dbo_Order_Details = Super_Store_Data{[Schema="dbo",Item="Order_Details"]}[Data]
+				in
+				    dbo_Order_Details
+
+	annotation PBI_ResultType = Table
+

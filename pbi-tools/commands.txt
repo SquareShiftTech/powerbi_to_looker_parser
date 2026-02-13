@@ -1,0 +1,1 @@
+.\pbi-tools.exe extract "C:\squareshift\powerbi\powerbi_to_looker_parser\powerbi_reports\Suprer_Store_Dashboard.pbix" -outPath "./ExtractedModel"

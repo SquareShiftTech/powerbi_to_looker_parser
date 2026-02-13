@@ -1,0 +1,61 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 214,
+            "y": 162
+          },
+          "nodeIndex": "Order_Details",
+          "nodeLineageTag": "f372b6ca-e208-4ee0-b643-1660962b727e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 67.201561193185171,
+            "y": 0
+          },
+          "nodeIndex": "Region",
+          "nodeLineageTag": "e08d57d7-44b0-4400-8d99-14561d21d24b",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 551.20156119318517,
+            "y": 0
+          },
+          "nodeIndex": "Returns",
+          "nodeLineageTag": "b504bed9-75b8-42d3-8296-9a45c8a5bba1",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 2
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
