@@ -1,0 +1,337 @@
+{
+  "workspace_id": "e30575e4-66e6-457f-b11a-351fc73de664",
+  "reports": [
+    {
+      "id": "ad094011-2546-41e1-a1ac-53981a196d9b",
+      "reportType": "PowerBIReport",
+      "format": "PBIR",
+      "name": "Global Marketing & Customer Insights Dashboard",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/ad094011-2546-41e1-a1ac-53981a196d9b",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=ad094011-2546-41e1-a1ac-53981a196d9b&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": true,
+      "isOwnedByMe": true,
+      "datasetId": "859177ca-4e64-437d-8e06-291b57f959f8",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "f6be5222-cc42-4dd8-ad0f-7ae167b40809",
+      "reportType": "PowerBIReport",
+      "format": "PBIR",
+      "name": "hr_recruiting",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/f6be5222-cc42-4dd8-ad0f-7ae167b40809",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=f6be5222-cc42-4dd8-ad0f-7ae167b40809&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": true,
+      "isOwnedByMe": true,
+      "datasetId": "7b923646-f9a6-4ec9-8b97-096ecb2b6c51",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "4c8460f9-4052-4007-a55c-4c37caaa06ac",
+      "reportType": "PowerBIReport",
+      "format": "PBIRLegacy",
+      "name": "Retail Banking Overview",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/4c8460f9-4052-4007-a55c-4c37caaa06ac",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=4c8460f9-4052-4007-a55c-4c37caaa06ac&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": true,
+      "isOwnedByMe": true,
+      "datasetId": "30405c8d-db5e-4a61-b6df-24d0e6b18cf9",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "9bd72c5d-f204-4513-8261-d7f163140212",
+      "reportType": "PowerBIReport",
+      "format": "PBIRLegacy",
+      "name": "Report Usage Metrics Report",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/9bd72c5d-f204-4513-8261-d7f163140212",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=9bd72c5d-f204-4513-8261-d7f163140212&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": false,
+      "isOwnedByMe": true,
+      "datasetId": "0d3d2f6b-c177-4741-b29f-3af78ab37137",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "421d8db8-c6cc-4482-8388-a7af0000e8f9",
+      "reportType": "PowerBIReport",
+      "format": "PBIRLegacy",
+      "name": "Healthcare Operations Summary",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/421d8db8-c6cc-4482-8388-a7af0000e8f9",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=421d8db8-c6cc-4482-8388-a7af0000e8f9&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": false,
+      "isOwnedByMe": true,
+      "datasetId": "3b783b73-530d-46a0-920e-0a597408c2b1",
+      "datasetWorkspaceId": "5945fc8b-1fb7-48a5-873a-0a35ea442166",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "8ff0a2ab-912f-4dd7-91ce-f7bd0d8e222e",
+      "reportType": "PowerBIReport",
+      "format": "PBIR",
+      "name": "Museum Events Analytics",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/8ff0a2ab-912f-4dd7-91ce-f7bd0d8e222e",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=8ff0a2ab-912f-4dd7-91ce-f7bd0d8e222e&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": true,
+      "isOwnedByMe": true,
+      "datasetId": "2425f730-fca2-4273-84f8-fc4a22afc10c",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "6a57bb91-cda9-430f-83ea-65279fc4c1e9",
+      "reportType": "PowerBIReport",
+      "format": "PBIRLegacy",
+      "name": "Spotify Performance Intelligence Dashboard",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/6a57bb91-cda9-430f-83ea-65279fc4c1e9",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=6a57bb91-cda9-430f-83ea-65279fc4c1e9&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": true,
+      "isOwnedByMe": true,
+      "datasetId": "f8d7a1ca-0c85-4be8-a75c-ac63328672de",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "24b04535-fbbe-4099-8c4c-eeb4b7f7897c",
+      "reportType": "PowerBIReport",
+      "format": "PBIRLegacy",
+      "name": "education",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/reports/24b04535-fbbe-4099-8c4c-eeb4b7f7897c",
+      "embedUrl": "https://app.powerbi.com/reportEmbed?reportId=24b04535-fbbe-4099-8c4c-eeb4b7f7897c&groupId=e30575e4-66e6-457f-b11a-351fc73de664&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "isFromPbix": true,
+      "isOwnedByMe": true,
+      "datasetId": "1d080a99-67dc-42e5-9dbe-8289652ee8dd",
+      "datasetWorkspaceId": "e30575e4-66e6-457f-b11a-351fc73de664",
+      "users": [],
+      "subscriptions": []
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "c212a854-fe39-40e5-ab16-0fa6c30bd8d4",
+      "displayName": "Global Marketing & Customer Insights Dashboard",
+      "isReadOnly": false,
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/dashboards/c212a854-fe39-40e5-ab16-0fa6c30bd8d4",
+      "embedUrl": "https://app.powerbi.com/dashboardEmbed?dashboardId=c212a854-fe39-40e5-ab16-0fa6c30bd8d4&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7fX0%3d",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "495d520b-3628-48db-a8db-66ad9c951965",
+      "displayName": "Retail Banking Overview",
+      "isReadOnly": false,
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/dashboards/495d520b-3628-48db-a8db-66ad9c951965",
+      "embedUrl": "https://app.powerbi.com/dashboardEmbed?dashboardId=495d520b-3628-48db-a8db-66ad9c951965&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7fX0%3d",
+      "users": [],
+      "subscriptions": []
+    },
+    {
+      "id": "8b1804b1-a46a-4ab6-92f8-a5ea0370839f",
+      "displayName": "hr_recruiting",
+      "isReadOnly": false,
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/dashboards/8b1804b1-a46a-4ab6-92f8-a5ea0370839f",
+      "embedUrl": "https://app.powerbi.com/dashboardEmbed?dashboardId=8b1804b1-a46a-4ab6-92f8-a5ea0370839f&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7fX0%3d",
+      "users": [],
+      "subscriptions": []
+    }
+  ],
+  "datasets": [
+    {
+      "id": "6c127a30-9c0c-4056-81b7-49b3522b915f",
+      "name": "Recruiting Funnel Analysis",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/6c127a30-9c0c-4056-81b7-49b3522b915f",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "ashok@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "PremiumFiles",
+      "createdDate": "2026-02-09T09:42:23.26Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "859177ca-4e64-437d-8e06-291b57f959f8",
+      "name": "Global Marketing & Customer Insights Dashboard",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/859177ca-4e64-437d-8e06-291b57f959f8",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "ashok@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "PremiumFiles",
+      "createdDate": "2026-02-10T07:27:22.543Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "7b923646-f9a6-4ec9-8b97-096ecb2b6c51",
+      "name": "hr_recruiting",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/7b923646-f9a6-4ec9-8b97-096ecb2b6c51",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "ashok@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "PremiumFiles",
+      "createdDate": "2026-02-10T11:56:04.513Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "30405c8d-db5e-4a61-b6df-24d0e6b18cf9",
+      "name": "Retail Banking Overview",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/30405c8d-db5e-4a61-b6df-24d0e6b18cf9",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "mownisha@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "Abf",
+      "createdDate": "2026-02-10T12:00:56.533Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "0d3d2f6b-c177-4741-b29f-3af78ab37137",
+      "name": "Report Usage Metrics Model",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/0d3d2f6b-c177-4741-b29f-3af78ab37137",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "sujishri@squareshift.co",
+      "isRefreshable": false,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "Abf",
+      "createdDate": "2026-02-11T11:16:54.523Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "2425f730-fca2-4273-84f8-fc4a22afc10c",
+      "name": "museum_cultural_analytics",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/2425f730-fca2-4273-84f8-fc4a22afc10c",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "ashok@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": true,
+      "targetStorageMode": "PremiumFiles",
+      "createdDate": "2026-02-12T05:35:51.773Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "2bcc8603-3c31-4cb4-ab38-4d32b25dcd05",
+      "name": "Stock_Analysis_Data",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/2bcc8603-3c31-4cb4-ab38-4d32b25dcd05",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "ashok@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": true,
+      "targetStorageMode": "PremiumFiles",
+      "createdDate": "2026-02-12T09:39:56.793Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "f8d7a1ca-0c85-4be8-a75c-ac63328672de",
+      "name": "Spotify Performance Intelligence Dashboard",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/f8d7a1ca-0c85-4be8-a75c-ac63328672de",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "mownisha@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "Abf",
+      "createdDate": "2026-02-13T11:51:13.277Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    },
+    {
+      "id": "1d080a99-67dc-42e5-9dbe-8289652ee8dd",
+      "name": "education",
+      "webUrl": "https://app.powerbi.com/groups/e30575e4-66e6-457f-b11a-351fc73de664/datasets/1d080a99-67dc-42e5-9dbe-8289652ee8dd",
+      "addRowsAPIEnabled": false,
+      "configuredBy": "sujishri@squareshift.co",
+      "isRefreshable": true,
+      "isEffectiveIdentityRequired": false,
+      "isEffectiveIdentityRolesRequired": false,
+      "isOnPremGatewayRequired": false,
+      "targetStorageMode": "Abf",
+      "createdDate": "2026-02-13T11:58:45.75Z",
+      "createReportEmbedURL": "https://app.powerbi.com/reportEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "qnaEmbedURL": "https://app.powerbi.com/qnaEmbed?config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLVNPVVRILUVBU1QtQVNJQS1CLVBSSU1BUlktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQiLCJlbWJlZEZlYXR1cmVzIjp7InVzYWdlTWV0cmljc1ZOZXh0Ijp0cnVlfX0%3d",
+      "upstreamDatasets": [],
+      "users": [],
+      "queryScaleOutSettings": {
+        "autoSyncReadOnlyReplicas": true,
+        "maxReadOnlyReplicas": 0
+      }
+    }
+  ]
+}
