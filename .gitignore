@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+mstr2l-env/
+build/
+dist/
+*.egg-info/
+
+# Output files
+*.json
+microstrategy_output.json
+microstrategy_output_consolidated.json
+output/
+output_1/
+
+# HTML files
+*.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
