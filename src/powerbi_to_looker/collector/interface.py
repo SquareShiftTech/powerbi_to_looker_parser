@@ -14,10 +14,16 @@ class CollectorProtocol(Protocol):
         """Fetch artifact for one item; returns blob (bytes or path)."""
         ...
 
-    def extract(self, blob: bytes | str, artifact_type: str | None = None, **kwargs: Any) -> dict[str, Any]:
-        """Turn blob into structured metadata. artifact_type: model | report | dashboard | None (infer)."""
+    def extract(
+        self,
+        blob: str,
+        output_path: str,
+        pbi_tools_exe: str,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Run pbi-tools on .pbix (blob = path); write parsed output to output_path. Returns e.g. {"output_path": str}."""
         ...
 
-    def collect(self, item_id: str, artifact_type: str | None = None, **kwargs: Any) -> dict[str, Any]:
-        """Convenience: download(item_id) then extract(blob, artifact_type)."""
+    def collect(self, item_id: str, **kwargs: Any) -> dict[str, Any]:
+        """Convenience: download(item_id) then, when output_dir and pbi_tools_exe provided, extract(pbix_path, output_path, pbi_tools_exe)."""
         ...

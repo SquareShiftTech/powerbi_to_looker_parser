@@ -1,12 +1,13 @@
-"""Collector unit tests: protocol, list, download, extract, collect, parse. All in one file."""
+"""Collector unit tests: protocol, list, download, extract, collect, parse, run_pbi_tools. All in one file."""
 
+import subprocess
 from unittest.mock import patch, MagicMock
 
 import pytest
 
 from powerbi_to_looker.collector import Collector, CollectorProtocol
-from powerbi_to_looker.collector.extract import model as extract_model
 from powerbi_to_looker.collector.powerbi import get_workspace_id_by_name, list_groups
+from powerbi_to_looker.collector.powerbi.parse import run_pbi_tools
 
 
 # ---- Protocol ----
@@ -127,45 +128,64 @@ def test_download_writes_to_output_dir_and_returns_path(credentials, tmp_path):
 
 
 # ---- extract ----
-def test_extract_delegates_to_artifact_type(credentials):
-    """Call extract(blob, artifact_type='model'); assert extract.model.extract is called."""
-    with patch.object(extract_model, "extract", return_value={"tables": []}) as mock_extract:
+def test_extract_calls_extract_to_folder_and_returns_output_path(tmp_path):
+    """extract(pbix_path, output_path, pbi_tools_exe) calls extract_to_folder and returns dict with output_path."""
+    pbix = tmp_path / "report.pbix"
+    pbix.write_bytes(b"dummy")
+    out_dir = tmp_path / "out"
+    with patch("powerbi_to_looker.collector.collector.extract_to_folder", return_value=str(out_dir.resolve())) as mock_extract:
         c = Collector()
-        c.extract(b"blob", artifact_type="model")
-        mock_extract.assert_called_once_with(b"blob")
+        result = c.extract(str(pbix), str(out_dir), "pbi-tools.exe")
+        mock_extract.assert_called_once_with(pbix, out_dir, "pbi-tools.exe")
+        assert result == {"output_path": str(out_dir.resolve())}
 
 
-def test_extract_model_returns_dict():
-    """extract.model.extract returns dict (or raises). Currently raises NotImplementedError."""
-    with pytest.raises(NotImplementedError):
-        extract_model.extract(b"blob")
-
-
-def test_extract_raises_on_invalid_blob():
-    """Invalid or empty blob: extract still delegates; model may raise."""
+def test_extract_raises_on_non_pbix_path():
+    """extract requires .pbix path; raises ValueError for other paths."""
     c = Collector()
-    with patch.object(extract_model, "extract", side_effect=ValueError("invalid")):
-        with pytest.raises(ValueError):
-            c.extract(b"", artifact_type="model")
+    with pytest.raises(ValueError, match=".pbix path"):
+        c.extract("/some/file.json", "/out", "pbi-tools.exe")
 
 
 # ---- collect ----
-def test_collect_calls_download_then_extract(credentials):
-    """Mock download and extract; call collect(id); assert download called with id, extract with download return."""
-    with patch.object(Collector, "download", return_value=b"pbix_bytes") as mock_dl:
-        with patch.object(Collector, "extract", return_value={"tables": []}) as mock_ex:
+def test_collect_calls_download_then_extract_when_output_dir_and_exe_provided(credentials, tmp_path):
+    """When output_dir and pbi_tools_exe provided, collect calls download then extract with pbix path and output_path."""
+    report_folder = tmp_path / "report-123"
+    pbix_path = str(report_folder / "Report_abc12345.pbix")
+    with patch.object(Collector, "download", return_value=pbix_path) as mock_dl:
+        with patch.object(Collector, "extract", return_value={"output_path": str(report_folder)}) as mock_ex:
             c = Collector()
             c.collect(
                 "report-123",
                 workspace_id="ws1",
                 credentials=credentials,
-                artifact_type="model",
+                output_dir=tmp_path,
+                pbi_tools_exe="pbi-tools.exe",
             )
             mock_dl.assert_called_once()
             assert mock_dl.call_args[0][0] == "report-123"
+            assert mock_dl.call_args[1].get("output_dir") == report_folder
             mock_ex.assert_called_once()
-            assert mock_ex.call_args[0][0] == b"pbix_bytes"
-            assert mock_ex.call_args[1].get("artifact_type") == "model"
+            assert mock_ex.call_args[0][0] == pbix_path
+            assert mock_ex.call_args[0][1] == report_folder
+            assert mock_ex.call_args[0][2] == "pbi-tools.exe"
+
+
+def test_collect_returns_download_only_when_no_pbi_tools_exe(credentials):
+    """When pbi_tools_exe not provided, collect does not call extract; returns download result."""
+    with patch.object(Collector, "download", return_value="/path/to/report.pbix") as mock_dl:
+        with patch.object(Collector, "extract") as mock_ex:
+            c = Collector()
+            result = c.collect(
+                "report-123",
+                workspace_id="ws1",
+                credentials=credentials,
+                output_dir="/out",
+            )
+            mock_dl.assert_called_once()
+            mock_ex.assert_not_called()
+            assert result["output_path"] is None
+            assert result["download"] == "/path/to/report.pbix"
 
 
 # ---- parse ----
@@ -189,3 +209,84 @@ def test_parse_runs_subprocess_with_given_exe(tmp_path):
             tmp_path,
             "pbi-tools.exe",
         )
+
+
+# ---- run_pbi_tools (powerbi/parse.py) ----
+def test_run_pbi_tools_success_uses_extract_folder_and_model_serialization_raw(tmp_path):
+    """run_pbi_tools calls subprocess with extract, -extractFolder, -modelSerialization Raw."""
+    pbix = tmp_path / "report.pbix"
+    pbix.write_bytes(b"x")
+    out = tmp_path / "out"
+    exe = tmp_path / "pbi-tools.exe"
+    exe.write_bytes(b"x")
+    with patch("powerbi_to_looker.collector.powerbi.parse.subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        run_pbi_tools(pbix, out, exe)
+        mock_run.assert_called_once()
+        call_args = mock_run.call_args[0][0]
+        assert call_args[0] == str(exe)
+        assert call_args[1] == "extract"
+        assert call_args[2] == str(pbix)
+        assert "-extractFolder" in call_args
+        assert str(out) in call_args
+        assert "-modelSerialization" in call_args
+        assert "Raw" in call_args
+
+
+def test_run_pbi_tools_raises_called_process_error_on_nonzero_exit(tmp_path):
+    """When pbi-tools exits non-zero, run_pbi_tools raises CalledProcessError with stderr and stdout."""
+    pbix = tmp_path / "report.pbix"
+    pbix.write_bytes(b"x")
+    out = tmp_path / "out"
+    exe = tmp_path / "pbi-tools.exe"
+    exe.write_bytes(b"x")
+    with patch("powerbi_to_looker.collector.powerbi.parse.subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=1, stdout="out", stderr="pbi-tools error message")
+        with pytest.raises(subprocess.CalledProcessError) as exc_info:
+            run_pbi_tools(pbix, out, exe)
+        e = exc_info.value
+        assert e.returncode == 1
+        assert e.stderr == "pbi-tools error message"
+        assert e.stdout == "out"
+
+
+def test_run_pbi_tools_raises_file_not_found_for_missing_exe(tmp_path):
+    """run_pbi_tools raises FileNotFoundError when exe path does not exist."""
+    pbix = tmp_path / "report.pbix"
+    pbix.write_bytes(b"x")
+    out = tmp_path / "out"
+    with pytest.raises(FileNotFoundError, match="pbi-tools executable not found"):
+        run_pbi_tools(pbix, out, tmp_path / "nonexistent.exe")
+
+
+def test_run_pbi_tools_raises_file_not_found_for_missing_pbix(tmp_path):
+    """run_pbi_tools raises FileNotFoundError when .pbix path does not exist."""
+    exe = tmp_path / "pbi-tools.exe"
+    exe.write_bytes(b"x")
+    with pytest.raises(FileNotFoundError, match="PBIX file not found"):
+        run_pbi_tools(tmp_path / "missing.pbix", tmp_path / "out", exe)
+
+
+def test_parse_failure_includes_exit_code_stderr_stdout_in_failed_entry(tmp_path):
+    """When parse raises CalledProcessError, script-style handling includes exit_code, stderr, stdout in failed item."""
+    (tmp_path / "report.pbix").write_bytes(b"x")
+    parsed_dir = tmp_path / "parsed"
+    collector = Collector()
+    err = subprocess.CalledProcessError(1, ["pbi-tools"], output="pbi-tools stdout", stderr="pbi-tools stderr")
+    with patch.object(collector, "parse", side_effect=err):
+        parse_failed: list[dict] = []
+        for pbix_path in sorted(tmp_path.glob("*.pbix")):
+            try:
+                collector.parse(pbix_path, parsed_dir / pbix_path.stem, "pbi-tools.exe")
+            except subprocess.CalledProcessError as e:
+                parse_failed.append({
+                    "pbix": str(pbix_path),
+                    "error": str(e),
+                    "exit_code": e.returncode,
+                    "stderr": (e.stderr or "").strip() or None,
+                    "stdout": (e.stdout or "").strip() or None,
+                })
+        assert len(parse_failed) == 1
+        assert parse_failed[0]["exit_code"] == 1
+        assert parse_failed[0]["stderr"] == "pbi-tools stderr"
+        assert parse_failed[0]["stdout"] == "pbi-tools stdout"

@@ -18,7 +18,7 @@ def run_pbi_tools(
 
     Raises:
         FileNotFoundError: If exe or pbix not found.
-        subprocess.CalledProcessError: If pbi-tools exits non-zero.
+        subprocess.CalledProcessError: If pbi-tools exits non-zero. .stderr and .stdout are set for diagnostics.
     """
     pbix = Path(pbix_path)
     out = Path(output_path)
@@ -28,9 +28,22 @@ def run_pbi_tools(
     if not pbix.exists():
         raise FileNotFoundError(f"PBIX file not found: {pbix_path}")
     out.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        [str(exe), "extract", str(pbix), "-outPath", str(out)],
-        check=True,
+    cmd = [
+        str(exe), "extract", str(pbix),
+        "-extractFolder", str(out),
+        "-modelSerialization", "Raw",
+    ]
+    result = subprocess.run(
+        cmd,
         capture_output=True,
+        text=True,
         timeout=300,
     )
+    if result.returncode != 0:
+        err_msg = result.stderr or result.stdout or f"Exit code {result.returncode}"
+        raise subprocess.CalledProcessError(
+            result.returncode,
+            cmd,
+            output=result.stdout,
+            stderr=result.stderr,
+        )

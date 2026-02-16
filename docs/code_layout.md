@@ -34,14 +34,11 @@ collector/
     parse.py              # run_pbi_tools(pbix_path, output_path, pbi_tools_exe)
   extract/
     __init__.py
-    model.py             # Extract semantic/model metadata from blob
-    report.py            # Extract report metadata from blob
-    dashboard.py         # Extract dashboard metadata from blob
+    run.py               # extract_to_folder(pbix_path, output_path, pbi_tools_exe) — runs pbi-tools, exe from orchestrator
 ```
 
 - **Root** holds only the contract and the main implementation; **powerbi/** holds auth, API, and parse so the root is not cluttered.
-- **extract/** holds one module per artifact type so “how we get metadata from a blob” is grouped and not mixed in the root.
-
+- **extract/** has a single code path: “.pbix path + output folder + pbi-tools exe (from orchestrator) → parsed output in folder” 
 ### Interface (contract)
 
 The collector interface exposes:
@@ -49,11 +46,11 @@ The collector interface exposes:
 | Method | Purpose |
 |--------|--------|
 | `list(...)` | Return list of report/dataset identifiers (id, name, workspace, type, etc.). |
-| `download(id)` | Fetch the artifact for one item; returns blob (bytes or path). |
-| `extract(blob, artifact_type?)` | Turn blob into structured metadata. Optional `artifact_type` in `model` \| `report` \| `dashboard`; if omitted, infer from blob. |
-| `collect(id, artifact_type?)` | **Tweak:** Convenience: `download(id)` then `extract(blob, artifact_type)`. Single call for “get metadata for one item” from API/CLI. |
+| `download(id)` | Fetch the artifact for one item; returns blob (bytes or path when `output_dir` set). |
+| `extract(pbix_path, output_path, pbi_tools_exe)` | Run pbi-tools on .pbix; write parsed output to folder. Returns e.g. `{"output_path": str}`. Exe path from orchestrator. |
+| `collect(id, ...)` | Convenience: `download(id)` then, when `output_dir` and `pbi_tools_exe` provided, `extract(pbix_path, output_path, pbi_tools_exe)`. “” |
 
-Implementations live in `collector.py`; they may delegate to `extract.model`, `extract.report`, `extract.dashboard` for each type.
+Implementations live in `collector.py`; extract delegates to `extract.run.extract_to_folder` (which calls `powerbi.parse.run_pbi_tools`).
 
 ### Parallelization
 
@@ -62,7 +59,7 @@ Implementations live in `collector.py`; they may delegate to `extract.model`, `e
 - **Tweak:** The collector accepts an optional **`max_workers`** (e.g. in constructor or config). Callers use it to run a thread/process pool over the item list:
   - `max_workers=1`: single-threaded (e.g. default for CLI).
   - `max_workers>1`: parallel (e.g. API batch or CLI `--parallel`).
-- **extract/** modules stay **stateless**: input = blob, output = dict. No shared mutable state, so parallel execution is safe.
+- **extract/** is stateless: input = .pbix path + output folder + exe; output = folder. No shared mutable state, so parallel execution is safe.
 
 ### Using from API and CLI
 
@@ -159,7 +156,7 @@ generator/
 | **Collector** contract | `collector/interface.py` |
 | Collector implementation | `collector/collector.py` |
 | Power BI backend | `collector/powerbi/auth.py`, `powerbi_api.py`, `parse.py` |
-| Extract by type | `collector/extract/model.py`, `report.py`, `dashboard.py` |
+| Extract (parse) | `collector/extract/run.py` (extract_to_folder); `collector/powerbi/parse.py` (run_pbi_tools) |
 | One-item flow | `collect(id)` on the interface |
 | Parallelism | Config/constructor `max_workers`; caller runs per-item `collect` in a pool |
 | **Parser–normalizer** entry | `parser_normalizer/__init__.py` (`load`) |

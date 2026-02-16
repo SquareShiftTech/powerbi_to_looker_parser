@@ -1,9 +1,10 @@
-"""Implementation (generic name; Power BI today). Delegates to extract.model, extract.report, extract.dashboard."""
+"""Implementation (generic name; Power BI today). Single extract: pbix → folder via pbi-tools."""
 
 import re
 from pathlib import Path
 from typing import Any
 
+from powerbi_to_looker.collector.extract import extract_to_folder
 from powerbi_to_looker.collector.interface import CollectorProtocol
 from powerbi_to_looker.collector.powerbi import auth, powerbi_api
 from powerbi_to_looker.collector.powerbi.parse import run_pbi_tools
@@ -24,7 +25,7 @@ def _resolve_workspace_id(
     if resolved is None:
         raise ValueError(f"No workspace found with name: {workspace_name!r}")
     return resolved
-from powerbi_to_looker.collector.extract import model as extract_model, report as extract_report, dashboard as extract_dashboard
+
 
 # Safe filename for .pbix: no path chars, limit length
 _INVALID_FILENAME_CHARS = re.compile(r'[\\/:*?"<>|]')
@@ -96,26 +97,33 @@ class Collector(CollectorProtocol):
 
     def extract(
         self,
-        blob: bytes | str,
-        artifact_type: str | None = None,
+        blob: str | Path,
+        output_path: str | Path,
+        pbi_tools_exe: str | Path,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """Turn blob into structured metadata. Delegates to extract.model/report/dashboard by artifact_type."""
-        if artifact_type == "model":
-            return extract_model.extract(blob)
-        if artifact_type == "report":
-            return extract_report.extract(blob)
-        if artifact_type == "dashboard":
-            return extract_dashboard.extract(blob)
-        # Default to model when not specified
-        return extract_model.extract(blob)
+        """Run pbi-tools on .pbix (blob = path); write parsed output to output_path. Exe from orchestrator.
+        Returns {"output_path": str}."""
+        path = Path(blob)
+        if path.suffix.lower() != ".pbix":
+            raise ValueError(f"extract requires .pbix path, got {blob!r}")
+        out = Path(output_path)
+        result_path = extract_to_folder(path, out, pbi_tools_exe)
+        return {"output_path": result_path}
 
     def collect(
         self,
         item_id: str,
-        artifact_type: str | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """download then extract. Pass credentials, workspace_id, etc. via kwargs."""
+        """Download then extract (pbix → folder). Pass credentials, output_dir, pbi_tools_exe, report_name, etc. via kwargs.
+        Only runs extract when output_dir and pbi_tools_exe are provided and download returns a path."""
+        output_dir = kwargs.get("output_dir")
+        report_folder = Path(output_dir) / item_id if output_dir is not None else None
+        if report_folder is not None:
+            kwargs = {**kwargs, "output_dir": report_folder}
         blob = self.download(item_id, **kwargs)
-        return self.extract(blob, artifact_type=artifact_type, **kwargs)
+        pbi_tools_exe = kwargs.get("pbi_tools_exe")
+        if isinstance(blob, str) and pbi_tools_exe and report_folder is not None:
+            return self.extract(blob, report_folder, pbi_tools_exe, **kwargs)
+        return {"output_path": None, "download": blob}

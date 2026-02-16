@@ -27,7 +27,7 @@ DEFAULT_CREDENTIALS = {
     "client_secret": "MD48Q~7nQTc2f8oVsgn.Y3q9osWc3~4rkQGtVc2g",
 }
 DEFAULT_WORKSPACE_ID = "e30575e4-66e6-457f-b11a-351fc73de664"
-DEFAULT_REPORT_ID = "ad094011-2546-41e1-a1ac-53981a196d9b"  # Super_Store_Dashboard
+DEFAULT_REPORT_ID = "8ff0a2ab-912f-4dd7-91ce-f7bd0d8e222e"  # Super_Store_Dashboard
 
 
 def _credentials() -> dict[str, str]:
