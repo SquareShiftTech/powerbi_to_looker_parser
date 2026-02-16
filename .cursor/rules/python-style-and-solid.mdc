@@ -1,0 +1,44 @@
+---
+description: Python style, SOLID, DRY, crisp code, and readability
+globs: src/**/*.py, tests/**/*.py, **/pyproject.toml
+---
+
+# Python, SOLID, and code quality
+
+## Tooling and types
+
+- Python 3.11+. Use modern typing: `list[...]`, `dict[str, Any]`, `str | None`. Ruff: line-length 100, py311. Run `uv run ruff check src` before committing.
+- Canonical models: Pydantic BaseModel in models/. Keep fields aligned with pipeline (raw → canonical → LookML). In Pydantic models, existing use of `List`/`Optional` from typing is acceptable; new code outside models prefers built-in generics and `| None`.
+- **When changing production code in src/,** always update or add the corresponding tests in the same change (unit and/or integration as applicable).
+
+## SOLID and structure
+
+- **Single responsibility:** One module/class does one thing (e.g. one extract type per file, one mapper concern per file).
+- **Open/closed:** Prefer **YAML-driven rules** for mapping and behavior so new cases are added via config, not by editing code everywhere. Use classes when you need a clear extension point (e.g. CollectorProtocol).
+- **Liskov / Interface segregation:** Implement CollectorProtocol fully where used; don't force callers to depend on methods they don't use.
+- **Dependency inversion:** Depend on interfaces (e.g. CollectorProtocol) and common helpers; avoid cross-package business logic in common/.
+
+## DRY and common/
+
+- **Any code used by two or more of** collector, parser_normalizer, transformer, generator **must go in common/.** No copy-paste between these packages. Path resolution, YAML loading, and shared small helpers live in common/.
+- If only one module needs a helper, keep it in that module (or its _helpers) until a second consumer appears.
+
+## Crisp and understandable code
+
+- Write for **specific use cases and scenarios** the pipeline actually handles. Avoid generic "framework" code that doesn't map to a concrete scenario.
+- Prefer **short, well-named functions** and clear variable names. One level of indirection per idea; if a function does more than one thing, split it.
+- **Design patterns:** Use only when they directly improve clarity or reduce duplication (e.g. Protocol for collector, strategy-like behavior via YAML rules). Do not add patterns for hypothetical future needs.
+
+## Readability when AI writes code
+
+- **Naming:** Use names that describe the use case (e.g. `extract_report_metadata`, `map_dimension_to_lookml`). Avoid vague names like `process`, `handle`, `do_work`.
+- **Comments:** Add a one-line docstring for every public function and for non-obvious blocks. Explain *why* or *what scenario* when the code is not self-explanatory.
+- **Structure:** Prefer top-down: main flow first, helpers below or in _helpers. So a reader (or you) can understand "what this does" before "how."
+- **Length:** If a file grows beyond ~150–200 lines or has many responsibilities, split by use case or step; keep each file understandable in one pass.
+
+## Entry point signatures (do not change without updating callers)
+
+- Parser/normalizer: `load(path_or_metadata: str | dict[str, Any]) -> dict[str, Any]`; semantic/visualization/dashboard handlers: `run(raw: dict[str, Any]) -> ...`.
+- Transformer: `to_lookml_terms(canonical_bundle: Any) -> dict[str, Any]`; mappers: `run(canonical_*, config: dict | None = None) -> ...`.
+- Generator: `write(lookml_terms: dict[str, Any], output_dir: str | Path) -> list[str]`.
+- Collector: implement CollectorProtocol (list, download, extract, collect); extract modules: `extract(blob: bytes | str) -> dict[str, Any]`.

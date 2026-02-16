@@ -1,0 +1,28 @@
+---
+description: Unit tests in tests/, integration in scripts/, no duplicate tests, update tests with every change
+globs: tests/**/*.py, scripts/**/*.py
+---
+
+# Tests and scripts
+
+## Unit tests (tests/)
+
+- **All unit tests live under tests/.** Test one behavior per test; one module under test per test file when possible (e.g. test_collector.py, test_view_mapper.py).
+- **Avoid duplicate or redundant tests:** Do not add multiple tests that assert the same behavior with trivial variations. One clear test per scenario; parameterize (pytest parametrize) if you have many similar inputs for the same scenario.
+- **Scope:** Mock external I/O (Power BI API, file system) in unit tests. Tests should be fast and not require network or real .pbix files. Use fixtures for shared setup; avoid copy-paste setup across tests.
+- **Naming:** `test_<function_or_behavior>_<scenario_or_condition>` so it's clear what is being tested (e.g. `test_extract_returns_dict_when_blob_is_valid`, `test_load_returns_metadata_when_given_dict`).
+- **Shared fixtures:** Put shared test fixtures and session-scoped setup in `tests/conftest.py`; avoid copy-paste setup across test files.
+
+## Integration tests and scripts
+
+- **Real integration flows** (e.g. call Power BI API, download real .pbix, run full pipeline on real data) belong in **scripts/**, not in tests/. Example: `scripts/run_collector_real.py`. If you add an automated integration test suite (e.g. `tests/integration/`), keep it separate from unit tests and document how to run it (env, credentials, optional).
+- **Update when code changes:** When you change code that an integration flow or integration test uses (e.g. collector, API client, pipeline steps), **update the integration script or integration test** in the same change. Integration coverage must stay in sync with behavior, just like unit tests.
+- **No duplication:** Do not duplicate the same integration scenario in multiple scripts or in both scripts and tests. One script or one integration test per scenario; share helpers or fixtures if several flows reuse the same setup. Keep integration tests minimal and focused (e.g. "list and download one report," "migrate from file to LookML").
+- Scripts are for manual or CI "real" runs. Keep scripts focused: one script per main use case.
+
+## Keep tests in sync with code changes
+
+- **Whenever you change production code, update the tests that cover it.** Do not leave tests stale: if a function's behavior, signature, or contract changes, update or remove the corresponding test(s) in the same change. This applies to both unit tests and integration scripts/tests.
+- **One place per scenario:** Each behavior is tested in exactly one test (or one parameterized test). When adding a new scenario, either add one new test or extend an existing parameterized test; do not add a near-duplicate test that only differs by a trivial input.
+- **No orphan tests:** If you remove or replace a feature, remove or rewrite the tests for that feature. Do not leave tests that refer to old behavior or dead code.
+- **Refactor tests when behavior is shared:** If two tests would repeat the same setup/assertions with small variations, extract a shared fixture or helper and use `@pytest.mark.parametrize` (or a small helper) so the scenario is defined once and the cases are data-driven.

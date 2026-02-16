@@ -1,0 +1,10 @@
+---
+description: data-extractor app and Power BI API usage
+globs: data-extractor/**/*, docs/extract_api.txt
+---
+
+# data-extractor and Power BI APIs
+
+- **data-extractor/** is the app that uses Power BI REST API to list and download reports (.pbix). It is separate from the library `src/powerbi_to_looker`; the library consumes metadata (e.g. from collector or from file).
+- **Power BI API reference:** See `docs/extract_api.txt` for list reports (My Workspace + Workspace), export report (My Workspace + Workspace), and query params (e.g. preferClientRouting, downloadType).
+- When adding or changing API calls, keep auth and endpoint logic in data-extractor (e.g. auth.py, api.py); collector in the library remains the contract that consumes blobs or metadata.

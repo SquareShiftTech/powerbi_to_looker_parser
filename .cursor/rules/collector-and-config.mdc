@@ -1,0 +1,11 @@
+---
+description: Collector contract, extract pattern, and config usage
+globs: src/powerbi_to_looker/collector/**/*.py, src/powerbi_to_looker/config/**/*
+---
+
+# Collector and config
+
+- **Collector:** Implement `CollectorProtocol` in `collector/interface.py`. `extract/` modules are stateless: input = blob, output = dict; no shared mutable state (safe for parallel collect).
+- **Extract by type:** One module per artifact in `collector/extract/`: model.py, report.py, dashboard.py. Optional `artifact_type` when inferring from blob is not desired.
+- **Config (YAML):** Parser/normalizer uses `config/semantic_mapping.yaml`, `config/visualization_mapping.yaml`. Transformer uses `config/lookml_mapping.yaml`. Always load via `powerbi_to_looker.common.yaml_loader.load_yaml` (or package-relative path). Config is the single place for mapping rules (types, renames, defaults, aggregation → LookML).
+- **Generator:** Templates live under the package (e.g. `generator/dashboard_template/*.lookml`, `templates/*.j2` per pyproject.toml package-data). Writer only renders and writes; no mapping logic.

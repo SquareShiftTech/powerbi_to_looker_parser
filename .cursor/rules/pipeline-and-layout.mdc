@@ -1,0 +1,24 @@
+---
+description: Power BI to Looker pipeline, code layout, and anti-overengineering
+globs: src/**/*.py, docs/**/*
+---
+
+# Pipeline and code layout
+
+- Pipeline: **Collector → Parser/Normalizer → Transformer → Generator**. See `docs/code_layout.md`.
+- **Source of truth:** `src/powerbi_to_looker/`. Do not add new logic under `archive/`; archive is reference only.
+
+## Layout (follow strictly)
+
+- **common/** – Shared utilities only (path_utils, yaml_loader). No business logic. Code used by two or more of collector/parser_normalizer/transformer/generator must live here to avoid duplication.
+- **collector/** – interface.py (contract), collector.py (implementation), extract/*.py per artifact type (model, report, dashboard).
+- **parser_normalizer/** – load() entry; loader → raw dict; semantic/ (orchestrator + dimension, measure, calc_field, tables); visualization.py, dashboard.py.
+- **transformer/** – to_lookml_terms() in orchestrator; semantic/ (view_mapper, model_mapper, _helpers); visualization; dashboard/dashboard_mapper.
+- **generator/** – writer.write(lookml_terms, output_dir); templates only; no mapping logic.
+- **models/** – Canonical Pydantic models. **config/** – YAML mapping files; load via common.yaml_loader.
+
+## Anti-overengineering
+
+- Prefer **small, focused modules** that solve one use case or scenario. Do not introduce extra layers, facades, or abstractions "for flexibility" unless the same logic is reused in multiple places or the current file is hard to follow.
+- Add **classes** only when they improve clarity or are required (e.g. stateful collector, protocol implementation, clear domain entity). Prefer **functions** for stateless steps (e.g. extract, run, mapper).
+- When in doubt, implement the **simplest thing that fits the pipeline**; refactor when duplication or complexity appears.

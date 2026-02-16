@@ -1,0 +1,12 @@
+---
+description: Rule-based behavior via YAML config; when to use YAML
+globs: src/**/*.py, src/**/config/**/*.yaml, **/templates/**/*
+---
+
+# YAML as rule-based config
+
+- **Use YAML for all rule-based behavior** that might change per deployment or use case: mapping (e.g. Power BI type → canonical type, canonical → LookML), renames, defaults, aggregation rules, viz type mapping, conditional formatting rules.
+- **Config files:** Parser/normalizer: `config/semantic_mapping.yaml`, `config/visualization_mapping.yaml`. Transformer: `config/lookml_mapping.yaml`. Load via `common.yaml_loader.load_yaml` only; no ad-hoc YAML parsing elsewhere.
+- **Code vs YAML:** Code implements *flow* (orchestration, extraction, rendering). YAML defines *rules* (what maps to what, defaults, options). When adding a new mapping or rule, add it to the appropriate YAML (and schema if needed) rather than hardcoding in Python.
+- **Single source of truth:** One YAML per concern (semantic, visualization, lookml). If a new domain appears (e.g. dashboard rules), add a new config file and reference it from the index or loader; don't mix unrelated rules in one file.
+- **Config file names:** Names may vary (e.g. `powerbi_canonical_mapping.yaml`, `canonical_lookml_mapping.yaml`). Follow the same pattern: one YAML per concern, load via `common.yaml_loader.load_yaml` only.
