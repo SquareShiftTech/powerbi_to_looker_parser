@@ -27,6 +27,11 @@ collector/
   __init__.py
   interface.py           # Contract: list, download, extract, collect
   collector.py            # Implementation (generic name; Power BI today)
+  powerbi/                # Power BI backend: auth, API, pbi-tools parse
+    __init__.py
+    auth.py               # get_token(credentials)
+    powerbi_api.py        # list_groups, get_workspace_id_by_name, list_reports, export_report
+    parse.py              # run_pbi_tools(pbix_path, output_path, pbi_tools_exe)
   extract/
     __init__.py
     model.py             # Extract semantic/model metadata from blob
@@ -34,7 +39,7 @@ collector/
     dashboard.py         # Extract dashboard metadata from blob
 ```
 
-- **Root** holds only the contract and the main implementation.
+- **Root** holds only the contract and the main implementation; **powerbi/** holds auth, API, and parse so the root is not cluttered.
 - **extract/** holds one module per artifact type so “how we get metadata from a blob” is grouped and not mixed in the root.
 
 ### Interface (contract)
@@ -153,6 +158,7 @@ generator/
 | Common YAML load | `common/yaml_loader.py` |
 | **Collector** contract | `collector/interface.py` |
 | Collector implementation | `collector/collector.py` |
+| Power BI backend | `collector/powerbi/auth.py`, `powerbi_api.py`, `parse.py` |
 | Extract by type | `collector/extract/model.py`, `report.py`, `dashboard.py` |
 | One-item flow | `collect(id)` on the interface |
 | Parallelism | Config/constructor `max_workers`; caller runs per-item `collect` in a pool |

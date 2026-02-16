@@ -9,7 +9,7 @@ Plan for **collector** unit tests and integration testing. Review and approve be
 - **Contract** (see `collector/interface.py` and `docs/code_layout.md`): `list`, `download`, `extract`, `collect`.
 - **All of the following are provided by the orchestration layer** (scripts / API / CLI). The collector does not read env, config, or defaults for them:
   - **credentials** — e.g. `tenant_id`, `client_id`, `client_secret` or `access_token`. Passed into `list(...)` and `download(...)`.
-  - **workspace_id** — Power BI workspace (group) id or “My Workspace”. Passed into `list(...)` and `download(...)`.
+  - **workspace_id** — Power BI workspace (group) id or “My Workspace”. Passed into `list(...)` and `download(...)`. **Scripts/CLI may accept workspace name:** orchestration can resolve name → id via Power BI Groups API (`GET .../myorg/groups`) and pass the resolved id to the collector.
   - **pbi_tools_exe** — Path to pbi-tools executable. Passed in when the collector runs parse (e.g. `extract(..., pbi_tools_exe=...)` or a dedicated parse method).
 - **Library responsibility:** Implement list (Power BI API), download (Export API, optional success/failed tracking), extract/parse (using pbi_tools_exe, one folder per report). No orchestration logic; callers decide order and batching.
 
@@ -69,7 +69,7 @@ We already use **tests/collector/** with one file. If `test_collector.py` grows 
 
 | Script | Purpose | Inputs (env / CLI) | What it does |
 |--------|---------|--------------------|--------------|
-| `scripts/run_collector.py` | Integration: full collector flow | `PBI_TENANT_ID`, `PBI_CLIENT_ID`, `PBI_CLIENT_SECRET`, `PBI_WORKSPACE_ID`, `PBI_TOOLS_EXE` (or CLI args); `output_dir` | **Default:** list → download each report (one folder per report) → parse with pbi_tools_exe; track and print success/failed. **Optional flags:** `--list-only` (only list and print), `--download-only` (list + download, no parse) for debugging. |
+| `scripts/run_collector.py` | Integration: full collector flow | `PBI_TENANT_ID`, `PBI_CLIENT_ID`, `PBI_CLIENT_SECRET`; **workspace:** `PBI_WORKSPACE_ID` (id) or `PBI_WORKSPACE_NAME` (name → id via Groups API); `PBI_TOOLS_EXE`, `output_dir` | **Default:** resolve workspace (name → id if needed) → list → download each report (one folder per report) → parse with pbi_tools_exe; track and print success/failed. **Optional flags:** `--list-only`, `--download-only`. |
 
 - **Run manually or from CI** with real credentials and pbi-tools path. Full run exercises list, download, and parse together.
 - **Document in script docstring or README:** Required env vars, CLI args, that this is the integration test for full collector functionality.
@@ -85,7 +85,9 @@ We already use **tests/collector/** with one file. If `test_collector.py` grows 
 1. **Collector implementation** — Implement the collector in `src/powerbi_to_looker/collector/`: list (Power BI API + auth), download (Export API, success/failed tracking), extract (delegate to extract.model/report/dashboard), parse (invoke pbi-tools with `pbi_tools_exe`, one folder per report). Match contract in `interface.py` and requirements in section 2.
 2. **Unit tests** — Subfolder `tests/collector/` with single file `test_collector.py` containing all cases (protocol, list, download, extract, collect, parse); use mocks and fixtures.
 3. **Integration script** — One script `scripts/run_collector.py` that runs the full flow (list → download → parse); optional `--list-only`, `--download-only`. Document env and usage. Required for integration coverage.
-4. **If unit tests grow** — Add at most 1–2 more files in `tests/collector/` (e.g. test_extract_and_parse.py); cap at 2–3 files in that folder.
+4. **Workspace by name** — Support passing workspace by **name** in addition to id: in `powerbi_api` add list groups (`GET .../myorg/groups`) and optional helper to resolve name → id; in `scripts/run_collector.py` accept `PBI_WORKSPACE_NAME` (or CLI `--workspace-name`); if name is given, resolve to id then pass id to collector. Collector continues to receive only `workspace_id` (orchestration resolves name).
+5. **Collector layout** — Collector root holds only **contract and main implementation**: `interface.py`, `collector.py`, `extract/`. Power BI–specific code (auth, API, parse) lives in **collector/powerbi/** (`auth.py`, `powerbi_api.py`, `parse.py`) so the root is not cluttered. See `docs/code_layout.md`.
+6. **If unit tests grow** — Add at most 1–2 more files in `tests/collector/` (e.g. test_extract_and_parse.py); cap at 2–3 files in that folder.
 
 ---
 
@@ -94,7 +96,10 @@ We already use **tests/collector/** with one file. If `test_collector.py` grows 
 | Area | Where | Notes |
 |------|--------|--------|
 | Unit tests | tests/collector/test_collector.py | Subfolder from the start; single file; mock API and I/O; protocol, list, download, extract, collect, parse. If split later: add max 1–2 more files in tests/collector/ (2–3 files total). |
-| Integration tests | scripts/run_collector.py | Required. One script: full flow (list → download → parse); optional --list-only, --download-only. credentials, workspace_id, pbi_tools_exe from env/CLI. |
-| From orchestration | All caller-provided | credentials, workspace_id, pbi_tools_exe; collector never reads env/config for these. |
+| Integration tests | scripts/run_collector.py | Required. One script: full flow (list → download → parse); optional --list-only, --download-only. credentials, workspace (id or name), pbi_tools_exe from env/CLI; script resolves workspace name → id via Groups API. |
+| From orchestration | All caller-provided | credentials, workspace_id, pbi_tools_exe; collector never reads env/config for these. Script may accept workspace name and resolve to id before calling collector. |
+| Collector layout | collector/ root + powerbi/ | Root: interface.py, collector.py, extract/. Power BI backend: collector/powerbi/ (auth.py, powerbi_api.py, parse.py). |
+
+**Process (see .cursor/rules/plan-and-process.mdc):** Update this plan when adding features (e.g. workspace-by-name); review plan then proceed; keep plan files under plan/ only (no duplicate plan docs).
 
 Review this plan and say when to proceed with implementation.

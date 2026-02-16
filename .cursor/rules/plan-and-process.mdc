@@ -1,0 +1,11 @@
+---
+description: Plan-first workflow; update plan and review before implementation; no duplicate plan files
+globs: plan/**/*.md, docs/**/*.md
+---
+
+# Plan and process
+
+- **Plan first:** Before implementing a new feature or non-trivial change, check and if needed **update the plan** (e.g. `plan/collector_tests_and_integration.md` or other plan docs). Document scope, contract, and implementation order in the plan.
+- **Review then proceed:** Review the (updated) plan and get alignment, then proceed with implementation. Do not implement in a direction that contradicts the plan without updating the plan first.
+- **Single source of truth for plans:** Plan files live under **plan/** only. Do not duplicate plan content in multiple files (e.g. no second "collector plan" in docs/ that mirrors plan/). One plan per area or feature; reference from docs if needed (e.g. "see plan/collector_tests_and_integration.md").
+- **Keep plan in sync:** When implementation diverges from the plan (e.g. new inputs, new script flags, API changes), update the plan in the same change so the plan stays accurate.

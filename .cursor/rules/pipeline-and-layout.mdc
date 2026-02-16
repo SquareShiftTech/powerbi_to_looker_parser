@@ -11,7 +11,7 @@ globs: src/**/*.py, docs/**/*
 ## Layout (follow strictly)
 
 - **common/** – Shared utilities only (path_utils, yaml_loader). No business logic. Code used by two or more of collector/parser_normalizer/transformer/generator must live here to avoid duplication.
-- **collector/** – interface.py (contract), collector.py (implementation), extract/*.py per artifact type (model, report, dashboard).
+- **collector/** – interface.py (contract), collector.py (implementation), powerbi/ (auth, powerbi_api, parse), extract/*.py per artifact type (model, report, dashboard).
 - **parser_normalizer/** – load() entry; loader → raw dict; semantic/ (orchestrator + dimension, measure, calc_field, tables); visualization.py, dashboard.py.
 - **transformer/** – to_lookml_terms() in orchestrator; semantic/ (view_mapper, model_mapper, _helpers); visualization; dashboard/dashboard_mapper.
 - **generator/** – writer.write(lookml_terms, output_dir); templates only; no mapping logic.
