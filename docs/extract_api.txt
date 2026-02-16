@@ -1,0 +1,9 @@
+
+Key APIs
+List Reports (My Workspace): GET https://api.powerbi.com/v1.0/myorg/reports – Returns array of reports with ID, name, datasetId.
+
+List Reports (Workspace): GET https://api.powerbi.com/v1.0/myorg/groups/{groupId}/reports – Targets specific workspace (groupId).
+
+Export Report (My Workspace): GET https://api.powerbi.com/v1.0/myorg/reports/{reportId}/Export?preferClientRouting=true – Downloads .pbix directly (application/zip).
+
+Export Report (Workspace): GET https://api.powerbi.com/v1.0/myorg/groups/{groupId}/reports/{reportId}/Export – For workspace reports; supports ?downloadType=LiveConnect or IncludeModel.
