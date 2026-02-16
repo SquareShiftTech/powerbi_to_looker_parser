@@ -83,7 +83,7 @@ def export_report(
     workspace_id: str | None,
     access_token: str,
     *,
-    prefer_client_routing: bool = True,
+    prefer_client_routing: bool = False,
 ) -> bytes:
     """Export a report as .pbix bytes.
 

@@ -7,6 +7,23 @@ from typing import Any
 from powerbi_to_looker.collector.interface import CollectorProtocol
 from powerbi_to_looker.collector.powerbi import auth, powerbi_api
 from powerbi_to_looker.collector.powerbi.parse import run_pbi_tools
+
+
+def _resolve_workspace_id(
+    workspace_id: str | None,
+    workspace_name: str | None,
+    credentials: dict[str, str],
+) -> str | None:
+    """Return workspace_id if set; else resolve workspace_name to id via API. Raise if name given but not found."""
+    if workspace_id is not None:
+        return workspace_id
+    if not workspace_name or not workspace_name.strip():
+        return None
+    token = auth.get_token(credentials)
+    resolved = powerbi_api.get_workspace_id_by_name(workspace_name.strip(), token)
+    if resolved is None:
+        raise ValueError(f"No workspace found with name: {workspace_name!r}")
+    return resolved
 from powerbi_to_looker.collector.extract import model as extract_model, report as extract_report, dashboard as extract_dashboard
 
 # Safe filename for .pbix: no path chars, limit length
@@ -34,26 +51,30 @@ class Collector(CollectorProtocol):
         self,
         *,
         workspace_id: str | None = None,
+        workspace_name: str | None = None,
         credentials: dict[str, str],
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
-        """Return list of report/dataset identifiers. credentials and workspace_id from caller."""
+        """Return list of report/dataset identifiers. Pass workspace_id or workspace_name (resolved via API)."""
+        resolved_id = _resolve_workspace_id(workspace_id, workspace_name, credentials)
         token = auth.get_token(credentials)
-        return powerbi_api.list_reports(workspace_id, token)
+        return powerbi_api.list_reports(resolved_id, token)
 
     def download(
         self,
         item_id: str,
         *,
         workspace_id: str | None = None,
+        workspace_name: str | None = None,
         credentials: dict[str, str],
         output_dir: str | Path | None = None,
         report_name: str | None = None,
         **kwargs: Any,
     ) -> bytes | str:
-        """Fetch .pbix for one report. Returns bytes or path if output_dir set. Raises on API error."""
+        """Fetch .pbix for one report. Pass workspace_id or workspace_name (resolved via API). Returns bytes or path if output_dir set."""
+        resolved_id = _resolve_workspace_id(workspace_id, workspace_name, credentials)
         token = auth.get_token(credentials)
-        content = powerbi_api.export_report(item_id, workspace_id, token)
+        content = powerbi_api.export_report(item_id, resolved_id, token)
         if output_dir is None:
             return content
         out = Path(output_dir)

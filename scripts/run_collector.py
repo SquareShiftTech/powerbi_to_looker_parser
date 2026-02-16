@@ -23,7 +23,6 @@ if _SRC.exists() and str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from powerbi_to_looker.collector import Collector, CollectorProtocol  # noqa: E402
-from powerbi_to_looker.collector.powerbi import get_token, get_workspace_id_by_name  # noqa: E402
 
 # Fallback from archive for local testing (env PBI_* overrides these)
 DEFAULT_CREDENTIALS = {
@@ -32,7 +31,7 @@ DEFAULT_CREDENTIALS = {
     "client_secret": "MD48Q~7nQTc2f8oVsgn.Y3q9osWc3~4rkQGtVc2g",
 }
 DEFAULT_WORKSPACE_ID = "5945fc8b-1fb7-48a5-873a-0a35ea442166"  # Powerbi-POC
-DEFAULT_WORKSPACE_NAME = "Orders & Sales"
+DEFAULT_WORKSPACE_NAME = "P2L_Devop"
 
 
 def _credentials() -> dict[str, str]:
@@ -71,7 +70,7 @@ def main() -> None:
     parser.add_argument(
         "--workspace-name",
         type=str,
-        default=None,
+        default="P2L_Devop",
         help="Power BI workspace name (resolved to id via API). Overridden by PBI_WORKSPACE_ID.",
     )
     parser.add_argument(
@@ -87,17 +86,17 @@ def main() -> None:
     credentials = _credentials()
     workspace_id = os.environ.get("PBI_WORKSPACE_ID")
     workspace_name = args.workspace_name or os.environ.get("PBI_WORKSPACE_NAME")
-    if not workspace_id and workspace_name:
-        token = get_token(credentials)
-        workspace_id = get_workspace_id_by_name(workspace_name, token)
-        if not workspace_id:
-            raise SystemExit(f"No workspace found with name: {workspace_name!r}")
-    if not workspace_id:
-        workspace_id = DEFAULT_WORKSPACE_ID
+    if workspace_id is None and not workspace_name:
+        workspace_name = DEFAULT_WORKSPACE_NAME
 
     collector: CollectorProtocol = Collector()
-    reports = collector.list(workspace_id=workspace_id, credentials=credentials)
-    print(json.dumps({"workspace_id": workspace_id, "count": len(reports), "reports": reports}, indent=2))
+    reports = collector.list(
+        workspace_id=workspace_id,
+        workspace_name=workspace_name,
+        credentials=credentials,
+    )
+    workspace_display = workspace_name if workspace_name else workspace_id
+    print(json.dumps({"workspace": workspace_display, "count": len(reports), "reports": reports}, indent=2))
 
     if args.list_only:
         return
@@ -126,6 +125,7 @@ def main() -> None:
             path_or_bytes = collector.download(
                 report_id,
                 workspace_id=workspace_id,
+                workspace_name=workspace_name,
                 credentials=credentials,
                 output_dir=report_folder,
                 report_name=name,
