@@ -29,9 +29,10 @@ def extract_report_from_pbix(pbix_path: str | Path, out_folder: str | Path) -> i
     count = 0
     with zipfile.ZipFile(pbix, "r") as zf:
         for name in zf.namelist():
-            # Normalize: ZIP often uses forward slashes; accept "Report" or "Report/..."
+            # Normalize: ZIP often uses forward slashes; accept Report (case-insensitive)
             normalized = name.replace("\\", "/").strip("/")
-            if normalized == "Report" or normalized.startswith("Report/"):
+            lower = normalized.lower()
+            if lower == "report" or lower.startswith("report/"):
                 zf.extract(name, out)
                 count += 1
     return count

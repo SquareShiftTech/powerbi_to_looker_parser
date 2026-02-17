@@ -26,6 +26,18 @@ def test_extract_report_from_pbix_extracts_report_entries(tmp_path: Path) -> Non
     assert not (out / "DataModelSchema").exists()
 
 
+def test_extract_report_from_pbix_case_insensitive(tmp_path: Path) -> None:
+    """Zip entries with lowercase 'report/' are still extracted."""
+    pbix = tmp_path / "report.pbix"
+    with zipfile.ZipFile(pbix, "w") as zf:
+        zf.writestr("report/Layout", "{}")
+    out = tmp_path / "parsed"
+    out.mkdir()
+    n = extract_report_from_pbix(pbix, out)
+    assert n == 1
+    assert (out / "report" / "Layout").read_text() == "{}"
+
+
 def test_extract_report_from_pbix_missing_file_raises(tmp_path: Path) -> None:
     """Missing .pbix path raises FileNotFoundError."""
     with pytest.raises(FileNotFoundError, match="not found"):

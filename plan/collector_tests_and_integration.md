@@ -52,6 +52,21 @@ Plan for **collector** unit tests and integration testing. Review and approve be
 - **When to run:** After pbi-tools extract succeeds; then check `parsed_output_dir/<stem>/Report`. If missing, run the zip fallback for that .pbix into that folder.
 - **Scope:** Read-only extraction from zip into the existing parsed folder; no modification of the .pbix. Implementation: e.g. `powerbi/pbix_zip.py` or helper in parse layer; script calls it when Report is missing.
 
+**What needs to be done (before implementation):**
+
+1. In the **existing** parse flow (e.g. `run_collector.py` step 2): after each successful pbi-tools run for a .pbix, check whether the output folder has a `Report` directory.
+2. If **no** `Report`: open the same .pbix as a ZIP; extract every entry whose name is `Report` or starts with `Report/` into that same output folder; then continue.
+3. No new scripts or CLI flags. No backfill or scan of existing folders—only this in-flow fallback.
+4. Done when: run parse on a .pbix that pbi-tools does not write Report for → the same output folder ends up with `Report/` populated from the .pbix zip.
+
+**Implementation:**
+
+| Step | Location | What |
+|------|----------|------|
+| 1 | `src/powerbi_to_looker/collector/powerbi/pbix_zip.py` | `extract_report_from_pbix(pbix_path, out_folder)` — open .pbix as ZIP; extract every member named `Report` or `Report/...` (case-insensitive) into `out_folder`. |
+| 2 | `scripts/run_collector.py` | In `_run_step2_parse_all`, after successful `collector.parse(...)`, if `(out_folder / "Report").exists()` is False, call `extract_report_from_pbix(pbix_path, out_folder)`. |
+| 3 | `tests/collector/test_pbix_zip.py` | Unit tests: zip with `Report/` entries extracted into out_folder; non-Report entries skipped; missing .pbix raises. |
+
 ---
 
 ## 3. Unit test plan (tests/)

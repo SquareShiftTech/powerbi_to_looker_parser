@@ -11,6 +11,13 @@ data_types:
 column_types:
   Data: dimension
   Calculated: calculated_field
+  calculatedTableColumn: dimension  # columns in calculated tables
+
+# Power BI summarizeBy → canonical aggregation for dimensions (or null)
+summarizeBy:
+  none: null
+  sum: SUM
+  default: null
 
 relationship:
   join_type:
@@ -35,3 +42,11 @@ defaults:
   measure_default_aggregation: SUM   # when aggregation cannot be inferred
   measure_data_type: number          # default data_type for measures (formula/numeric)
   dimension_number_aggregation: SUM # default aggregation for numeric dimensions (e.g. Discount, Sales)
+
+# M expression pattern or source type → canonical connection_provider (for datasource type identification)
+connection_provider:
+  GoogleBigQuery.Database: bigquery
+  Sql.Database: sql_server
+  Odbc.DataSource: odbc
+  AdoDotNet.DataSource: sql_server
+  default: unknown

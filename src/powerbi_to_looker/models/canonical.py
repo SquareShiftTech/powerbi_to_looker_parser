@@ -11,6 +11,7 @@ class Connection(BaseModel):
     server: str
     database: str
     schema: Optional[str] = None
+    connection_provider: Optional[str] = None  # e.g. bigquery, sql_server, snowflake; from M/source
 
 
 class Table(BaseModel):
@@ -18,6 +19,7 @@ class Table(BaseModel):
     name: str
     schema: Optional[str] = None
     table_name: str
+    extended_properties: Optional[dict] = None  # e.g. isHidden, hierarchies
 
 
 class TableRelationship(BaseModel):
@@ -38,6 +40,7 @@ class Field(BaseModel):
     formula: Optional[str] = None
     depends_on: Optional[List[str]] = None
     is_calculated: Optional[bool] = None  # True when field has formula (e.g. calculated measure)
+    extended_properties: Optional[dict] = None  # e.g. format_string, lineageTag
 
 
 class Parameter(BaseModel):

@@ -268,15 +268,14 @@ def main() -> None:
             sys.exit(1)
         collector = Collector()
 
-    if not pbi_tools_exe:
+    if pbi_tools_exe:
+        parsed_ok, parse_failed = _run_step2_parse_all(collector, output_dir, parsed_output_dir, pbi_tools_exe)
+        print("Parsed:", len(parsed_ok))
+        if parse_failed:
+            print("Parse failed:", len(parse_failed))
+            print(json.dumps({"parse_failed": parse_failed}, indent=2))
+    else:
         print("PBI_TOOLS_EXE not set and no default pbi-tools.exe found in repo; skipping parse step.", file=sys.stderr)
-        return
-
-    parsed_ok, parse_failed = _run_step2_parse_all(collector, output_dir, parsed_output_dir, pbi_tools_exe)
-    print("Parsed:", len(parsed_ok))
-    if parse_failed:
-        print("Parse failed:", len(parse_failed))
-        print(json.dumps({"parse_failed": parse_failed}, indent=2))
 
 
 if __name__ == "__main__":

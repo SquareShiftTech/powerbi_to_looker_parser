@@ -3,7 +3,13 @@
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
-    """Load a YAML file; return dict. Placeholder."""
-    raise NotImplementedError("load_yaml")
+    """Load a YAML file; return dict."""
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"Config file not found: {p}")
+    with open(p, encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
