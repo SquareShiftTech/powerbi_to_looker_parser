@@ -2,6 +2,15 @@
 
 from typing import Any
 
+# Empty structures for server-only mode (no .pbix file).
+EMPTY_PBIX_RESULT: dict[str, Any] = {
+    "relationships": [],
+    "dax_measures": [],
+    "power_query": [],
+    "rls": [],
+}
+EMPTY_REPORT_LAYOUT: dict[str, Any] = {}
+
 
 def _pbix_relationship_to_api_style(rel: dict) -> dict:
     """Map pbixray relationship keys to API-style (fromTable, toTable, etc.)."""
@@ -55,3 +64,82 @@ def merge_api_and_pbix(
         break
 
     return out
+
+
+def raw_from_pbix_only(
+    pbix_result: dict[str, Any],
+    report_layout: dict[str, Any],
+    report_name: str = "Report",
+) -> dict[str, Any]:
+    """Build raw metadata dict from pbix result + layout only (no API).
+
+    Converts pbix_loader + layout output into the same shape expected by
+    canonical builder: workspaces with one dataset, tables with columns and measures.
+    """
+    relationships_pbix = pbix_result.get("relationships") or []
+    relationships_api_style = [_pbix_relationship_to_api_style(r) for r in relationships_pbix]
+    dax_measures = pbix_result.get("dax_measures") or []
+
+    # Group measures by table (TableName from pbixray)
+    measures_by_table: dict[str, list[dict]] = {}
+    for m in dax_measures:
+        if not isinstance(m, dict):
+            continue
+        table_name = m.get("TableName") or m.get("table_name") or ""
+        meas_name = m.get("MeasureName") or m.get("name") or m.get("measure_name")
+        expr = m.get("Expression") or m.get("expression")
+        if not meas_name:
+            continue
+        measures_by_table.setdefault(table_name, []).append({
+            "name": meas_name,
+            "expression": expr if isinstance(expr, str) else None,
+            "Expression": expr,
+        })
+
+    # Build dataset.tables from pbix_result.tables + measures
+    api_tables: list[dict[str, Any]] = []
+    for t in pbix_result.get("tables") or []:
+        table_name = t.get("table_name") or t.get("name") or ""
+        if not table_name:
+            continue
+        columns = []
+        for c in t.get("columns") or []:
+            col_name = c.get("column_name") or c.get("name")
+            if not col_name:
+                continue
+            data_type = c.get("data_type") or c.get("dataType")
+            columns.append({
+                "name": col_name,
+                "dataType": data_type,
+                "columnType": c.get("columnType", "Data"),
+            })
+        measures = measures_by_table.get(table_name, [])
+        api_tables.append({
+            "name": table_name,
+            "columns": columns,
+            "measures": measures,
+        })
+
+    dataset = {
+        "id": "local_1",
+        "name": report_name,
+        "tables": api_tables,
+        "relationships": relationships_api_style,
+    }
+    return {
+        "workspace_id": "",
+        "workspace_name": "",
+        "report_name": report_name,
+        "workspaces": [{
+            "id": "",
+            "name": "",
+            "datasets": [dataset],
+            "reports": [],
+            "dashboards": [],
+        }],
+        "relationships": relationships_api_style,
+        "report_layout": report_layout,
+        "dax_measures": dax_measures,
+        "power_query": pbix_result.get("power_query") or [],
+        "rls": pbix_result.get("rls"),
+    }

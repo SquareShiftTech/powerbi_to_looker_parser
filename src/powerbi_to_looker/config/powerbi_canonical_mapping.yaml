@@ -1,12 +1,20 @@
 # Power BI → canonical mapping (see plan/yaml_rules.md). No Looker/LookML keys here.
 
 data_types:
+  # Power BI / API
   String: string
   Int64: number
   Double: number
   DateTime: datetime
   Date: date
   Boolean: boolean
+  # Pandas (e.g. from pbixray when using --local)
+  object: string
+  int64: number
+  float64: number
+  datetime64[ns]: datetime
+  datetime64[ns, UTC]: datetime
+  bool: boolean
 
 column_types:
   Data: dimension
