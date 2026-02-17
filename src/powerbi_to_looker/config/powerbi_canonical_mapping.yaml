@@ -49,4 +49,6 @@ connection_provider:
   Sql.Database: sql_server
   Odbc.DataSource: odbc
   AdoDotNet.DataSource: sql_server
+  Csv.Document: csv
+  Excel.Workbook: excel
   default: unknown

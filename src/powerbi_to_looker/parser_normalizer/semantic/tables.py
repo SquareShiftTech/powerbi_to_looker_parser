@@ -88,12 +88,28 @@ def run(raw: dict[str, Any]) -> TablesResult:
         table_name = t.get("name") or ""
         table_id = t.get("lineageTag") or table_name
         schema_val: str | None = None
-        # Get schema from first partition M if available
+        table_type: str | None = None
+        formula_val: str | None = None
         for part in t.get("partitions") or []:
             src = part.get("source") or {}
-            if src.get("type") == "m" and isinstance(src.get("expression"), list):
+            src_type = src.get("type")
+            if src_type == "m" and isinstance(src.get("expression"), list):
                 _server, _db, schema_val = _parse_m_for_connection(src["expression"])
                 if schema_val:
+                    break
+            if src_type == "calculated":
+                expr = src.get("expression")
+                if isinstance(expr, list):
+                    formula_val = "\n".join(str(line) for line in expr).strip() or None
+                elif isinstance(expr, str):
+                    formula_val = expr.strip() or None
+                table_type = "calculated"
+                break
+        if table_type is None:
+            # Has M partition(s) only or no partitions
+            for part in t.get("partitions") or []:
+                if (part.get("source") or {}).get("type") == "m":
+                    table_type = "physical"
                     break
         tables.append(
             Table(
@@ -101,6 +117,8 @@ def run(raw: dict[str, Any]) -> TablesResult:
                 name=table_name,
                 schema=schema_val,
                 table_name=table_name,
+                table_type=table_type,
+                formula=formula_val,
                 extended_properties={
                     "isHidden": t.get("isHidden"),
                     "hierarchies": t.get("hierarchies"),

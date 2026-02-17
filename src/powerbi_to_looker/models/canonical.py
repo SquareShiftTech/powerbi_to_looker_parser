@@ -19,6 +19,8 @@ class Table(BaseModel):
     name: str
     schema: Optional[str] = None
     table_name: str
+    table_type: Optional[str] = None  # "physical" | "calculated"
+    formula: Optional[str] = None  # DAX expression for calculated tables (for later conversion to SQL/LookML)
     extended_properties: Optional[dict] = None  # e.g. isHidden, hierarchies
 
 
@@ -33,7 +35,7 @@ class Field(BaseModel):
     id: str
     name: str
     field_type: str  # dimension, measure, calculated_field
-    data_type: str  # string, number, date, datetime, boolean
+    data_type: Optional[str] = None  # string, number, date, datetime, boolean; None when unknown
     source_table: Optional[str] = None
     source_column: Optional[str] = None
     aggregation: Optional[str] = None  # SUM, AVG, COUNT, MIN, MAX

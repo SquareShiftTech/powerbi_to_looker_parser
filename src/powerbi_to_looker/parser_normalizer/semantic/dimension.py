@@ -15,6 +15,19 @@ def _get_config() -> dict[str, Any]:
     return {}
 
 
+def _data_type_from_config(data_type_key: str | None, data_types: dict[str, Any]) -> str | None:
+    """Case-insensitive lookup; return None when unknown (no default)."""
+    if not data_type_key:
+        return None
+    key_lower = data_type_key.strip().lower()
+    if not key_lower:
+        return None
+    for k, v in data_types.items():
+        if k.strip().lower() == key_lower:
+            return v
+    return None
+
+
 def can_handle(raw: dict[str, Any]) -> bool:
     """Return True if raw model has tables with columns."""
     model = raw.get("model") or raw
@@ -27,12 +40,16 @@ def can_handle(raw: dict[str, Any]) -> bool:
 
 
 def run(raw: dict[str, Any]) -> list[Field]:
-    """Build list of canonical Field (dimension or calculated_field) from all table columns."""
+    """Build list of canonical Field (dimension, measure, or calculated_field) from all table columns.
+    Columns with aggregation (summarizeBy) are emitted as field_type=measure; others as dimension/calculated_field.
+    data_type is None when Power BI type is missing or unmapped.
+    """
     config = _get_config()
     data_types = config.get("data_types") or {}
     column_types = config.get("column_types") or {}
     summarize_by = config.get("summarizeBy") or {}
-    default_data_type = (config.get("defaults") or {}).get("data_type", "string")
+    defaults = config.get("defaults") or {}
+    measure_data_type = defaults.get("measure_data_type", "number")
 
     model_obj = raw.get("model") or raw
     model = model_obj.get("model", model_obj) if isinstance(model_obj, dict) else model_obj
@@ -45,12 +62,24 @@ def run(raw: dict[str, Any]) -> list[Field]:
         for col in t.get("columns") or []:
             col_name = col.get("name") or ""
             lineage = col.get("lineageTag") or col_name
-            data_type_key = col.get("dataType") or "String"
-            data_type = data_types.get(data_type_key, default_data_type)
+            data_type_key = col.get("dataType")
+            data_type = _data_type_from_config(data_type_key, data_types)
+
             col_type_key = col.get("type") or "Data"
-            field_type = column_types.get(col_type_key, column_types.get("Data", "dimension"))
-            sum_by = col.get("summarizeBy") or "none"
-            aggregation = summarize_by.get(sum_by, summarize_by.get("default"))
+            base_field_type = column_types.get(col_type_key, column_types.get("Data", "dimension"))
+            sum_by_key = (col.get("summarizeBy") or "none").strip().lower()
+            aggregation = next(
+                (v for k, v in summarize_by.items() if k.strip().lower() == sum_by_key),
+                summarize_by.get("default"),
+            )
+
+            # If column has aggregation (e.g. summarizeBy sum), treat as measure
+            if aggregation is not None:
+                field_type = "measure"
+                if data_type is None:
+                    data_type = measure_data_type
+            else:
+                field_type = base_field_type
 
             expression = col.get("expression")
             formula = None

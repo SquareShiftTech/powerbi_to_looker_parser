@@ -11,9 +11,9 @@ Env: PBI_TENANT_ID, PBI_CLIENT_ID, PBI_CLIENT_SECRET; PBI_WORKSPACE_ID or PBI_WO
 Optional: PBI_TOOLS_EXE.
 
 Run from repo root:
-  uv run python scripts/run_integration.py
-  uv run python scripts/run_integration.py --no-download   # skip step 1; use existing .pbix in output-dir
-  uv run python scripts/run_integration.py --skip-canonical  # stop after parse
+  uv run python scripts/run_integration.py                 # default: no download; use existing .pbix
+  uv run python scripts/run_integration.py --download       # run step 1 (list and download)
+  uv run python scripts/run_integration.py --skip-canonical # stop after parse
 """
 
 import argparse
@@ -51,6 +51,14 @@ def _default_pbi_tools_exe() -> str | None:
     return None
 
 
+# Same defaults as run_collector.py for credentials and workspace
+DEFAULT_CREDENTIALS = {
+    "tenant_id": "a812643e-dcca-45b3-bde2-ef646799d843",
+    "client_id": "8ee9bf2b-e49f-4cb4-90f8-bfd9fd47af17",
+    "client_secret": "MD48Q~7nQTc2f8oVsgn.Y3q9osWc3~4rkQGtVc2g",
+}
+DEFAULT_WORKSPACE_NAME = "P2L_Devop"
+
 _MAX_STEM_LEN = 35
 
 
@@ -61,13 +69,16 @@ def _short_stem(stem: str) -> str:
 
 
 def _credentials() -> dict[str, str]:
+    """Same logic as run_collector: env overrides, else DEFAULT_CREDENTIALS."""
     if os.environ.get("PBI_ACCESS_TOKEN"):
         return {"access_token": os.environ["PBI_ACCESS_TOKEN"]}
-    tenant = os.environ.get("PBI_TENANT_ID", "")
-    client = os.environ.get("PBI_CLIENT_ID", "")
-    secret = os.environ.get("PBI_CLIENT_SECRET", "")
+    tenant = os.environ.get("PBI_TENANT_ID") or DEFAULT_CREDENTIALS["tenant_id"]
+    client = os.environ.get("PBI_CLIENT_ID") or DEFAULT_CREDENTIALS["client_id"]
+    secret = os.environ.get("PBI_CLIENT_SECRET") or DEFAULT_CREDENTIALS["client_secret"]
     if not secret:
-        raise SystemExit("Set PBI_CLIENT_SECRET (and optionally PBI_TENANT_ID, PBI_CLIENT_ID) for download.")
+        raise SystemExit(
+            "Set PBI_CLIENT_SECRET (or PBI_TENANT_ID, PBI_CLIENT_ID, PBI_CLIENT_SECRET) for API auth."
+        )
     return {"tenant_id": tenant, "client_id": client, "client_secret": secret}
 
 
@@ -220,9 +231,9 @@ def main() -> None:
     p.add_argument("--output-dir", type=Path, default=Path("collector_output"), help=".pbix folder (default: collector_output)")
     p.add_argument("--parsed-output-dir", type=Path, default=Path("parsed_output"), help="Parsed output folder (default: parsed_output)")
     p.add_argument("--canonical-output-dir", type=Path, default=Path("canonical_output"), help="Canonical output folder (default: canonical_output)")
-    p.add_argument("--no-download", action="store_true", help="Skip step 1; use existing .pbix in --output-dir")
+    p.add_argument("--download", action="store_true", help="Run step 1 (list and download .pbix). Default: skip step 1.")
     p.add_argument("--skip-canonical", action="store_true", help="Stop after step 2 (parse only)")
-    p.add_argument("--workspace-name", type=str, default=os.environ.get("PBI_WORKSPACE_NAME", "P2L_Devop"))
+    p.add_argument("--workspace-name", type=str, default=os.environ.get("PBI_WORKSPACE_NAME") or DEFAULT_WORKSPACE_NAME)
     p.add_argument("--skip-name-contains", type=str, action="append", default=[], metavar="TEXT")
     args = p.parse_args()
 
@@ -233,16 +244,16 @@ def main() -> None:
     workspace_id = os.environ.get("PBI_WORKSPACE_ID")
     workspace_name = args.workspace_name
 
-    # Step 1 — Download
-    if not args.no_download and (workspace_id or workspace_name):
+    # Step 1 — Download (default: skipped)
+    if args.download and (workspace_id or workspace_name):
         print("Step 1: List and download .pbix ...")
         ok1, fail1 = step1_download(output_dir, workspace_id, workspace_name, args.skip_name_contains)
         print(f"  Download: {ok1} ok, {fail1} failed")
     else:
-        if args.no_download and not output_dir.exists():
-            print(f"Output dir missing: {output_dir}. Use --output-dir or run without --no-download.", file=sys.stderr)
+        if not args.download and not output_dir.exists():
+            print(f"Output dir missing: {output_dir}. Use --output-dir or pass --download to run step 1.", file=sys.stderr)
             sys.exit(1)
-        print("Step 1: Skipped (--no-download or no workspace).")
+        print("Step 1: Skipped (use --download to list and download).")
 
     # Step 2 — Parse
     print("Step 2: Parse .pbix -> parsed output ...")
