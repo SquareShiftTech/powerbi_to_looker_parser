@@ -15,12 +15,14 @@ except ImportError:
 
 
 def _df_to_records(df: Any) -> list[dict]:
-    """Convert DataFrame to list of dicts, replacing NaN with None for JSON."""
+    """Convert DataFrame to list of dicts, replacing NaN/NA with None for JSON."""
     if df is None or (pd is not None and hasattr(df, "empty") and df.empty):
         return []
     if pd is None:
         return []
-    return df.replace({pd.NA: None}).fillna(value=None).to_dict(orient="records")
+    # fillna(value=None) is invalid in pandas 3.x; convert to records then replace NA/NaN with None
+    records = df.replace({pd.NA: None}).to_dict(orient="records")
+    return [{k: (None if pd.isna(v) else v) for k, v in row.items()} for row in records]
 
 
 def load_from_pbix(pbix_path: str | Path) -> dict[str, Any]:
