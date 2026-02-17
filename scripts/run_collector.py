@@ -27,6 +27,7 @@ if _SRC.exists() and str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from powerbi_to_looker.collector import Collector, CollectorProtocol  # noqa: E402
+from powerbi_to_looker.collector.powerbi.pbix_zip import extract_report_from_pbix  # noqa: E402
 
 
 def _default_pbi_tools_exe() -> str | None:
@@ -153,6 +154,8 @@ def _run_step2_parse_all(
         out_folder.mkdir(parents=True, exist_ok=True)
         try:
             collector.parse(pbix_path, out_folder, pbi_tools_exe)
+            if not (out_folder / "Report").exists():
+                extract_report_from_pbix(pbix_path, out_folder)
             parsed_ok.append({"pbix": str(pbix_path), "output_path": str(out_folder)})
         except subprocess.CalledProcessError as e:
             parse_failed.append({

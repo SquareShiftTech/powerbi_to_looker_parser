@@ -45,6 +45,15 @@ Plan for **collector** unit tests and integration testing. Review and approve be
 
 ---
 
+## 2d. Report fallback: extract from .pbix zip when pbi-tools did not write Report
+
+- **Problem:** For some .pbix files, pbi-tools completes successfully but does not write a **Report** folder (no `Report/sections/`, no page/viz layout). We then have no dashboard/viz details.
+- **Fix:** A .pbix file is a **ZIP archive**. When the parsed output folder has **no** `Report` directory after pbi-tools, **unzip the .pbix** and extract only the **Report**-related entries (e.g. `Report/`, `Report/Layout`, or whatever the zip contains) into the same parsed output folder. This gives us report layout/viz without depending on pbi-tools writing it.
+- **When to run:** After pbi-tools extract succeeds; then check `parsed_output_dir/<stem>/Report`. If missing, run the zip fallback for that .pbix into that folder.
+- **Scope:** Read-only extraction from zip into the existing parsed folder; no modification of the .pbix. Implementation: e.g. `powerbi/pbix_zip.py` or helper in parse layer; script calls it when Report is missing.
+
+---
+
 ## 3. Unit test plan (tests/)
 
 **Scope:** Fast tests, no real network or real .pbix. Mock Power BI API and (when needed) file I/O or subprocess. One behavior per test.
