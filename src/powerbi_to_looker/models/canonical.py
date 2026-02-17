@@ -3,10 +3,12 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Connection(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     type: str  # live, extract, direct_query
     server: str
     database: str
@@ -14,6 +16,8 @@ class Connection(BaseModel):
 
 
 class Table(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     id: str
     name: str
     schema: Optional[str] = None
