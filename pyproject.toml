@@ -27,6 +27,7 @@ dependencies = [
     "pandas>=2.0.0",
     "pyyaml>=6.0.0",
     "pybix",
+    "lark>=1.1.0,<2.0.0",
 ]
 
 [project.optional-dependencies]

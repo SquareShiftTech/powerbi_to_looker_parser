@@ -21,6 +21,7 @@ Requires-Dist: pbixray>=0.5.0
 Requires-Dist: pandas>=2.0.0
 Requires-Dist: pyyaml>=6.0.0
 Requires-Dist: pybix
+Requires-Dist: lark<2.0.0,>=1.1.0
 Provides-Extra: dev
 Requires-Dist: pytest<9.0.0,>=8.0.0; extra == "dev"
 Requires-Dist: ruff<1.0.0,>=0.3.0; extra == "dev"

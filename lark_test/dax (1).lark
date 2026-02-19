@@ -1,0 +1,250 @@
+// ============================================================
+// DAX Grammar for Lark
+// Compatible with: lark >= 1.1.0, parser="earley" or "lalr"
+// Usage:
+//   from lark import Lark
+//   parser = Lark(open("dax.lark").read(), parser="earley", ambiguity="resolve")
+// ============================================================
+
+
+// ============================================================
+// TOP LEVEL
+// A DAX file can be:
+//   1. A measure definition:  MeasureName = <expr>
+//   2. A bare expression (used in calculated columns, query editor)
+// ============================================================
+
+start: measure_def
+     | expr
+
+measure_def: measure_name "=" expr
+measure_name: UNQUOTED_NAME
+            | QUOTED_TABLE_NAME
+            | "[" COL_NAME "]"
+
+
+// ============================================================
+// REFERENCES (defined before EXPRESSIONS so multi_col_in can use column_ref)
+// ============================================================
+
+qualified_col_ref: table_name "[" COL_NAME "]"
+unqualified_col_ref: "[" COL_NAME "]"
+column_ref: qualified_col_ref | unqualified_col_ref
+
+table_ref: table_name
+var_ref: VAR_NAME
+table_name: QUOTED_TABLE_NAME
+          | UNQUOTED_NAME
+
+
+// ============================================================
+// EXPRESSIONS — ordered by increasing binding strength
+// (lower in the tree = tighter binding = higher precedence)
+// ============================================================
+
+expr: var_expr
+    | or_expr
+
+// --- VAR / RETURN -----------------------------------------------
+// Multiple VARs allowed before a single RETURN
+// VAR/RETURN can appear anywhere an expr is valid (nested too)
+
+var_expr: var_binding+ "RETURN"i expr
+var_binding: "VAR"i VAR_NAME "=" expr
+
+// --- Logical: OR -----------------------------------------------
+or_expr: or_expr ("||" | "OR"i)  and_expr   -> or_op
+       | and_expr
+
+// --- Logical: AND ----------------------------------------------
+and_expr: and_expr ("&&" | "AND"i) not_expr  -> and_op
+        | not_expr
+
+// --- Logical: NOT ----------------------------------------------
+not_expr: "NOT"i not_expr                    -> not_op
+        | cmp_expr
+
+// --- Comparison ------------------------------------------------
+// DAX uses = (not ==) for equality, <> for not-equal
+cmp_expr: cmp_expr "="  concat_expr  -> eq
+        | cmp_expr "<>" concat_expr  -> neq
+        | cmp_expr "<"  concat_expr  -> lt
+        | cmp_expr ">"  concat_expr  -> gt
+        | cmp_expr "<=" concat_expr  -> lte
+        | cmp_expr ">=" concat_expr  -> gte
+        | in_expr
+
+// --- IN / NOT IN -----------------------------------------------
+// Single column:    [Color] IN {"Red","Blue"}
+// Multi column:     ([Color],[Size]) IN {("Red","L"),("Blue","M")}
+// column_ref is defined in REFERENCES; alias for qualified_col_ref | unqualified_col_ref
+
+in_expr: concat_expr "IN"i     set_expr  -> in_op
+       | concat_expr "NOT"i "IN"i set_expr  -> not_in_op
+       | concat_expr
+
+set_expr: "{" set_row ("," set_row)* "}"
+set_row:  "(" expr ("," expr)* ")"         -> tuple_row
+        | expr                              -> scalar_row
+
+// Multi-column IN lhs:  (col1, col2) IN { ... }
+multi_col_in: "(" column_ref ("," column_ref)+ ")" "IN"i set_expr      -> multi_in_op
+            | "(" column_ref ("," column_ref)+ ")" "NOT"i "IN"i set_expr -> multi_not_in_op
+
+// --- String concatenation --------------------------------------
+concat_expr: concat_expr "&" add_expr  -> concat_op
+           | add_expr
+
+// --- Additive --------------------------------------------------
+add_expr: add_expr "+" mul_expr  -> add
+        | add_expr "-" mul_expr  -> sub
+        | mul_expr
+
+// --- Multiplicative --------------------------------------------
+mul_expr: mul_expr "*" unary_expr  -> mul
+        | mul_expr "/" unary_expr  -> div
+        | unary_expr
+
+// --- Unary -----------------------------------------------------
+unary_expr: "-" unary_expr  -> neg
+          | "+" unary_expr  -> pos
+          | power_expr
+
+// --- Power (^ not standard DAX but some dialects allow it) -----
+power_expr: power_expr "^" atom  -> power
+          | atom
+
+// --- Atoms -----------------------------------------------------
+atom: function_call
+    | qualified_col_ref
+    | unqualified_col_ref
+    | table_ref
+    | var_ref
+    | literal
+    | table_constructor
+    | multi_col_in
+    | "(" expr ")"
+
+
+// ============================================================
+// FUNCTION CALLS
+// ============================================================
+// Handles:
+//   SUM([Sales])
+//   IF(cond, t, f)
+//   CALCULATE([M], filter1, filter2, modifier)
+//   PERCENTILE.INC(...)
+//   DATEADD([Date], -1, YEAR)   <-- interval keyword as arg
+//   BLANK()                     <-- zero-arg
+
+function_call: FUNC_NAME "(" ")"                    -> func_no_args
+             | FUNC_NAME "(" arg_list ")"           -> func_with_args
+
+arg_list: arg ("," arg)*
+
+// An argument can be a regular expression OR an interval keyword
+// (for time intelligence functions like DATEADD, PARALLELPERIOD)
+arg: expr
+   | interval_keyword
+
+
+// ============================================================
+// INTERVAL KEYWORDS (time intelligence)
+// These appear as bare keywords inside certain function calls:
+//   DATEADD([Date], -1, YEAR)
+//   PARALLELPERIOD([Date], -1, MONTH)
+//
+// IMPORTANT DUAL ROLE:
+//   YEAR([Date])  -> function call (returns integer)
+//   DATEADD(..., -1, YEAR) -> interval keyword (not a call)
+//   DAY([Date])   -> function call
+//   DATEDIFF(a, b, DAY) -> interval keyword
+//
+// Resolution: interval_keyword only matches when NOT followed by "("
+// The grammar handles this via Earley ambiguity resolution —
+// YEAR(...) will always match function_call first because
+// FUNC_NAME matches YEAR and the "(" follows immediately.
+// YEAR with no "(" (bare, as last arg) matches interval_keyword.
+// ============================================================
+
+interval_keyword: "YEAR"i    -> interval_year
+                | "QUARTER"i -> interval_quarter
+                | "MONTH"i   -> interval_month
+                | "WEEK"i    -> interval_week
+                | "DAY"i     -> interval_day
+                | "HOUR"i    -> interval_hour
+                | "MINUTE"i  -> interval_minute
+                | "SECOND"i  -> interval_second
+
+// NOTE: YEAR([Date]), MONTH([Date]), DAY([Date]) are handled as
+// regular function_call because FUNC_NAME matches them and "("
+// follows. Earley parser resolves the ambiguity correctly.
+// If using LALR, you may need to make interval_keyword a fallback
+// rule only used when no "(" follows — handle in Transformer by
+// checking if a VarRef/TableRef named YEAR/MONTH/DAY is actually
+// an interval, based on the parent function context.
+
+
+// ============================================================
+// TABLE CONSTRUCTOR
+// {1, 2, 3}                      -- single column
+// {("Red", 1), ("Blue", 2)}      -- multi column
+// ============================================================
+
+table_constructor: "{" tc_row ("," tc_row)* "}"
+tc_row: "(" expr ("," expr)* ")"   -> tc_tuple_row
+      | expr                        -> tc_scalar_row
+
+
+// ============================================================
+// LITERALS
+// ============================================================
+
+literal: NUMBER          -> number
+       | STRING          -> string
+       | "TRUE"i         -> true_lit
+       | "FALSE"i        -> false_lit
+       | "BLANK"i "()"   -> blank_lit    // BLANK() as literal shorthand
+
+
+// ============================================================
+// TERMINALS
+// ============================================================
+
+// Table names: unquoted (Sales) or single-quoted ('Sales Data')
+UNQUOTED_NAME: /[A-Za-z_\u00C0-\u024F][A-Za-z0-9_ \u00C0-\u024F]*/
+QUOTED_TABLE_NAME: /\'[^\']+\'/
+
+// Column names: everything between [ ] except brackets
+// Allows spaces, special chars common in Power BI column names
+COL_NAME: /[^\[\]]+/
+
+// Variable names: start with letter or underscore, no spaces
+VAR_NAME: /[A-Za-z_][A-Za-z0-9_]*/
+
+// Function names: uppercase, may contain dots (PERCENTILE.INC)
+// Must start with uppercase letter
+FUNC_NAME: /[A-Z][A-Z0-9]*(\.[A-Z][A-Z0-9]*)*/
+
+// Numbers: integer, decimal, scientific notation
+NUMBER: /[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?/
+
+// Strings: double-quoted, "" is escaped double-quote inside string
+// e.g. "He said ""hello"""
+STRING: /\"([^\"]|\"\")*\"/
+
+
+// ============================================================
+// WHITESPACE AND COMMENTS
+// ============================================================
+
+// Single-line comments: -- or //
+LINE_COMMENT: /\/\/[^\n]*/
+             | /--[^\n]*/
+
+// Multi-line comments: /* ... */
+BLOCK_COMMENT: /\/\*(.|\n)*?\*\//
+
+%ignore /[ \t\n\r]+/
+%ignore LINE_COMMENT
+%ignore BLOCK_COMMENT
