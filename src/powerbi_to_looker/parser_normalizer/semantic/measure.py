@@ -43,11 +43,13 @@ def can_handle(raw: dict[str, Any]) -> bool:
 
 
 def run(raw: dict[str, Any]) -> list[Field]:
-    """Build list of canonical Field (measure) from all table measures."""
+    """Build list of canonical Field (measure) from all table measures.
+    Model measures have a formula (DAX) that is already the full expression; we leave
+    aggregation=None so the transform layer can emit the formula as-is and avoid double aggregation.
+    """
     config = _get_config()
     defaults = config.get("defaults") or {}
     measure_data_type = defaults.get("measure_data_type", "number")
-    measure_default_agg = defaults.get("measure_default_aggregation", "SUM")
 
     model_obj = raw.get("model") or raw
     model = model_obj.get("model", model_obj) if isinstance(model_obj, dict) else model_obj
@@ -61,8 +63,14 @@ def run(raw: dict[str, Any]) -> list[Field]:
             name = m.get("name") or ""
             lineage = m.get("lineageTag") or name
             expression = m.get("expression") or []
-            formula = "\n".join(str(x) for x in expression).strip() if expression else None
-            aggregation = _infer_aggregation_from_dax(expression, config) if expression else measure_default_agg
+            if isinstance(expression, str):
+                formula = expression.strip() or None
+            elif expression:
+                formula = "\n".join(str(x) for x in expression).strip()
+            else:
+                formula = None
+            # Leave aggregation=None for model measures; formula is the full expression.
+            # Transform layer: measure with formula and no aggregation → emit formula only.
             is_calculated = formula is not None
 
             ext: dict[str, Any] = {}
@@ -79,7 +87,7 @@ def run(raw: dict[str, Any]) -> list[Field]:
                     data_type=measure_data_type,
                     source_table=table_name,
                     source_column=None,
-                    aggregation=aggregation,
+                    aggregation=None,
                     formula=formula,
                     depends_on=None,
                     is_calculated=is_calculated,

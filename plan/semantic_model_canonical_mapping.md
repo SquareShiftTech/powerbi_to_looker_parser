@@ -168,7 +168,9 @@ Power BI does **not** store join direction (LEFT/INNER) in this layout; use conf
 
 ### 3.5 Field (dimensions and measures)
 
-**Rule:** Every field is either **dimension** or **measure**. If it has a **formula** (DAX expression), it is also treated as **calculated** (field_type = calculated_field or is_calculated = true).
+**Classification:** See [dimension_measure_classification.md](dimension_measure_classification.md) for how we assign dimension vs measure vs calculated_field and how aggregation is set (including why model measures have aggregation = null).
+
+**Rule:** Every field is either **dimension**, **measure**, or **calculated_field**. If it has a **formula** (DAX expression), is_calculated = true.
 
 | Canonical field | Source (column) | Source (measure) | Rule |
 |-----------------|------------------|------------------|------|
@@ -178,7 +180,7 @@ Power BI does **not** store join direction (LEFT/INNER) in this layout; use conf
 | data_type | column.dataType | — | YAML: String→string, Int64→number, Double→number, DateTime→datetime, Boolean→boolean. Measures: default measure_data_type (number). |
 | source_table | table.name | table.name | Owning table |
 | source_column | column.sourceColumn / column.name | — | Column name or source ref |
-| aggregation | column.summarizeBy (YAML) | DAX inference (YAML) | Dimension: summarizeBy → canonical aggregation or null. Measure: from DAX (SUM, AVG, etc.) via measure_aggregation YAML; else null. |
+| aggregation | column.summarizeBy (YAML) | — | Dimension: summarizeBy → canonical aggregation or null. **Model measures: always null** (formula is full expression; transform emits formula only to avoid double aggregation). |
 | formula | column.expression (if present) | measure.expression | Concatenate expression array to string (DAX). |
 | depends_on | — | Optional: parse DAX for table/column refs | Can be null in Phase 1. |
 | is_calculated | true if expression present | true if expression present | True for calculated columns and all measures with formula. |
