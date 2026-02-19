@@ -11,6 +11,8 @@ class Position(BaseModel):
     y: float
     width: float
     height: float
+    z: Optional[int] = None  # stacking order from PBI; optional for backward compatibility
+    tab_order: Optional[int] = None  # accessibility tab order from PBI
 
 
 class DataMapping(BaseModel):
@@ -39,7 +41,7 @@ class VisibilityCondition(BaseModel):
 
 class DashboardComponent(BaseModel):
     id: str
-    type: Literal["visualization", "text", "filter", "image", "container", "parameter", "web_content"]
+    type: Literal["visualization", "text", "filter", "image", "container", "parameter", "web_content", "button"]
     position: Position
     visualization_id: Optional[str] = None
     text_id: Optional[str] = None
@@ -74,6 +76,7 @@ class Dashboard(BaseModel):
     id: str
     name: str
     source_system: str
+    report_id: Optional[str] = None  # link to raw report id (e.g. folder name or PBI report id)
     created_at: Optional[datetime] = None
     created_by: Optional[str] = None
     description: Optional[str] = None
@@ -104,10 +107,10 @@ class ConditionalFormatting(BaseModel):
 class Visualization(BaseModel):
     id: str
     name: str
-    visualization_type: str
+    visualization_type: str  # e.g. clusteredColumnChart, slicer, actionButton, button
     source_system: str
     viz_calculated_fields: List[VizCalculatedField] = []
-    data_mappings: List[DataMapping]
+    data_mappings: List[DataMapping] = []  # empty for actionButton/button
     filters: List[Filter] = []
     parameters: List[str] = []
     conditional_formatting: Optional[List[ConditionalFormatting]] = None

@@ -34,3 +34,23 @@ def test_discover_report_folders_single_report(tmp_path):
     assert len(found_root) == 1
     assert found_root[0][0] == report_dir.name
     assert found_root[0][1] == report_dir
+
+
+def test_load_from_path_with_definition_populates_pages(tmp_path):
+    """Load from folder with Report/definition -> report, pages_metadata, pages populated via factory."""
+    report_dir = tmp_path / "ReportWithDef"
+    report_dir.mkdir()
+    (report_dir / "Model").mkdir()
+    (report_dir / "Model" / "database.json").write_text("{}")
+    (report_dir / "Report" / "definition").mkdir(parents=True)
+    (report_dir / "Report" / "definition" / "report.json").write_text("{}")
+    (report_dir / "Report" / "definition" / "pages").mkdir()
+    (report_dir / "Report" / "definition" / "pages" / "pages.json").write_text('{"pageOrder":["p1"]}')
+    (report_dir / "Report" / "definition" / "pages" / "p1").mkdir()
+    (report_dir / "Report" / "definition" / "pages" / "p1" / "page.json").write_text('{"name":"p1"}')
+    raw = load(str(report_dir))
+    assert raw["model"] == {}
+    assert "report" in raw
+    assert raw["pages_metadata"].get("pageOrder") == ["p1"]
+    assert "p1" in raw["pages"]
+    assert "page" in raw["pages"]["p1"]

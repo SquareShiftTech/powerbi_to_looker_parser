@@ -32,6 +32,7 @@ if _SRC.exists() and str(_SRC) not in sys.path:
 from powerbi_to_looker.collector import Collector, CollectorProtocol  # noqa: E402
 from powerbi_to_looker.collector.powerbi.pbix_zip import extract_report_from_pbix  # noqa: E402
 from powerbi_to_looker.parser_normalizer import discover_report_folders, load  # noqa: E402
+from powerbi_to_looker.parser_normalizer.dashboard.orchestrator import run_viz  # noqa: E402
 from powerbi_to_looker.parser_normalizer.semantic.orchestrator import run as run_semantic  # noqa: E402
 
 
@@ -193,12 +194,29 @@ def process_one_report_canonical(
                 indent=2,
                 default=str,
             )
-        entry["success"] = True
         entry["metadata_model"] = str(out_file.relative_to(canonical_output_dir))
     except Exception as e:
         entry["error"] = str(e)
         entry["stage"] = "semantic"
         _write_canonical_error(report_out, report_id, str(e), "semantic")
+        return entry
+
+    try:
+        dashboard_metadata = run_viz(raw, report_id=report_id)
+        dash_file = report_out / "dashboard_metadata.json"
+        with open(dash_file, "w", encoding="utf-8") as f:
+            json.dump(
+                dashboard_metadata.model_dump(mode="json"),
+                f,
+                indent=2,
+                default=str,
+            )
+        entry["success"] = True
+        entry["dashboard_metadata"] = str(dash_file.relative_to(canonical_output_dir))
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "visualization"
+        _write_canonical_error(report_out, report_id, str(e), "visualization")
     return entry
 
 

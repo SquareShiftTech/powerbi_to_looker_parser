@@ -1,0 +1,99 @@
+# Visualization & dashboard mapping (see plan/viz_dashboard_parsing_requirements.md).
+# All visualTypes observed in parsed_output; no defaults in code — only keys listed here are supported.
+# mapping_role: Measure projections -> always "measure" from projection; Column projections -> role from query_state_roles below (no YAML fallback for measure).
+
+visual_types:
+  # Power BI visualType -> canonical DashboardComponent.type
+  component_type:
+    # Charts
+    clusteredColumnChart: visualization
+    clusteredBarChart: visualization
+    barChart: visualization
+    columnChart: visualization
+    lineChart: visualization
+    areaChart: visualization
+    pieChart: visualization
+    donutChart: visualization
+    scatterChart: visualization
+    lineStackedColumnComboChart: visualization
+    lineClusteredColumnComboChart: visualization
+    hundredPercentStackedColumnChart: visualization
+    hundredPercentStackedBarChart: visualization
+    waterfallChart: visualization
+    ribbonChart: visualization
+    treemap: visualization
+    # Tables / matrix
+    tableEx: visualization
+    pivotTable: visualization
+    # Cards / KPI
+    card: visualization
+    cardVisual: visualization
+    # Slicers -> filter
+    slicer: filter
+    listSlicer: filter
+    advancedSlicerVisual: filter
+    # Buttons / nav
+    actionButton: visualization
+    pageNavigator: visualization
+    # Decorative / static
+    textbox: text
+    image: image
+    shape: image
+    # Custom (PBI marketplace / template)
+    Gantt1448688115699: visualization
+    Sunburst1445472000808: visualization
+    sdmPbiTable78C63D3ED55C41ECB9F4B21D24D6AB3F: visualization
+
+  # Visual types that create a FilterComponent (slicer field)
+  creates_filter_component:
+    - slicer
+    - listSlicer
+    - advancedSlicerVisual
+
+  # Visual types that create a Visualization (data-bound or button)
+  creates_visualization:
+    - clusteredColumnChart
+    - clusteredBarChart
+    - barChart
+    - columnChart
+    - lineChart
+    - areaChart
+    - pieChart
+    - donutChart
+    - scatterChart
+    - lineStackedColumnComboChart
+    - lineClusteredColumnComboChart
+    - hundredPercentStackedColumnChart
+    - hundredPercentStackedBarChart
+    - waterfallChart
+    - ribbonChart
+    - treemap
+    - tableEx
+    - pivotTable
+    - card
+    - cardVisual
+    - actionButton
+    - pageNavigator
+    - Gantt1448688115699
+    - Sunburst1445472000808
+    - sdmPbiTable78C63D3ED55C41ECB9F4B21D24D6AB3F
+
+  # Visual types with no queryState -> data_mappings = []
+  empty_data_mappings:
+    - actionButton
+    - pageNavigator
+
+# Power BI queryState key -> role for Column projections only.
+# Measure projections always get mapping_role: measure from the projection (no YAML).
+# Keys not listed are not processed (no default).
+query_state_roles:
+  Category: dimension
+  Y: dimension
+  Values: dimension
+  Legend: grouping
+  Tooltip: tooltip
+  Axis: dimension
+  Rows: dimension
+  Columns: grouping
+  Detail: detail
+  Label: label

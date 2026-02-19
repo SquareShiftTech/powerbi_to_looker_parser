@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from powerbi_to_looker.parser_normalizer.dashboard.orchestrator import run_viz
 from powerbi_to_looker.parser_normalizer.loader import discover_report_folders, load
 from powerbi_to_looker.parser_normalizer.semantic.orchestrator import run as run_semantic
 
@@ -61,12 +62,30 @@ def run_all(
                     indent=2,
                     default=str,
                 )
-            entry["success"] = True
             entry["metadata_model"] = str(out_file.relative_to(out_dir))
         except Exception as e:
             entry["error"] = str(e)
             entry["stage"] = "semantic"
             _write_error(report_out, report_id, str(e), "semantic")
+            manifest.append(entry)
+            continue
+
+        try:
+            dashboard_metadata = run_viz(raw, report_id=report_id)
+            dash_file = report_out / "dashboard_metadata.json"
+            with open(dash_file, "w", encoding="utf-8") as f:
+                json.dump(
+                    dashboard_metadata.model_dump(mode="json"),
+                    f,
+                    indent=2,
+                    default=str,
+                )
+            entry["success"] = True
+            entry["dashboard_metadata"] = str(dash_file.relative_to(out_dir))
+        except Exception as e:
+            entry["error"] = str(e)
+            entry["stage"] = "visualization"
+            _write_error(report_out, report_id, str(e), "visualization")
         manifest.append(entry)
 
     if write_manifest:
