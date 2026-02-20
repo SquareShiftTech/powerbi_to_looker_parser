@@ -24,6 +24,9 @@ src/powerbi_to_looker/config/__init__.py
 src/powerbi_to_looker/config/canonical_lookml_mapping.yaml
 src/powerbi_to_looker/config/powerbi_canonical_mapping.yaml
 src/powerbi_to_looker/config/visualization_mapping.yaml
+src/powerbi_to_looker/dax/__init__.py
+src/powerbi_to_looker/dax/dax.lark
+src/powerbi_to_looker/dax/parser.py
 src/powerbi_to_looker/generator/__init__.py
 src/powerbi_to_looker/generator/_helpers.py
 src/powerbi_to_looker/generator/writer.py

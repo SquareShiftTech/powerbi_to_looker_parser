@@ -34,12 +34,14 @@ class TableRelationship(BaseModel):
 class Field(BaseModel):
     id: str
     name: str
-    field_type: str  # dimension, measure, calculated_field
+    field_type: str  # dimension | measure (is_calculated=True for formula-based fields)
     data_type: Optional[str] = None  # string, number, date, datetime, boolean; None when unknown
     source_table: Optional[str] = None
     source_column: Optional[str] = None
     aggregation: Optional[str] = None  # SUM, AVG, COUNT, MIN, MAX
     formula: Optional[str] = None
+    formula_ast: Optional[dict] = None  # Parsed DAX AST (dict) when formula parses successfully
+    formula_parse_error: Optional[str] = None  # Short error message when formula fails to parse
     depends_on: Optional[List[str]] = None
     is_calculated: Optional[bool] = None  # True when field has formula (e.g. calculated measure)
     extended_properties: Optional[dict] = None  # e.g. format_string, lineageTag

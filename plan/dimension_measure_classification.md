@@ -1,92 +1,63 @@
 # Dimension vs measure classification
 
-**Purpose:** Document how we assign canonical `field_type` (dimension, measure, calculated_field) from Power BI parsed model (`Model/database.json`). Used by the semantic layer (dimension + measure handlers) and by the transform layer when emitting LookML/SQL.
+**Purpose:** Document how we assign canonical `field_type` (dimension | measure) from Power BI parsed model (`Model/database.json`). Formula-based fields use **dimension** or **measure** with `is_calculated=True`; we do not use a separate `calculated_field` type.
 
 **Config:** `config/powerbi_canonical_mapping.yaml` (column_types, summarizeBy, defaults).
 
 ---
 
-## 1. Source of fields
+## 1. Three handlers, no overlap on formulas
 
-Canonical **fields** come from two places in the Power BI model:
+| Handler | Output | Rule |
+|--------|--------|------|
+| **Dimension** | `field_type="dimension"` only | Columns with **no expression** and **no summarizeBy** (or summarizeBy → null). No formula; `is_calculated=False`. |
+| **Measure** | `field_type="measure"` only | Columns with **summarizeBy** that maps to an aggregation (e.g. sum → SUM). No formula; `is_calculated=False`; transform applies aggregation to column. |
+| **Calc_field** | `field_type="dimension"` or `"measure"` | **All fields that have a formula:** (1) calculated columns → `field_type="dimension"`, (2) model measures → `field_type="measure"`. Both with `is_calculated=True` and `formula` set. |
 
-| Source | Path | Description |
-|--------|------|-------------|
-| **Columns** | `model.tables[].columns[]` | Table columns (data, calculated, or from calculated tables). |
-| **Measures** | `model.tables[].measures[]` | Model measures: DAX expressions (e.g. `AVERAGE(...)`, `SUM(...)`). |
-
-Columns and measures are processed by different handlers; the combined list is the datasource’s `fields[]`.
-
----
-
-## 2. Classification for columns (dimension handler)
-
-Columns are classified using **column type** and **summarizeBy**:
-
-### 2.1 Base type from column type
-
-Power BI column `type` is mapped via YAML **column_types**:
-
-| Power BI column.type | Canonical base field_type |
-|----------------------|---------------------------|
-| (omit / Data) | dimension |
-| Calculated | calculated_field |
-| calculatedTableColumn | dimension |
-
-So by default a column is **dimension** or **calculated_field** from its type alone.
-
-### 2.2 Override: summarizeBy → measure
-
-If the column has **summarizeBy** set to an aggregation (e.g. `sum`), we treat it as a measure for canonical purposes:
-
-| Condition | Result |
-|-----------|--------|
-| Column has `summarizeBy` and YAML maps it to a non-null **aggregation** (e.g. sum → SUM) | **field_type = "measure"**, **aggregation** = that value (e.g. SUM). data_type defaults to measure_data_type (number) if not set. |
-| Column has `summarizeBy` = none (or unmapped) | Keep **base field_type** (dimension or calculated_field). **aggregation** = null. |
-
-So:
-
-- **dimension** = column with no aggregation (summarizeBy none or default).
-- **calculated_field** = column with type Calculated and no aggregation.
-- **measure** (from columns) = column with summarizeBy that maps to an aggregation (e.g. sum). These get **aggregation** set; the transform layer will apply that aggregation to the column (e.g. SUM(column)).
+So: dimension and measure handlers never emit a formula. The calc_field handler emits dimension/measure with `formula` and `is_calculated=True`.
 
 ---
 
-## 3. Classification for model measures (measure handler)
+## 2. Dimension handler
 
-All entries in **`model.tables[].measures[]`** are emitted as:
-
-| Canonical field | Value |
-|-----------------|--------|
-| field_type | **"measure"** |
-| formula | DAX expression (string or joined lines). |
-| aggregation | **null** |
-| is_calculated | true when formula is present. |
-
-We do **not** set aggregation on model measures. The DAX formula is already the full expression (e.g. `AVERAGE(fact_enrollments[total_marks])`). Setting aggregation there would imply “apply this aggregation again” and cause **double aggregation** in the transform layer. So: measure with formula and aggregation null → transform layer should **emit formula only**.
+- **Source:** `model.tables[].columns[]` only.
+- **Filter:** Skip any column that has `expression`. Skip any column whose `summarizeBy` maps to a non-null aggregation (those go to measure).
+- **Output:** One `Field` per remaining column: `field_type="dimension"`, `formula=None`, `aggregation=None`, `is_calculated=False`. data_type from column.dataType via YAML.
 
 ---
 
-## 4. Summary table
+## 3. Measure handler
 
-| Source | field_type | aggregation | formula | When |
-|--------|------------|-------------|---------|------|
-| Column, type Data, summarizeBy none | dimension | null | (optional) | Regular dimension. |
-| Column, type Calculated, summarizeBy none | calculated_field | null | (optional) | Calculated column. |
-| Column, type Data/Calculated, summarizeBy sum (etc.) | measure | SUM (etc.) | (optional) | Column used as measure; transform applies aggregation. |
-| Model measure (tables[].measures[]) | measure | **null** | DAX | Full expression; transform emits formula only. |
+- **Source:** `model.tables[].columns[]` only (columns with summarizeBy).
+- **Filter:** Only columns where `summarizeBy` maps to a non-null aggregation (e.g. sum → SUM).
+- **Output:** One `Field` per such column: `field_type="measure"`, `aggregation` set from YAML, `formula=None`, `is_calculated=False`. Transform layer will apply this aggregation to the column.
+
+Model measures (`tables[].measures[]`) are **not** handled here; they have formulas and go to calculated_field.
 
 ---
 
-## 5. Transform layer contract
+## 4. Calc_field handler
 
-- **Measure with formula and aggregation = null**  
-  → Emit the formula as-is (translate DAX to SQL/LookML expression). Do **not** apply an extra aggregation.
+- **Source:** (1) `model.tables[].columns[]` where column has `expression`, (2) `model.tables[].measures[]`.
+- **Output:** One `Field` per such item: **calculated columns** → `field_type="dimension"`, **model measures** → `field_type="measure"`; both with `formula` set (DAX string) and `is_calculated=True`. `aggregation=None` (transform emits formula as-is to avoid double aggregation).
 
-- **Measure with aggregation set** (e.g. from summarizeBy on a column)  
-  → Apply that aggregation to the referenced column (e.g. SUM(dimension)).
+---
 
-- **Dimension / calculated_field**  
-  → Emit as dimension (no aggregation unless the chart asks for it elsewhere).
+## 5. Summary table
 
-See also: `plan/semantic_model_canonical_mapping.md` §3.5 (Field mapping), `validation/semantic_dashboard_relationship.md` (dashboard refs to semantic fields).
+| Source | Handler | field_type | is_calculated | formula | aggregation |
+|--------|---------|------------|---------------|---------|-------------|
+| Column, no expression, summarizeBy none | dimension | dimension | false | None | null |
+| Column, summarizeBy sum (etc.) | measure | measure | false | None | SUM (etc.) |
+| Column, has expression | calc_field | dimension | true | DAX | null |
+| Model measure (tables[].measures[]) | calc_field | measure | true | DAX | null |
+
+---
+
+## 6. Transform layer contract
+
+- **Dimension** → Emit as dimension (no aggregation unless chart asks).
+- **Measure** (no formula) → Apply `aggregation` to the referenced column (e.g. SUM(column)).
+- **Measure/Dimension** with `is_calculated=True` (formula set) → Emit formula as-is (translate DAX). Do not apply extra aggregation.
+
+See also: `plan/semantic_model_canonical_mapping.md` §3.5, `validation/semantic_dashboard_relationship.md`.

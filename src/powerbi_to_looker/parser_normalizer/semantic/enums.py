@@ -4,11 +4,10 @@ from enum import Enum
 
 
 class FieldType(str, Enum):
-    """Canonical field_type. Must match config column_types / measure output."""
+    """Canonical field_type. Must match config column_types / measure output. Formula-based fields use dimension|measure + is_calculated=True."""
 
     DIMENSION = "dimension"
     MEASURE = "measure"
-    CALCULATED_FIELD = "calculated_field"
 
 
 class DataType(str, Enum):

@@ -98,7 +98,7 @@ Power BI does **not** store join direction (LEFT/INNER) in this layout; use conf
 - **Connection:** type, server, database, schema.
 - **Table:** id, name, schema, table_name.
 - **TableRelationship:** from_table, to_table, join_type, on_columns (list of {from, to}).
-- **Field:** id, name, field_type (dimension | measure | calculated_field), data_type, source_table, source_column, aggregation, formula, depends_on, is_calculated.
+- **Field:** id, name, field_type (dimension | measure; formula-based use dimension/measure + is_calculated=True), data_type, source_table, source_column, aggregation, formula, depends_on, is_calculated.
 
 ---
 
@@ -166,24 +166,18 @@ Power BI does **not** store join direction (LEFT/INNER) in this layout; use conf
   **Or** keep hierarchies in **`extended_properties`** (e.g. `{"hierarchies": [...]}`) to avoid changing canonical schema.  
 - **Recommendation:** Put in **Table.extended_properties** for now (`"hierarchies": table.hierarchies` as-is or minimal shape). If Transformer needs stronger typing, add optional `hierarchies` to Table later.
 
-### 3.5 Field (dimensions and measures)
+### 3.5 Field (dimensions, measures)
 
-**Classification:** See [dimension_measure_classification.md](dimension_measure_classification.md) for how we assign dimension vs measure vs calculated_field and how aggregation is set (including why model measures have aggregation = null).
+**Classification:** See [dimension_measure_classification.md](dimension_measure_classification.md). **field_type is always dimension or measure.** Dimension handler emits only dimensions (columns with no expression, no summarizeBy). Measure handler emits only columns with summarizeBy (aggregation, no formula). Calc_field handler emits formula-based fields as **dimension** (calculated columns) or **measure** (model measures), both with `is_calculated=True` and `formula` set.
 
-**Rule:** Every field is either **dimension**, **measure**, or **calculated_field**. If it has a **formula** (DAX expression), is_calculated = true.
-
-| Canonical field | Source (column) | Source (measure) | Rule |
-|-----------------|------------------|------------------|------|
-| id | column.lineageTag | measure.lineageTag | Stable id |
-| name | column.name | measure.name | As-is |
-| field_type | column type | — | "dimension" or "calculated_field" (YAML: Data→dimension, Calculated/calculatedTableColumn→dimension or calculated_field). Measures → "measure"; measures with expression → "measure" + is_calculated true (or calculated_field per project). |
-| data_type | column.dataType | — | YAML: String→string, Int64→number, Double→number, DateTime→datetime, Boolean→boolean. Measures: default measure_data_type (number). |
-| source_table | table.name | table.name | Owning table |
-| source_column | column.sourceColumn / column.name | — | Column name or source ref |
-| aggregation | column.summarizeBy (YAML) | — | Dimension: summarizeBy → canonical aggregation or null. **Model measures: always null** (formula is full expression; transform emits formula only to avoid double aggregation). |
-| formula | column.expression (if present) | measure.expression | Concatenate expression array to string (DAX). |
-| depends_on | — | Optional: parse DAX for table/column refs | Can be null in Phase 1. |
-| is_calculated | true if expression present | true if expression present | True for calculated columns and all measures with formula. |
+| Canonical field | dimension | measure (summarizeBy) | formula-based (calc_field) |
+|-----------------|------------|------------------------|----------------------------|
+| field_type | dimension | measure | dimension (calc column) or measure (model measure) |
+| formula | None | None | DAX string (column.expression or measure.expression) |
+| aggregation | null | From summarizeBy (YAML) | null |
+| is_calculated | False | False | True |
+| source_table | table.name | table.name | table.name |
+| source_column | column.name/sourceColumn | column.name | column or None (measures) |
 
 **Format string / PBI-specific:** Store in **Field.extended_properties** (e.g. `{"format_string": "0.00%"}`) so canonical stays agnostic.
 
@@ -208,7 +202,7 @@ Power BI cardinality/crossFiltering can go into **extended_properties** on a fut
 |--------|--------|-----|
 | **Connection: add connection_provider (or Datasource: datasource_type)** | models/canonical.py | Identify backend (BigQuery, SQL Server, etc.) from M; required for Transformer and connection setup. |
 | **Table: hierarchies in extended_properties** | models/canonical.py | Store hierarchy (e.g. Date Hierarchy) as-is for Transformer; no schema change if we use extended_properties. Optional: add `hierarchies: Optional[List[dict]] = None` to Table if we want first-class. |
-| **Field: keep as-is** | — | dimension | measure | calculated_field; is_calculated and formula already exist. format_string in extended_properties. |
+| **Field: keep as-is** | — | dimension | measure (formula-based use is_calculated=True + formula). format_string in extended_properties. |
 
 **Minimal change set for Phase 1:**
 
@@ -221,7 +215,7 @@ Power BI cardinality/crossFiltering can go into **extended_properties** on a fut
 ## 5. YAML config (semantic)
 
 - **data_types:** Power BI dataType → canonical data_type (already in powerbi_canonical_mapping.yaml).
-- **column_types:** Data | Calculated | calculatedTableColumn → dimension | calculated_field.
+- **column_types:** Data | Calculated | calculatedTableColumn → dimension (calculated columns emitted by calc_field as dimension + is_calculated).
 - **measure_aggregation:** DAX function name → canonical aggregation (SUM, AVG, COUNT, etc.); already present.
 - **summarizeBy:** Power BI summarizeBy → canonical aggregation for dimensions (e.g. sum → SUM, none → null).
 - **relationship.join_type.default:** LEFT (already present).

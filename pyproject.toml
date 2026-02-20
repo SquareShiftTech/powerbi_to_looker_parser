@@ -44,7 +44,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-powerbi_to_looker = ["generator/dashboard_template/*.lookml", "templates/*.j2", "config/*.yaml"]
+powerbi_to_looker = ["generator/dashboard_template/*.lookml", "templates/*.j2", "config/*.yaml", "dax/*.lark"]
 
 [tool.pytest.ini_options]
 # Only tests/ contains pytest tests. scripts/ is for standalone real runs (e.g. run_collector_real.py).

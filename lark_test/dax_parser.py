@@ -626,10 +626,14 @@ def run_tests():
         try:
             tree = parser.parse(dax.strip())
             ast  = transformer.transform(tree)
-            print(f"  ✅  {name}")
+
+            if name == "Market share":
+                print(ast)
+
+            print(f"  OK   {name}")
             passed += 1
         except Exception as e:
-            print(f"  ❌  {name}")
+            print(f"  FAIL {name}")
             print(f"       {e}")
             errors.append((name, str(e)))
             failed += 1

@@ -25,10 +25,12 @@ measure_name: UNQUOTED_NAME
 
 // ============================================================
 // REFERENCES (defined before EXPRESSIONS so multi_col_in can use column_ref)
+// Power BI hierarchy: Table[Column].[Level] or [Column].[Level]
 // ============================================================
 
-qualified_col_ref: table_name "[" COL_NAME "]"
-unqualified_col_ref: "[" COL_NAME "]"
+qualified_col_ref: table_name "[" COL_NAME "]" hierarchy_suffix?
+unqualified_col_ref: "[" COL_NAME "]" hierarchy_suffix?
+hierarchy_suffix: "." "[" COL_NAME "]"
 column_ref: qualified_col_ref | unqualified_col_ref
 
 table_ref: table_name
@@ -137,8 +139,10 @@ atom: function_call
 //   DATEADD([Date], -1, YEAR)   <-- interval keyword as arg
 //   BLANK()                     <-- zero-arg
 
-function_call: FUNC_NAME "(" ")"                    -> func_no_args
-             | FUNC_NAME "(" arg_list ")"           -> func_with_args
+// func_name accepts both FUNC_NAME and UNQUOTED_NAME so lowercase (e.g. sum) works
+function_call: func_name "(" ")"                    -> func_no_args
+             | func_name "(" arg_list ")"           -> func_with_args
+func_name: FUNC_NAME | UNQUOTED_NAME
 
 arg_list: arg ("," arg)*
 
@@ -222,9 +226,8 @@ COL_NAME: /[^\[\]]+/
 // Variable names: start with letter or underscore, no spaces
 VAR_NAME: /[A-Za-z_][A-Za-z0-9_]*/
 
-// Function names: uppercase, may contain dots (PERCENTILE.INC, T.INV.2T)
-// Must start with uppercase letter; after dot, segment can start with letter or digit
-FUNC_NAME: /[A-Z][A-Z0-9]*(\.[A-Z0-9][A-Z0-9]*)*/
+// Function names: case-insensitive (DAX allows sum, SUM, Sum), dots allowed (PERCENTILE.INC)
+FUNC_NAME: /[A-Za-z][A-Za-z0-9]*(\.[A-Za-z0-9][A-Za-z0-9]*)*/
 
 // Numbers: integer, decimal, scientific notation
 NUMBER: /[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?/

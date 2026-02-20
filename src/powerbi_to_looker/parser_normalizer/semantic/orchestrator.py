@@ -1,4 +1,4 @@
-"""Semantic orchestrator: run handlers (tables, dimension, measure), merge fields, build MetadataModel."""
+"""Semantic orchestrator: run handlers (tables, dimension, measure, calc_field), merge fields, build MetadataModel."""
 
 from datetime import datetime, timezone
 from typing import Any
@@ -8,13 +8,14 @@ from powerbi_to_looker.models.canonical import (
     MetadataModel,
     Parameter,
 )
-from powerbi_to_looker.parser_normalizer.semantic import dimension, measure, tables
+from powerbi_to_looker.parser_normalizer.semantic import calc_field, dimension, measure, tables
 
 
 def run(raw: dict[str, Any]) -> MetadataModel:
     """
     Build canonical MetadataModel from raw. Sends full raw to each handler.
-    Merges dimension + measure fields into one list; tables handler supplies tables, relationships, connection.
+    Dimension = no formula. Measure = summarizeBy only (no formula). Calc_field = all formulas emitted as dimension or measure with is_calculated=True.
+    Merges dimension + measure + calc_field into one fields list.
     """
     model_obj = raw.get("model") or raw
     db_name = model_obj.get("name", "unknown") if isinstance(model_obj, dict) else "unknown"
@@ -31,8 +32,8 @@ def run(raw: dict[str, Any]) -> MetadataModel:
         all_fields.extend(dimension.run(raw))
     if measure.can_handle(raw):
         all_fields.extend(measure.run(raw))
-    # Optional: apply calculated_field typing for any field with formula (already have is_calculated)
-    # We keep dimension/measure field_type as-is; is_calculated and formula are set.
+    if calc_field.can_handle(raw):
+        all_fields.extend(calc_field.run(raw))
 
     datasource = Datasource(
         id=ds_id,

@@ -1,6 +1,5 @@
-"""Measure handler: raw["model"].tables[].measures -> list[Field] (measure)."""
+"""Measure handler: raw["model"].tables[].columns with summarizeBy -> list[Field] (measure, no formula)."""
 
-import re
 from pathlib import Path
 from typing import Any
 
@@ -16,38 +15,42 @@ def _get_config() -> dict[str, Any]:
     return {}
 
 
-def _infer_aggregation_from_dax(expression: list[str] | str, config: dict[str, Any]) -> str | None:
-    """Infer canonical aggregation from DAX expression using measure_aggregation map."""
-    agg_map = config.get("measure_aggregation") or {}
-    text = "\n".join(expression).strip() if isinstance(expression, list) else str(expression)
-    for dax_key, canonical_agg in agg_map.items():
-        if dax_key == "default":
-            continue
-        if canonical_agg is None:
-            continue
-        # Match word boundary for SUM, COUNT, etc.
-        if re.search(rf"\b{dax_key}\s*\(", text, re.IGNORECASE):
-            return canonical_agg
-    return agg_map.get("default")
+def _data_type_from_config(data_type_key: str | None, data_types: dict[str, Any]) -> str | None:
+    if not data_type_key:
+        return None
+    key_lower = data_type_key.strip().lower()
+    for k, v in data_types.items():
+        if k.strip().lower() == key_lower:
+            return v
+    return None
 
 
 def can_handle(raw: dict[str, Any]) -> bool:
-    """Return True if raw model has tables with measures."""
+    """Return True if raw model has any column with summarizeBy that maps to an aggregation."""
+    config = _get_config()
+    summarize_by = config.get("summarizeBy") or {}
     model = raw.get("model") or raw
     if isinstance(model, dict) and "model" in model:
         model = model["model"]
-    tables = model.get("tables") if isinstance(model, dict) else None
-    if not isinstance(tables, list):
+    if not isinstance(model, dict):
         return False
-    return any(isinstance(t.get("measures"), list) for t in tables)
+    for t in model.get("tables") or []:
+        for col in t.get("columns") or []:
+            sum_by_key = (col.get("summarizeBy") or "none").strip().lower()
+            agg = next(
+                (v for k, v in summarize_by.items() if k.strip().lower() == sum_by_key),
+                summarize_by.get("default"),
+            )
+            if agg is not None:
+                return True
+    return False
 
 
 def run(raw: dict[str, Any]) -> list[Field]:
-    """Build list of canonical Field (measure) from all table measures.
-    Model measures have a formula (DAX) that is already the full expression; we leave
-    aggregation=None so the transform layer can emit the formula as-is and avoid double aggregation.
-    """
+    """Build list of canonical Field (measure only) from columns with summarizeBy. No formula."""
     config = _get_config()
+    data_types = config.get("data_types") or {}
+    summarize_by = config.get("summarizeBy") or {}
     defaults = config.get("defaults") or {}
     measure_data_type = defaults.get("measure_data_type", "number")
 
@@ -59,38 +62,42 @@ def run(raw: dict[str, Any]) -> list[Field]:
     fields: list[Field] = []
     for t in model.get("tables") or []:
         table_name = t.get("name") or ""
-        for m in t.get("measures") or []:
-            name = m.get("name") or ""
-            lineage = m.get("lineageTag") or name
-            expression = m.get("expression") or []
-            if isinstance(expression, str):
-                formula = expression.strip() or None
-            elif expression:
-                formula = "\n".join(str(x) for x in expression).strip()
-            else:
-                formula = None
-            # Leave aggregation=None for model measures; formula is the full expression.
-            # Transform layer: measure with formula and no aggregation → emit formula only.
-            is_calculated = formula is not None
+        for col in t.get("columns") or []:
+            if col.get("expression"):
+                continue
+            sum_by_key = (col.get("summarizeBy") or "none").strip().lower()
+            aggregation = next(
+                (v for k, v in summarize_by.items() if k.strip().lower() == sum_by_key),
+                summarize_by.get("default"),
+            )
+            if aggregation is None:
+                continue
+
+            col_name = col.get("name") or ""
+            lineage = col.get("lineageTag") or col_name
+            data_type_key = col.get("dataType")
+            data_type = _data_type_from_config(data_type_key, data_types)
+            if data_type is None:
+                data_type = measure_data_type
 
             ext: dict[str, Any] = {}
-            if m.get("formatString"):
-                ext["format_string"] = m.get("formatString")
-            if m.get("lineageTag"):
-                ext["lineageTag"] = m.get("lineageTag")
+            if col.get("formatString"):
+                ext["format_string"] = col.get("formatString")
+            if col.get("lineageTag"):
+                ext["lineageTag"] = col.get("lineageTag")
 
             fields.append(
                 Field(
                     id=lineage,
-                    name=name,
+                    name=col_name,
                     field_type="measure",
-                    data_type=measure_data_type,
+                    data_type=data_type,
                     source_table=table_name,
-                    source_column=None,
-                    aggregation=None,
-                    formula=formula,
+                    source_column=col.get("sourceColumn") or col_name,
+                    aggregation=aggregation,
+                    formula=None,
                     depends_on=None,
-                    is_calculated=is_calculated,
+                    is_calculated=False,
                     extended_properties=ext if ext else None,
                 )
             )

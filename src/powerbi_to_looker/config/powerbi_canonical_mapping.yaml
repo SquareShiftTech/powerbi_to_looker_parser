@@ -10,7 +10,7 @@ data_types:
 
 column_types:
   Data: dimension
-  Calculated: calculated_field
+  Calculated: dimension  # calculated columns emitted by calc_field as dimension + is_calculated
   calculatedTableColumn: dimension  # columns in calculated tables
 
 # Power BI summarizeBy → canonical aggregation for dimensions (or null)
