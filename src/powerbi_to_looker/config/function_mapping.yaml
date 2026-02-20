@@ -1,0 +1,681 @@
+# ============================================================
+# function_mapping.yaml
+# DAX Function → BigQuery SQL Equivalent
+#
+# Three sections:
+#   direct_mapping   → rename only, args pass through as-is
+#   special_mapping  → named handler in code, shape changes
+#   unsupported      → cannot auto-convert, flag as manual
+#
+# Template syntax in direct_mapping:
+#   {0}, {1} ... = positional args
+#   No template = wrap args in parens: FUNC(arg1, arg2, ...)
+# ============================================================
+
+
+# ============================================================
+# DIRECT MAPPING
+# Pure 1:1 rename. Args passed through recursively.
+# ============================================================
+
+direct_mapping:
+
+  # --- Aggregation -------------------------------------------
+  SUM:              SUM
+  MIN:              MIN
+  MAX:              MAX
+  AVERAGE:          AVG
+  MEDIAN:           "APPROX_QUANTILES({0}, 2)[OFFSET(1)]"
+  GEOMEAN:          "EXP(AVG(LN({0})))"
+  PRODUCT:          "EXP(SUM(LN({0})))"
+  COUNTA:           COUNT           # COUNT in BQ counts non-null same as COUNTA
+
+  # --- Statistical -------------------------------------------
+  STDEV.P:          "STDDEV_POP"
+  STDEV.S:          "STDDEV_SAMP"
+  STDEVX.P:         "STDDEV_POP"
+  STDEVX.S:         "STDDEV_SAMP"
+  VAR.P:            "VAR_POP"
+  VAR.S:            "VAR_SAMP"
+  VARX.P:           "VAR_POP"
+  VARX.S:           "VAR_SAMP"
+
+  # --- Math --------------------------------------------------
+  ABS:              ABS
+  SQRT:             SQRT
+  EXP:              EXP
+  POWER:            "POW({0}, {1})"
+  MOD:              MOD
+  SIGN:             SIGN
+  FLOOR:            "FLOOR({0})"
+  CEILING:          "CEIL({0})"
+  EVEN:             "2 * CEILING({0} / 2)"
+  ODD:              "2 * FLOOR({0} / 2) + 1"
+  LN:               LN
+  LOG10:            LOG10
+  LOG:              "LOG({0}, {1})"           # LOG(number, base)
+  FACT:             null                       # no BQ equivalent → special
+  COMBIN:           null                       # → special
+  PERMUT:           null                       # → special
+  GCD:              null                       # → special
+  LCM:              null                       # → special
+  QUOTIENT:         "DIV({0}, {1})"
+  TRUNC:            "TRUNC({0})"
+  INT:              "CAST({0} AS INT64)"
+  PI:               "ACOS(-1)"
+  DEGREES:          "({0} * 180 / ACOS(-1))"
+  RADIANS:          "({0} * ACOS(-1) / 180)"
+  SIN:              SIN
+  COS:              COS
+  TAN:              TAN
+  ASIN:             ASIN
+  ACOS:             ACOS
+  ATAN:             ATAN
+  ATAN2:            ATAN
+
+  # --- Text --------------------------------------------------
+  LEN:              LENGTH
+  UPPER:            UPPER
+  LOWER:            LOWER
+  TRIM:             TRIM
+  LEFT:             LEFT
+  RIGHT:            RIGHT
+  REPT:             REPEAT
+  UNICODE:          "TO_CODE_POINTS({0})[OFFSET(0)]"
+  UNICHAR:          "CODE_POINTS_TO_STRING([{0}])"
+  EXACT:            "({0} = {1})"
+  SEARCH:           "STRPOS(LOWER({0}), LOWER({1}))"    # approximate — no start_pos
+  FIND:             "STRPOS({0}, {1})"
+
+  # --- Logical -----------------------------------------------
+  AND:              "({0} AND {1})"
+  OR:               "({0} OR {1})"
+  NOT:              "(NOT {0})"
+  TRUE:             "TRUE"
+  FALSE:            "FALSE"
+
+  # --- Information -------------------------------------------
+  ISNUMBER:         "({0} IS NOT NULL)"              # approximate
+  ISTEXT:           "({0} IS NOT NULL)"              # approximate
+  ISLOGICAL:        "({0} IS NOT NULL)"              # approximate
+  ISNULL:           "({0} IS NULL)"
+  NONBLANK:         "({0} IS NOT NULL AND {0} != '')"
+
+  # --- Date extraction (bare — no EXTRACT wrapper needed) ---
+  # These are handled by extract_mapping below; listed here
+  # only as a reference that they ARE supported.
+
+  # --- Conversion --------------------------------------------
+  VALUE:            "CAST({0} AS FLOAT64)"
+  CURRENCY:         "CAST({0} AS FLOAT64)"
+  DATEVALUE:        "DATE({0})"
+  TIMEVALUE:        "TIME({0})"
+
+
+# ============================================================
+# EXTRACT MAPPING
+# DAX functions that become EXTRACT(unit FROM col) in BQ
+# ============================================================
+
+extract_mapping:
+  YEAR:     YEAR
+  MONTH:    MONTH
+  DAY:      DAY
+  HOUR:     HOUR
+  MINUTE:   MINUTE
+  SECOND:   SECOND
+  QUARTER:  QUARTER
+  WEEK:     ISOWEEK
+  WEEKDAY:  DAYOFWEEK
+  WEEKNUM:  ISOWEEK
+  YEARFRAC: null      # no direct extract → special
+
+
+# ============================================================
+# SPECIAL MAPPING
+# These need handler functions in code.
+# Value = handler name to call.
+# ============================================================
+
+special_mapping:
+
+  # --- Arithmetic --------------------------------------------
+  DIVIDE:           safe_divide
+    # DIVIDE(a, b, alt) → SAFE_DIVIDE(a, b) — alt value on divide-by-zero
+    # BQ SAFE_DIVIDE returns NULL not alt, so:
+    # IFNULL(SAFE_DIVIDE(a, b), alt)
+
+  ROUND:            round_handler
+    # ROUND(number, decimals) → ROUND(number, decimals)
+    # Identical but DAX allows negative decimals (rounds to tens/hundreds)
+
+  ROUNDUP:          roundup_handler
+    # ROUNDUP(number, decimals) → CEIL(number * POW(10, decimals)) / POW(10, decimals)
+
+  ROUNDDOWN:        rounddown_handler
+    # ROUNDDOWN(number, decimals) → FLOOR(number * POW(10, decimals)) / POW(10, decimals)
+
+  MROUND:           mround_handler
+    # MROUND(number, multiple) → ROUND(number / multiple) * multiple
+
+  # --- Logical -----------------------------------------------
+  IF:               case_when
+    # IF(cond, true_val, false_val)
+    # → CASE WHEN cond THEN true_val ELSE false_val END
+
+  IFERROR:          iferror_handler
+    # IFERROR(expr, fallback) → IFNULL(expr, fallback)
+    # Note: doesn't catch all errors like DAX does — flag as partial
+
+  SWITCH:           switch_case_when
+    # SWITCH(TRUE(), cond1, val1, cond2, val2, else_val)
+    # → CASE WHEN cond1 THEN val1 WHEN cond2 THEN val2 ELSE else_val END
+    # SWITCH(expr, match1, val1, match2, val2, else_val)
+    # → CASE expr WHEN match1 THEN val1 WHEN match2 THEN val2 ELSE else_val END
+
+  COALESCE:         coalesce_handler
+    # COALESCE(a, b, c) → COALESCE(a, b, c) — direct but needs null handling
+
+  NULLIF:           nullif_handler
+    # NULLIF(a, b) → NULLIF(a, b)
+
+  # --- Text --------------------------------------------------
+  CONCATENATE:      concat_handler
+    # CONCATENATE(a, b) → CONCAT(a, b)
+
+  CONCATENATEX:     concatenatex_handler
+    # CONCATENATEX(table, expr, delimiter) → STRING_AGG(expr, delimiter)
+    # conversion_status = partial — needs GROUP BY context
+
+  MID:              mid_handler
+    # MID(text, start, length) → SUBSTR(text, start, length)
+    # Note: DAX is 1-indexed, BQ SUBSTR is also 1-indexed — safe
+
+  SUBSTITUTE:       substitute_handler
+    # SUBSTITUTE(text, old, new) → REPLACE(text, old, new)
+    # SUBSTITUTE(text, old, new, instance) → no direct BQ equivalent for instance arg
+
+  REPLACE:          replace_handler
+    # REPLACE(text, start, length, new) → CONCAT(LEFT(text,start-1), new, SUBSTR(text, start+length))
+
+  FIXED:            fixed_handler
+    # FIXED(number, decimals, no_commas) → FORMAT('%.*f', decimals, number)
+
+  TEXT:             text_handler
+    # TEXT(value, format) → FORMAT_DATE or FORMAT or CAST depending on type
+    # format string mapping needed
+
+  FORMAT:           format_handler
+    # FORMAT(value, format_string)
+    # datetime → FORMAT_DATE(format, date) or FORMAT_TIMESTAMP(format, ts)
+    # number   → FORMAT('%g', value) approximate
+
+  CLEAN:            clean_handler
+    # CLEAN(text) → REGEXP_REPLACE(text, r'[\x00-\x1F]', '')
+
+  CODE:             code_handler
+    # CODE(text) → TO_CODE_POINTS(text)[OFFSET(0)]
+
+  CHAR:             char_handler
+    # CHAR(number) → CODE_POINTS_TO_STRING([number])
+
+  NUMBERVALUE:      numbervalue_handler
+    # NUMBERVALUE(text, decimal_sep, group_sep) → CAST(... AS FLOAT64) approximate
+
+  # --- Date / Time -------------------------------------------
+  DATE:             date_constructor
+    # DATE(year, month, day) → DATE(year, month, day)
+
+  TIME:             time_constructor
+    # TIME(hour, minute, second) → TIME(hour, minute, second)
+
+  NOW:              now_handler
+    # NOW() → CURRENT_TIMESTAMP()
+
+  TODAY:            today_handler
+    # TODAY() → CURRENT_DATE()
+
+  EOMONTH:          eomonth_handler
+    # EOMONTH(date, months) → DATE_SUB(DATE_TRUNC(DATE_ADD(date, INTERVAL months+1 MONTH), MONTH), INTERVAL 1 DAY)
+
+  EDATE:            edate_handler
+    # EDATE(date, months) → DATE_ADD(date, INTERVAL months MONTH)
+
+  DATEDIFF:         datediff_handler
+    # DATEDIFF(date1, date2, interval) → DATE_DIFF(date2, date1, interval)
+    # interval keyword maps: DAY→DAY, MONTH→MONTH, YEAR→YEAR, QUARTER→QUARTER, WEEK→WEEK
+
+  DATEADD:          dateadd_handler
+    # DATEADD(dates, n, interval) → DATE_ADD(date, INTERVAL n interval)
+    # conversion_status = partial — loses time intelligence semantics
+
+  NETWORKDAYS:      networkdays_handler
+    # No direct BQ equivalent — flag as partial, approximate with DATE_DIFF minus weekends
+
+  WEEKDAY:          weekday_handler
+    # WEEKDAY(date, return_type) → EXTRACT(DAYOFWEEK FROM date)
+    # return_type affects Sunday=1 vs Monday=1 — handle in code
+
+  # --- Aggregation (iterator variants) -----------------------
+  SUMX:             iteratorx_handler
+    # SUMX(table, expr) → SUM(expr) when table is source table
+    # → subquery pattern when table is filtered
+    # conversion_status = partial
+
+  AVERAGEX:         iteratorx_handler
+    # AVERAGEX(table, expr) → AVG(expr)
+
+  MINX:             iteratorx_handler
+    # MINX(table, expr) → MIN(expr)
+
+  MAXX:             iteratorx_handler
+    # MAXX(table, expr) → MAX(expr)
+
+  COUNTX:           iteratorx_handler
+    # COUNTX(table, expr) → COUNT(expr)
+
+  COUNTAX:          iteratorx_handler
+    # COUNTAX(table, expr) → COUNT(expr)
+
+  MEDIANX:          iteratorx_handler
+    # MEDIANX(table, expr) → APPROX_QUANTILES(expr, 2)[OFFSET(1)]
+
+  GEOMEANX:         iteratorx_handler
+    # GEOMEANX(table, expr) → EXP(AVG(LN(expr)))
+
+  PRODUCTX:         iteratorx_handler
+    # PRODUCTX(table, expr) → EXP(SUM(LN(expr)))
+
+  # --- Count variants ----------------------------------------
+  COUNT:            count_handler
+    # COUNT(column) → COUNT(column)
+
+  COUNTA:           count_handler
+    # COUNTA(column) → COUNT(column)
+
+  COUNTROWS:        countrows_handler
+    # COUNTROWS(table) → COUNT(*) FROM table  — needs FROM context
+
+  COUNTBLANK:       countblank_handler
+    # COUNTBLANK(column) → COUNTIF(column IS NULL)
+
+  DISTINCTCOUNT:    distinctcount_handler
+    # DISTINCTCOUNT(column) → COUNT(DISTINCT column)
+
+  DISTINCTCOUNTNOBLANK: distinctcount_handler
+    # Same as DISTINCTCOUNT but exclude blanks
+    # → COUNT(DISTINCT CASE WHEN column IS NOT NULL THEN column END)
+
+  # --- Casting / Type ----------------------------------------
+  BLANK:            blank_handler
+    # BLANK() → NULL
+
+  ISBLANK:          isblank_handler
+    # ISBLANK(expr) → (expr IS NULL OR expr = '')
+
+  ISERROR:          iserror_handler
+    # ISERROR(expr) → no direct BQ equivalent → flag partial, use SAFE.function
+
+  CONVERT:          convert_handler
+    # CONVERT(value, datatype) → CAST(value AS datatype)
+    # datatype integer mapping needed
+
+  # --- Ranking / Window --------------------------------------
+  RANK:             rank_handler
+    # RANK(value, column) → RANK() OVER (ORDER BY column)
+    # conversion_status = partial — loses DAX context semantics
+
+  PERCENTILE.INC:   percentile_handler
+    # PERCENTILE.INC(column, k) → PERCENTILE_CONT(k) WITHIN GROUP (ORDER BY column)
+    # BQ uses APPROX_QUANTILES for approximation
+
+  PERCENTILE.EXC:   percentile_handler
+    # Similar to PERCENTILE.INC
+
+  PERCENTILEX.INC:  percentile_handler
+  PERCENTILEX.EXC:  percentile_handler
+
+  # --- Financial ---------------------------------------------
+  XNPV:             financial_handler
+    # No direct BQ equivalent — flag manual
+
+  XIRR:             financial_handler
+    # No direct BQ equivalent — flag manual
+
+  PMT:              financial_handler
+  IPMT:             financial_handler
+  PPMT:             financial_handler
+  NPER:             financial_handler
+  PV:               financial_handler
+  FV:               financial_handler
+  RATE:             financial_handler
+  SLN:              financial_handler
+
+  # --- Information -------------------------------------------
+  SELECTEDVALUE:    selectedvalue_handler
+    # SELECTEDVALUE(column, alt) → MAX(column)
+    # Approximation only — loses slicer context
+    # conversion_status = partial
+
+  HASONEVALUE:      hasonevalue_handler
+    # HASONEVALUE(column) → COUNT(DISTINCT column) = 1
+    # conversion_status = partial
+
+  HASONEFILTER:     hasonefilter_handler
+    # conversion_status = partial
+
+  USERNAME:         username_handler
+    # USERNAME() → SESSION_USER()
+
+  USERPRINCIPALNAME: username_handler
+    # → SESSION_USER()
+
+  CUSTOMDATA:       manual_flag
+    # No BQ equivalent → manual
+
+  # --- Table functions (partial support) ---------------------
+  VALUES:           values_handler
+    # VALUES(column) → SELECT DISTINCT column FROM table
+    # conversion_status = partial — needs subquery context
+
+  DISTINCT:         distinct_handler
+    # DISTINCT(column) → SELECT DISTINCT column FROM table
+
+  ROW:              row_handler
+    # ROW("col", expr) → SELECT expr AS col
+    # conversion_status = partial
+
+  TOPN:             topn_handler
+    # TOPN(n, table, expr) → ORDER BY expr DESC LIMIT n
+    # conversion_status = partial
+
+
+# ============================================================
+# UNSUPPORTED
+# Cannot auto-convert. Always flag as manual.
+# Message explains what to do instead.
+# ============================================================
+
+unsupported:
+
+  # --- Filter context (core Power BI concept) ----------------
+  - name: CALCULATE
+    message: "CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually."
+
+  - name: CALCULATETABLE
+    message: "CALCULATETABLE returns a filtered table — rewrite as subquery or CTE with WHERE clause."
+
+  - name: ALL
+    message: "ALL removes filters — use window function SUM(...) OVER () or a subquery without WHERE for grand total."
+
+  - name: ALLEXCEPT
+    message: "ALLEXCEPT keeps filters on specified columns only — use PARTITION BY in window function with the kept columns."
+
+  - name: ALLSELECTED
+    message: "ALLSELECTED respects visual filters but removes slicer filters — no direct BQ equivalent. Requires manual query design."
+
+  - name: ALLNOBLANKROW
+    message: "ALLNOBLANKROW — similar to ALL but excludes blank row. Rewrite as ALL equivalent with IS NOT NULL filter."
+
+  - name: KEEPFILTERS
+    message: "KEEPFILTERS — CALCULATE modifier. Rewrite as AND condition in WHERE clause."
+
+  - name: REMOVEFILTERS
+    message: "REMOVEFILTERS — equivalent to ALL. Rewrite as window function or subquery without filter."
+
+  - name: USERELATIONSHIP
+    message: "USERELATIONSHIP activates an inactive relationship — requires manual JOIN on alternate key in BigQuery."
+
+  - name: CROSSFILTER
+    message: "CROSSFILTER changes relationship direction — requires manual bi-directional JOIN design in BigQuery."
+
+  # --- Row context -------------------------------------------
+  - name: EARLIER
+    message: "EARLIER references outer row context in nested iteration — rewrite as self-JOIN or window function with PARTITION BY."
+
+  - name: EARLIEST
+    message: "EARLIEST — similar to EARLIER. Rewrite as self-JOIN."
+
+  # --- Table functions (complex) -----------------------------
+  - name: FILTER
+    message: "FILTER returns a filtered table — rewrite as subquery SELECT ... WHERE ... or CTE."
+
+  - name: SUMMARIZE
+    message: "SUMMARIZE produces a virtual grouped table — rewrite as SELECT with GROUP BY in BigQuery or Looker derived table."
+
+  - name: SUMMARIZECOLUMNS
+    message: "SUMMARIZECOLUMNS — similar to SUMMARIZE. Rewrite as SELECT with GROUP BY."
+
+  - name: ADDCOLUMNS
+    message: "ADDCOLUMNS adds computed columns to a table — rewrite as SELECT with additional expressions."
+
+  - name: SELECTCOLUMNS
+    message: "SELECTCOLUMNS projects columns from a table — rewrite as SELECT col1, col2 FROM table."
+
+  - name: CROSSJOIN
+    message: "CROSSJOIN — rewrite as CROSS JOIN in BigQuery SQL."
+
+  - name: UNION
+    message: "UNION — rewrite as UNION ALL in BigQuery."
+
+  - name: INTERSECT
+    message: "INTERSECT — rewrite as INTERSECT DISTINCT in BigQuery."
+
+  - name: EXCEPT
+    message: "EXCEPT — rewrite as EXCEPT DISTINCT in BigQuery."
+
+  - name: NATURALLEFTOUTERJOIN
+    message: "NATURALLEFTOUTERJOIN — rewrite as LEFT JOIN on matching column names."
+
+  - name: NATURALINNERJOIN
+    message: "NATURALINNERJOIN — rewrite as INNER JOIN on matching column names."
+
+  - name: GENERATEALL
+    message: "GENERATEALL — rewrite as CROSS JOIN with filter."
+
+  - name: GENERATE
+    message: "GENERATE — rewrite as CROSS JOIN with filter."
+
+  - name: TOPNSKIP
+    message: "TOPNSKIP — rewrite as LIMIT n OFFSET k in BigQuery."
+
+  # --- Relationships -----------------------------------------
+  - name: RELATED
+    message: "RELATED fetches from related table — rewrite as JOIN on the relationship key defined in metadata."
+
+  - name: RELATEDTABLE
+    message: "RELATEDTABLE returns related rows — rewrite as subquery or JOIN."
+
+  - name: USERELATIONSHIP
+    message: "USERELATIONSHIP — rewrite as explicit JOIN on alternate key."
+
+  # --- Time intelligence -------------------------------------
+  - name: TOTALYTD
+    message: "TOTALYTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, YEAR) AND date <= current_date"
+
+  - name: TOTALQTD
+    message: "TOTALQTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, QUARTER)"
+
+  - name: TOTALMTD
+    message: "TOTALMTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, MONTH)"
+
+  - name: SAMEPERIODLASTYEAR
+    message: "SAMEPERIODLASTYEAR — rewrite as: WHERE date BETWEEN DATE_ADD(start, INTERVAL -1 YEAR) AND DATE_ADD(end, INTERVAL -1 YEAR)"
+
+  - name: PARALLELPERIOD
+    message: "PARALLELPERIOD — rewrite as: DATEADD equivalent with period shift."
+
+  - name: DATESINPERIOD
+    message: "DATESINPERIOD — rewrite as: WHERE date BETWEEN DATE_SUB(anchor, INTERVAL n unit) AND anchor"
+
+  - name: DATESBETWEEN
+    message: "DATESBETWEEN — rewrite as: WHERE date BETWEEN start_date AND end_date"
+
+  - name: DATESYTD
+    message: "DATESYTD — rewrite as: WHERE date BETWEEN DATE_TRUNC(date, YEAR) AND date"
+
+  - name: DATESQTD
+    message: "DATESQTD — rewrite as: WHERE date BETWEEN DATE_TRUNC(date, QUARTER) AND date"
+
+  - name: DATESMTD
+    message: "DATESMTD — rewrite as: WHERE date BETWEEN DATE_TRUNC(date, MONTH) AND date"
+
+  - name: FIRSTDATE
+    message: "FIRSTDATE — rewrite as: MIN(date)"
+
+  - name: LASTDATE
+    message: "LASTDATE — rewrite as: MAX(date)"
+
+  - name: FIRSTNONBLANK
+    message: "FIRSTNONBLANK — rewrite as: MIN(CASE WHEN expr IS NOT NULL THEN date END)"
+
+  - name: LASTNONBLANK
+    message: "LASTNONBLANK — rewrite as: MAX(CASE WHEN expr IS NOT NULL THEN date END)"
+
+  - name: NEXTDAY
+    message: "NEXTDAY — rewrite as: DATE_ADD(date, INTERVAL 1 DAY)"
+
+  - name: NEXTMONTH
+    message: "NEXTMONTH — rewrite as: DATE_ADD(date, INTERVAL 1 MONTH)"
+
+  - name: NEXTQUARTER
+    message: "NEXTQUARTER — rewrite as: DATE_ADD(date, INTERVAL 1 QUARTER)"
+
+  - name: NEXTYEAR
+    message: "NEXTYEAR — rewrite as: DATE_ADD(date, INTERVAL 1 YEAR)"
+
+  - name: PREVIOUSDAY
+    message: "PREVIOUSDAY — rewrite as: DATE_SUB(date, INTERVAL 1 DAY)"
+
+  - name: PREVIOUSMONTH
+    message: "PREVIOUSMONTH — rewrite as: DATE_SUB(date, INTERVAL 1 MONTH)"
+
+  - name: PREVIOUSQUARTER
+    message: "PREVIOUSQUARTER — rewrite as: DATE_SUB(date, INTERVAL 1 QUARTER)"
+
+  - name: PREVIOUSYEAR
+    message: "PREVIOUSYEAR — rewrite as: DATE_SUB(date, INTERVAL 1 YEAR)"
+
+  - name: STARTOFMONTH
+    message: "STARTOFMONTH — rewrite as: DATE_TRUNC(date, MONTH)"
+
+  - name: STARTOFQUARTER
+    message: "STARTOFQUARTER — rewrite as: DATE_TRUNC(date, QUARTER)"
+
+  - name: STARTOFYEAR
+    message: "STARTOFYEAR — rewrite as: DATE_TRUNC(date, YEAR)"
+
+  - name: ENDOFMONTH
+    message: "ENDOFMONTH — rewrite as: LAST_DAY(date, MONTH)"
+
+  - name: ENDOFQUARTER
+    message: "ENDOFQUARTER — rewrite as: LAST_DAY(date, QUARTER)"
+
+  - name: ENDOFYEAR
+    message: "ENDOFYEAR — rewrite as: LAST_DAY(date, YEAR)"
+
+  - name: CALENDAR
+    message: "CALENDAR — generates a date table. Rewrite as: SELECT date FROM UNNEST(GENERATE_DATE_ARRAY(start, end)) AS date"
+
+  - name: CALENDARAUTO
+    message: "CALENDARAUTO — auto date table. Rewrite as GENERATE_DATE_ARRAY between MIN and MAX date in model."
+
+  # --- Ranking -----------------------------------------------
+  - name: RANKX
+    message: "RANKX ranks across a table — rewrite as RANK() OVER (ORDER BY expr). Verify partition context."
+
+  # --- Parent-child hierarchy --------------------------------
+  - name: PATH
+    message: "PATH — hierarchical path function. Requires recursive CTE in BigQuery."
+
+  - name: PATHCONTAINS
+    message: "PATHCONTAINS — rewrite using REGEXP_CONTAINS on PATH result."
+
+  - name: PATHITEM
+    message: "PATHITEM — rewrite using SPLIT on PATH result."
+
+  - name: PATHITEMREVERSE
+    message: "PATHITEMREVERSE — rewrite using SPLIT and ARRAY_REVERSE."
+
+  - name: PATHLENGTH
+    message: "PATHLENGTH — ARRAY_LENGTH(SPLIT(path, '|'))"
+
+  # --- Advanced / no equivalent ------------------------------
+  - name: LOOKUPVALUE
+    message: "LOOKUPVALUE — rewrite as: SELECT result_col FROM table WHERE search_col = value. Use JOIN or scalar subquery."
+
+  - name: GROUPBY
+    message: "GROUPBY — rewrite as SELECT with GROUP BY in BigQuery."
+
+  - name: IGNORE
+    message: "IGNORE — SUMMARIZECOLUMNS modifier. No BQ equivalent."
+
+  - name: ROLLUP
+    message: "ROLLUP — use ROLLUP() grouping set in BigQuery."
+
+  - name: ROLLUPADDISSUBTOTAL
+    message: "ROLLUPADDISSUBTOTAL — use ROLLUP() in BigQuery."
+
+  - name: ISONORAFTER
+    message: "ISONORAFTER — pagination helper. Rewrite as WHERE clause with composite key comparison."
+
+  - name: CONTAINS
+    message: "CONTAINS — checks if table contains row. Rewrite as EXISTS subquery."
+
+  - name: CONTAINSROW
+    message: "CONTAINSROW — similar to CONTAINS. Rewrite as EXISTS."
+
+  - name: CONTAINSSTRING
+    message: "CONTAINSSTRING — rewrite as INSTR(text, substring) > 0 or LIKE '%substring%'."
+
+  - name: CONTAINSSTRINGEXACT
+    message: "CONTAINSSTRINGEXACT — rewrite as INSTR(text, substring) > 0 (case-sensitive)."
+
+  - name: ISFILTERED
+    message: "ISFILTERED — no BQ equivalent. Always returns TRUE in SQL context."
+
+  - name: ISCROSSFILTERED
+    message: "ISCROSSFILTERED — no BQ equivalent."
+
+  - name: ISSUBTOTAL
+    message: "ISSUBTOTAL — use GROUPING() function in BigQuery ROLLUP."
+
+  - name: NAMEOF
+    message: "NAMEOF — returns column name as string. No BQ equivalent."
+
+  - name: COLUMNSTATISTICS
+    message: "COLUMNSTATISTICS — metadata function. No BQ equivalent."
+
+  - name: DETAILROWS
+    message: "DETAILROWS — drill-through function. No BQ equivalent in SQL."
+
+  - name: EVALUATEANDLOG
+    message: "EVALUATEANDLOG — debugging function. Remove from formula."
+
+  - name: TOCSV
+    message: "TOCSV — export function. No BQ equivalent."
+
+  - name: TOJSON
+    message: "TOJSON — export function. Use TO_JSON_STRING() in BigQuery."
+
+
+# ============================================================
+# OPERATOR MAPPING
+# BinOp operators in DAX AST → BigQuery
+# ============================================================
+
+operator_mapping:
+  "&":   "||"       # string concatenation
+  "<>":  "!="       # not equal
+  "&&":  "AND"      # logical and
+  "||":  "OR"       # logical or
+  "=":   "="        # equality
+  "<":   "<"
+  ">":   ">"
+  "<=":  "<="
+  ">=":  ">="
+  "+":   "+"
+  "-":   "-"
+  "*":   "*"
+  "/":   "/"
+  "^":   "POW"      # power — needs special handling: POW(left, right)

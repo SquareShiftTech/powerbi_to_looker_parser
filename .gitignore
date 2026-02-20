@@ -2,6 +2,8 @@
 collector_output/
 parsed_output/
 canonical_output/
+generator_output/
+transformer_output/
 # Python
 __pycache__/
 *.py[cod]
@@ -27,3 +29,4 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+.cursor/debug.log

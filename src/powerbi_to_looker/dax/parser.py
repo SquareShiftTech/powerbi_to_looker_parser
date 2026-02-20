@@ -7,7 +7,7 @@ Grammar lives next to this module (dax.lark).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from lark import Lark, Transformer
 from pydantic import BaseModel
@@ -20,82 +20,98 @@ _PACKAGE_DIR = Path(__file__).resolve().parent
 # ============================================================
 
 class Number(BaseModel):
+    type: Literal["Number"] = "Number"
     value: float
 
 
 class String(BaseModel):
+    type: Literal["String"] = "String"
     value: str
 
 
 class Boolean(BaseModel):
+    type: Literal["Boolean"] = "Boolean"
     value: bool
 
 
 class Blank(BaseModel):
-    pass
+    type: Literal["Blank"] = "Blank"
 
 
 class ColumnRef(BaseModel):
+    type: Literal["ColumnRef"] = "ColumnRef"
     table: str | None = None
     column: str
     hierarchy_level: str | None = None  # e.g. [Date].[Date] -> level "Date"
 
 
 class TableRef(BaseModel):
+    type: Literal["TableRef"] = "TableRef"
     name: str
 
 
 class VarRef(BaseModel):
+    type: Literal["VarRef"] = "VarRef"
     name: str
 
 
 class VarBinding(BaseModel):
+    type: Literal["VarBinding"] = "VarBinding"
     name: str
     expr: Any
 
 
 class VarExpr(BaseModel):
+    type: Literal["VarExpr"] = "VarExpr"
     bindings: list[VarBinding]
     return_expr: Any
 
 
 class FunctionCall(BaseModel):
+    type: Literal["FunctionCall"] = "FunctionCall"
     name: str
     args: list[Any]
 
 
 class BinOp(BaseModel):
+    type: Literal["BinOp"] = "BinOp"
     op: str
     left: Any
     right: Any
 
 
 class UnaryOp(BaseModel):
+    type: Literal["UnaryOp"] = "UnaryOp"
     op: str
     operand: Any
 
 
 class InOp(BaseModel):
+    type: Literal["InOp"] = "InOp"
     expr: Any
     values: list[Any]
     negated: bool = False
 
 
 class MultiColInOp(BaseModel):
+    type: Literal["MultiColInOp"] = "MultiColInOp"
     columns: list[ColumnRef]
     rows: list[list[Any]]
     negated: bool = False
 
 
 class TableConstructor(BaseModel):
+    type: Literal["TableConstructor"] = "TableConstructor"
     rows: list[list[Any]]
 
 
 class IntervalKeyword(BaseModel):
+    type: Literal["IntervalKeyword"] = "IntervalKeyword"
     unit: str
 
 
 class MeasureDef(BaseModel):
+    type: Literal["MeasureDef"] = "MeasureDef"
     name: str
     expr: Any
 
@@ -218,7 +234,14 @@ class DAXTransformer(Transformer):
 
     def func_with_args(self, items):
         name = str(items[0]).upper()
-        args = list(items[2:])  # after func_name and "("
+        # Lark omits "(" and ")"; children are [func_name, arg_list]. arg_list returns a list.
+        raw = items[1] if len(items) > 1 else None
+        if raw is None:
+            args = []
+        elif isinstance(raw, list):
+            args = raw
+        else:
+            args = [raw]
         return FunctionCall(name=name, args=args)
 
     def arg_list(self, items):

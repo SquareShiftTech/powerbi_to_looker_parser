@@ -22,6 +22,9 @@ src/powerbi_to_looker/common/path_utils.py
 src/powerbi_to_looker/common/yaml_loader.py
 src/powerbi_to_looker/config/__init__.py
 src/powerbi_to_looker/config/canonical_lookml_mapping.yaml
+src/powerbi_to_looker/config/field_type_mapping.yaml
+src/powerbi_to_looker/config/function_mapping.yaml
+src/powerbi_to_looker/config/looker_reserved_words.yaml
 src/powerbi_to_looker/config/powerbi_canonical_mapping.yaml
 src/powerbi_to_looker/config/visualization_mapping.yaml
 src/powerbi_to_looker/dax/__init__.py
@@ -32,7 +35,11 @@ src/powerbi_to_looker/generator/_helpers.py
 src/powerbi_to_looker/generator/writer.py
 src/powerbi_to_looker/generator/dashboard_template/super_store_dashboard.dashboard.lookml
 src/powerbi_to_looker/generator/dashboard_template/super_store_dashboard_v2.dashboard.lookml
+src/powerbi_to_looker/generator/templates/manifest.lkml.j2
+src/powerbi_to_looker/generator/templates/model.lkml.j2
+src/powerbi_to_looker/generator/templates/view.lkml.j2
 src/powerbi_to_looker/models/__init__.py
+src/powerbi_to_looker/models/artifact.py
 src/powerbi_to_looker/models/canonical.py
 src/powerbi_to_looker/models/dashboard.py
 src/powerbi_to_looker/parser_normalizer/__init__.py
@@ -70,5 +77,11 @@ src/powerbi_to_looker/transformer/dashboard/__init__.py
 src/powerbi_to_looker/transformer/dashboard/dashboard_mapper.py
 src/powerbi_to_looker/transformer/semantic/__init__.py
 src/powerbi_to_looker/transformer/semantic/_helpers.py
+src/powerbi_to_looker/transformer/semantic/explore_builder.py
+src/powerbi_to_looker/transformer/semantic/field_cleanup.py
+src/powerbi_to_looker/transformer/semantic/field_type_mapping.py
+src/powerbi_to_looker/transformer/semantic/formula_converter.py
 src/powerbi_to_looker/transformer/semantic/model_mapper.py
+src/powerbi_to_looker/transformer/semantic/orchestrator.py
+src/powerbi_to_looker/transformer/semantic/view_builder.py
 src/powerbi_to_looker/transformer/semantic/view_mapper.py

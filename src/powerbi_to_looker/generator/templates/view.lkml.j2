@@ -1,0 +1,87 @@
+{# View: one view per artifact view. Measures use two-step: dimension {field_name}_measure then measure {field_name}. #}
+view: {{ view.view_name }} {
+
+  {%- if view.sql_table_name %}
+  sql_table_name: {{ view.sql_table_name }} ;;
+  {%- elif view.derived_table_sql %}
+  derived_table: {
+    sql: {{ view.derived_table_sql }} ;;
+  }
+  {%- endif %}
+
+  {%- for field in view.fields %}
+  {%- if field.field_type == 'measure' %}
+  {# Two-step measure: dimension _measure then measure #}
+  dimension: {{ field.field_name }}_measure {
+    type: {{ field.looker_type }}
+    {%- if field.conversion_status == 'manual' %}
+    description: |
+      Original DAX: {{ field.original_formula | comment_dax_lines }}
+      [MANUAL REVIEW REQUIRED]
+      {%- if field.message %}
+      Reason: {{ field.message }}
+      {%- endif %}
+    sql: NULL ;;
+    {%- else %}
+    {%- if field.original_formula %}
+    # Original DAX: {{ field.original_formula | comment_dax_lines }}
+    {%- if field.conversion_status == 'partial' %}
+    # Converted: {{ field.conversion_status }}
+    {%- endif %}
+    {%- endif %}
+    sql: {{ (field.sql if field.sql else '""') | sql_quote_table_column }} ;;
+    {%- endif %}
+    {%- if field.value_format %}
+    value_format_name: {{ field.value_format }}
+    {%- endif %}
+  }
+
+  measure: {{ field.field_name }} {
+    type: {{ field.looker_type }}
+    {%- set measure_ref = '${' ~ field.field_name ~ '_measure}' %}
+    sql: {{ measure_ref }} ;;
+    {%- if field.value_format %}
+    value_format_name: {{ field.value_format }}
+    {%- endif %}
+    {%- if field.label %}
+    label: "{{ field.label | replace('"', '\\"') }}"
+    {%- endif %}
+  }
+  {%- elif field.field_type == 'dimension_group' %}
+  dimension_group: {{ field.field_name }} {
+    type: {{ field.looker_type }}
+    timeframes: [{{ (field.timeframes or []) | join(', ') }}]
+    sql: {{ field.sql | sql_quote_table_column }} ;;
+    {%- if field.label %}
+    label: "{{ field.label | replace('"', '\\"') }}"
+    {%- endif %}
+  }
+  {%- else %}
+  dimension: {{ field.field_name }} {
+    type: {{ field.looker_type }}
+    {%- if field.conversion_status == 'manual' %}
+    description: |
+      {%- if field.original_formula %}
+      Original DAX: {{ field.original_formula | comment_dax_lines }}
+      {%- endif %}
+      [MANUAL REVIEW REQUIRED]
+      {%- if field.message %}
+      Reason: {{ field.message }}
+      {%- endif %}
+    sql: NULL ;;
+    {%- else %}
+    {%- if field.original_formula %}
+    # Original DAX: {{ field.original_formula | comment_dax_lines }}
+    {%- if field.conversion_status == 'partial' %}
+    # Converted: {{ field.conversion_status }}
+    {%- endif %}
+    {%- endif %}
+    sql: {{ field.sql | sql_quote_table_column }} ;;
+    {%- endif %}
+    {%- if field.label %}
+    label: "{{ field.label | replace('"', '\\"') }}"
+    {%- endif %}
+  }
+  {%- endif %}
+  {%- endfor %}
+}

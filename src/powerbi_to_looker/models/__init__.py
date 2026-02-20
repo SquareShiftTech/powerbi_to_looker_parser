@@ -1,5 +1,13 @@
-"""Data models: canonical (semantic layer) and dashboard (future viz)."""
+"""Data models: canonical (semantic layer), artifact (transformer output), dashboard (future viz)."""
 
+from powerbi_to_looker.models.artifact import (
+    ArtifactExplore,
+    ArtifactField,
+    ArtifactJoin,
+    ArtifactView,
+    ConversionSummary,
+    SemanticLayerArtifact,
+)
 from powerbi_to_looker.models.canonical import (
     Connection,
     CrossDatasourceRelationship,
@@ -12,12 +20,18 @@ from powerbi_to_looker.models.canonical import (
 )
 
 __all__ = [
+    "ArtifactExplore",
+    "ArtifactField",
+    "ArtifactJoin",
+    "ArtifactView",
+    "ConversionSummary",
     "Connection",
     "CrossDatasourceRelationship",
     "Datasource",
     "Field",
     "MetadataModel",
     "Parameter",
+    "SemanticLayerArtifact",
     "Table",
     "TableRelationship",
 ]

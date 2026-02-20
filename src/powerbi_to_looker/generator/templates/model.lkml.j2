@@ -1,0 +1,20 @@
+# Model: {{ artifact.project_name }}
+
+{% for explore in artifact.explores %}
+explore: {{ explore.explore_name }} {
+  {% if explore.label %}
+  label: "{{ explore.label | replace('"', '\\"') }}"
+  {% endif %}
+  {% for join in explore.joins %}
+  join: {{ join.join_name }} {
+    type: {{ join.join_type }}
+    relationship: {{ join.relationship }}
+    sql_on: {{ join.sql_on }} ;;
+    {% if join.conversion_status == 'partial' and join.message %}
+    # {{ join.message }}
+    {% endif %}
+  }
+  {% endfor %}
+}
+
+{% endfor %}

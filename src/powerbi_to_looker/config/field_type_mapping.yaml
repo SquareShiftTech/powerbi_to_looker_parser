@@ -1,0 +1,49 @@
+# Power BI -> Looker field type mapping for Transformer
+# Used by transformer/semantic/field_type_mapping.py
+
+data_type_map:
+  string: string
+  number: number
+  datetime: time
+  boolean: yesno
+  currency: sum
+  percent: number
+  integer: number
+  decimal: number
+  binary: string
+
+# When aggregation is set, field becomes measure with this looker_type
+aggregation_to_measure_type:
+  SUM: sum
+  AVG: average
+  AVERAGE: average
+  COUNT: count
+  COUNTA: count
+  COUNTROWS: count
+  DISTINCTCOUNT: count_distinct
+  MIN: min
+  MAX: max
+
+# Power BI join_type (from table_relationships) -> Looker join type
+join_type_map:
+  LEFT: left_outer
+  INNER: inner
+  FULL: full_outer
+  RIGHT: right_outer
+
+# value_format for measures (currency, percent, etc.)
+value_format_map:
+  currency: usd
+  percent: percent_2
+  decimal_2: "0.00"
+  integer: "0"
+
+# dimension_group timeframes when data_type is datetime or name suggests date
+dimension_group_timeframes:
+  - raw
+  - time
+  - date
+  - week
+  - month
+  - quarter
+  - year

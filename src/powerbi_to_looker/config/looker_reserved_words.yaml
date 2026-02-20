@@ -1,0 +1,44 @@
+# Looker reserved words: if cleaned field name matches one of these, append _field
+# Used by transformer/semantic/field_cleanup.py
+
+reserved_words:
+  - date
+  - time
+  - count
+  - sum
+  - max
+  - min
+  - average
+  - number
+  - string
+  - type
+  - label
+  - group
+  - order
+  - filter
+  - view
+  - model
+  - explore
+  - join
+  - measure
+  - dimension
+  - sql
+  - hidden
+  - primary_key
+  - foreign_key
+  - all
+  - select
+  - from
+  - where
+  - having
+  - by
+  - as
+  - on
+  - in
+  - not
+  - and
+  - or
+  - is
+  - null
+  - true
+  - false

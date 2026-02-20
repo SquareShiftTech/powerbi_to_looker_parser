@@ -1,19 +1,23 @@
-"""Integration script: Step 1 list+download → Step 2 parse → Step 3 canonical (per-report).
+"""Integration script: Step 1 list+download → Step 2 parse → Step 3 canonical → Step 4 transformer → Step 5 generator.
 
 Orchestration follows Option B (per-report loop) so an API layer can reuse the same steps.
 See plan/integration_script_orchestration.md.
 
 Step 1 — List and download .pbix into --output-dir (requires Power BI API creds + workspace).
 Step 2 — Parse all .pbix in --output-dir → --parsed-output-dir (one subdir per report).
-Step 3 — For each report: load → semantic → write canonical (metadata_model.json or _error.json).
+Step 3 — For each report: load → semantic → write canonical_output/<report>/ (metadata_model.json, etc.).
+Step 4 — For each report: read canonical_output/<report>/metadata_model.json → write transformer_output/<report>/semantic_layer_artifact.json.
+Step 5 — For each report: read transformer_output/<report>/semantic_layer_artifact.json → write generator_output/<report>/ (views/, models/, manifest.lkml).
 
 Env: PBI_TENANT_ID, PBI_CLIENT_ID, PBI_CLIENT_SECRET; PBI_WORKSPACE_ID or PBI_WORKSPACE_NAME.
 Optional: PBI_TOOLS_EXE.
 
 Run from repo root:
-  uv run python scripts/run_integration.py                 # default: no download; use existing .pbix
-  uv run python scripts/run_integration.py --download       # run step 1 (list and download)
-  uv run python scripts/run_integration.py --skip-canonical # stop after parse
+  uv run python scripts/run_integration.py                  # default: no download; run steps 2–5 if inputs exist
+  uv run python scripts/run_integration.py --download        # run step 1 (list and download)
+  uv run python scripts/run_integration.py --skip-canonical  # stop after parse
+  uv run python scripts/run_integration.py --skip-transformer # stop after step 3
+  uv run python scripts/run_integration.py --skip-generator  # stop after step 4
 """
 
 import argparse
@@ -34,6 +38,9 @@ from powerbi_to_looker.collector.powerbi.pbix_zip import extract_report_from_pbi
 from powerbi_to_looker.parser_normalizer import discover_report_folders, load  # noqa: E402
 from powerbi_to_looker.parser_normalizer.dashboard.orchestrator import run_viz  # noqa: E402
 from powerbi_to_looker.parser_normalizer.semantic.orchestrator import run as run_semantic  # noqa: E402
+from powerbi_to_looker.transformer.semantic.orchestrator import run as run_transformer  # noqa: E402
+from powerbi_to_looker.generator.writer import write as write_lookml  # noqa: E402
+from powerbi_to_looker.models.artifact import SemanticLayerArtifact  # noqa: E402
 
 
 def _default_pbi_tools_exe() -> str | None:
@@ -220,6 +227,150 @@ def process_one_report_canonical(
     return entry
 
 
+def process_one_report_transformer(
+    canonical_report_dir: Path,
+    report_id: str,
+    transformer_output_dir: Path,
+) -> dict[str, Any]:
+    """
+    Run transformer for one report: read canonical_report_dir/metadata_model.json -> run_transformer
+    -> write transformer_output_dir/report_id/semantic_layer_artifact.json.
+    On failure write _error.json in transformer_output_dir/report_id. Returns manifest entry.
+    """
+    entry: dict[str, Any] = {"report_id": report_id, "success": False}
+    meta_file = canonical_report_dir / "metadata_model.json"
+    transformer_report_out = transformer_output_dir / report_id
+    transformer_report_out.mkdir(parents=True, exist_ok=True)
+    if not meta_file.exists():
+        entry["error"] = "metadata_model.json not found"
+        entry["stage"] = "transformer"
+        _write_canonical_error(transformer_report_out, report_id, entry["error"], "transformer")
+        return entry
+    try:
+        with open(meta_file, encoding="utf-8") as f:
+            metadata_model = json.load(f)
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "transformer"
+        _write_canonical_error(transformer_report_out, report_id, str(e), "transformer")
+        return entry
+    try:
+        artifact = run_transformer(metadata_model)
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "transformer"
+        _write_canonical_error(transformer_report_out, report_id, str(e), "transformer")
+        return entry
+    try:
+        out_file = transformer_report_out / "semantic_layer_artifact.json"
+        with open(out_file, "w", encoding="utf-8") as f:
+            json.dump(
+                artifact.model_dump(mode="json"),
+                f,
+                indent=2,
+                default=str,
+            )
+        entry["success"] = True
+        entry["artifact"] = str(out_file.relative_to(transformer_output_dir))
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "transformer"
+        _write_canonical_error(transformer_report_out, report_id, str(e), "transformer")
+    return entry
+
+
+def step4_transformer(canonical_output_dir: Path, transformer_output_dir: Path) -> tuple[int, int]:
+    """
+    For each report folder in canonical_output_dir that has metadata_model.json, run transformer.
+    Writes to transformer_output_dir/report_id/semantic_layer_artifact.json. _manifest.json in transformer_output_dir.
+    Return (ok_count, fail_count).
+    """
+    canonical_output_dir.mkdir(parents=True, exist_ok=True)
+    transformer_output_dir.mkdir(parents=True, exist_ok=True)
+    report_dirs = [
+        p for p in canonical_output_dir.iterdir()
+        if p.is_dir() and (p / "metadata_model.json").exists()
+    ]
+    if not report_dirs:
+        return 0, 0
+    manifest: list[dict[str, Any]] = []
+    for report_out in sorted(report_dirs):
+        report_id = report_out.name
+        entry = process_one_report_transformer(report_out, report_id, transformer_output_dir)
+        manifest.append(entry)
+    manifest_file = transformer_output_dir / "_manifest.json"
+    with open(manifest_file, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2)
+    ok = sum(1 for e in manifest if e.get("success"))
+    return ok, len(manifest) - ok
+
+
+def process_one_report_generator(
+    report_id: str,
+    transformer_output_dir: Path,
+    generator_output_dir: Path,
+) -> dict[str, Any]:
+    """
+    Run generator for one report: read transformer_output_dir/report_id/semantic_layer_artifact.json
+    -> write_lookml -> generator_output_dir/report_id/ (views/, models/, manifest.lkml).
+    Returns manifest entry.
+    """
+    entry: dict[str, Any] = {"report_id": report_id, "success": False}
+    artifact_file = transformer_output_dir / report_id / "semantic_layer_artifact.json"
+    if not artifact_file.exists():
+        entry["error"] = "semantic_layer_artifact.json not found"
+        entry["stage"] = "generator"
+        return entry
+    try:
+        with open(artifact_file, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "generator"
+        return entry
+    try:
+        from datetime import datetime
+        if isinstance(data.get("generated_at"), str):
+            data["generated_at"] = datetime.fromisoformat(data["generated_at"].replace("Z", "+00:00"))
+        artifact = SemanticLayerArtifact.model_validate(data)
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "generator"
+        return entry
+    try:
+        out_dir = generator_output_dir / report_id
+        out_dir.mkdir(parents=True, exist_ok=True)
+        written = write_lookml(artifact, out_dir)
+        entry["success"] = True
+        entry["generated"] = [str(p) for p in written]
+    except Exception as e:
+        entry["error"] = str(e)
+        entry["stage"] = "generator"
+    return entry
+
+
+def step5_generator(transformer_output_dir: Path, generator_output_dir: Path) -> tuple[int, int]:
+    """
+    For each report in transformer_output_dir that has semantic_layer_artifact.json, run generator.
+    Writes to generator_output_dir/report_id/ (views/, models/, manifest.lkml). Return (ok_count, fail_count).
+    """
+    transformer_output_dir.mkdir(parents=True, exist_ok=True)
+    generator_output_dir.mkdir(parents=True, exist_ok=True)
+    report_dirs = [
+        p for p in transformer_output_dir.iterdir()
+        if p.is_dir() and (p / "semantic_layer_artifact.json").exists()
+    ]
+    if not report_dirs:
+        return 0, 0
+    manifest: list[dict[str, Any]] = []
+    for report_out in sorted(report_dirs):
+        report_id = report_out.name
+        entry = process_one_report_generator(report_id, transformer_output_dir, generator_output_dir)
+        manifest.append(entry)
+    ok = sum(1 for e in manifest if e.get("success"))
+    return ok, len(manifest) - ok
+
+
 def step3_canonical(parsed_output_dir: Path, canonical_output_dir: Path) -> tuple[int, int]:
     """
     Per-report canonical loop (Option B): discover folders → for each report run
@@ -249,8 +400,12 @@ def main() -> None:
     p.add_argument("--output-dir", type=Path, default=Path("collector_output"), help=".pbix folder (default: collector_output)")
     p.add_argument("--parsed-output-dir", type=Path, default=Path("parsed_output"), help="Parsed output folder (default: parsed_output)")
     p.add_argument("--canonical-output-dir", type=Path, default=Path("canonical_output"), help="Canonical output folder (default: canonical_output)")
+    p.add_argument("--transformer-output-dir", type=Path, default=Path("transformer_output"), help="Transformer output folder (default: transformer_output)")
+    p.add_argument("--generator-output-dir", type=Path, default=Path("generator_output"), help="Generator/LookML output folder (default: generator_output)")
     p.add_argument("--download", action="store_true", help="Run step 1 (list and download .pbix). Default: skip step 1.")
     p.add_argument("--skip-canonical", action="store_true", help="Stop after step 2 (parse only)")
+    p.add_argument("--skip-transformer", action="store_true", help="Stop after step 3 (skip transformer)")
+    p.add_argument("--skip-generator", action="store_true", help="Stop after step 4 (skip generator)")
     p.add_argument("--workspace-name", type=str, default=os.environ.get("PBI_WORKSPACE_NAME") or DEFAULT_WORKSPACE_NAME)
     p.add_argument("--skip-name-contains", type=str, action="append", default=[], metavar="TEXT")
     args = p.parse_args()
@@ -258,6 +413,8 @@ def main() -> None:
     output_dir = args.output_dir.resolve()
     parsed_dir = args.parsed_output_dir.resolve()
     canonical_dir = args.canonical_output_dir.resolve()
+    transformer_dir = args.transformer_output_dir.resolve()
+    generator_dir = args.generator_output_dir.resolve()
 
     workspace_id = os.environ.get("PBI_WORKSPACE_ID")
     workspace_name = args.workspace_name
@@ -291,6 +448,22 @@ def main() -> None:
     print(f"  Canonical: {ok3} ok, {fail3} failed")
     if fail3:
         print(f"  Manifest: {canonical_dir / '_manifest.json'}")
+
+    # Step 4 — Transformer (canonical_output -> transformer_output)
+    if args.skip_transformer:
+        print("Step 4: Skipped (--skip-transformer).")
+        return
+    print("Step 4: Transformer - metadata_model.json -> transformer_output/.../semantic_layer_artifact.json ...")
+    ok4, fail4 = step4_transformer(canonical_dir, transformer_dir)
+    print(f"  Transformer: {ok4} ok, {fail4} failed")
+
+    # Step 5 — Generator (transformer_output -> generator_output)
+    if args.skip_generator:
+        print("Step 5: Skipped (--skip-generator).")
+        return
+    print("Step 5: Generator - semantic_layer_artifact.json -> generator_output/.../ (views, models, manifest) ...")
+    ok5, fail5 = step5_generator(transformer_dir, generator_dir)
+    print(f"  Generator: {ok5} ok, {fail5} failed")
 
 
 if __name__ == "__main__":
