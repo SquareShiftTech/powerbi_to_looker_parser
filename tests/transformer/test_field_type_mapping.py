@@ -2,7 +2,7 @@
 
 import pytest
 
-from powerbi_to_looker.transformer.semantic.field_type_mapping import map_field_type
+from powerbi_to_looker.transformer.views.field_type_mapping import map_field_type
 
 
 def test_string_maps_to_dimension():

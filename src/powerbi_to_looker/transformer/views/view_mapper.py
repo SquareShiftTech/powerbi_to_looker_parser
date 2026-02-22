@@ -1,4 +1,4 @@
-"""canonical semantic -> view dicts (dimensions, measures)."""
+"""Canonical semantic -> view dicts (dimensions, measures). Placeholder."""
 
 from typing import Any
 

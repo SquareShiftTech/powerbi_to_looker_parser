@@ -38,7 +38,7 @@ from powerbi_to_looker.collector.powerbi.pbix_zip import extract_report_from_pbi
 from powerbi_to_looker.parser_normalizer import discover_report_folders, load  # noqa: E402
 from powerbi_to_looker.parser_normalizer.dashboard.orchestrator import run_viz  # noqa: E402
 from powerbi_to_looker.parser_normalizer.semantic.orchestrator import run as run_semantic  # noqa: E402
-from powerbi_to_looker.transformer.semantic.orchestrator import run as run_transformer  # noqa: E402
+from powerbi_to_looker.transformer.orchestrator import run as run_transformer  # noqa: E402
 from powerbi_to_looker.generator.writer import write as write_lookml  # noqa: E402
 from powerbi_to_looker.models.artifact import SemanticLayerArtifact  # noqa: E402
 

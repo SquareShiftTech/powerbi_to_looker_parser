@@ -2,7 +2,7 @@
 
 import pytest
 
-from powerbi_to_looker.transformer.semantic.formula_converter import convert, convert_with_status
+from powerbi_to_looker.transformer.views.formula_converter import convert, convert_with_status
 
 
 def test_sum_direct_mapping():

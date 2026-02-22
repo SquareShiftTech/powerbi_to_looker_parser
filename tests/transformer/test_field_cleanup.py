@@ -2,7 +2,7 @@
 
 import pytest
 
-from powerbi_to_looker.transformer.semantic.field_cleanup import (
+from powerbi_to_looker.transformer.views.field_cleanup import (
     clean_field_name,
     deduplicate_field_names,
 )

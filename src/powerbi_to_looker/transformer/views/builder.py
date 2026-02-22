@@ -5,9 +5,9 @@ from typing import Any
 
 from powerbi_to_looker.common.yaml_loader import load_yaml
 from powerbi_to_looker.models.artifact import ArtifactField, ArtifactView
-from powerbi_to_looker.transformer.semantic.field_cleanup import clean_field_name, deduplicate_field_names
-from powerbi_to_looker.transformer.semantic.field_type_mapping import map_field_type
-from powerbi_to_looker.transformer.semantic.formula_converter import convert_with_status
+from powerbi_to_looker.transformer.views.field_cleanup import clean_field_name, deduplicate_field_names
+from powerbi_to_looker.transformer.views.field_type_mapping import map_field_type
+from powerbi_to_looker.transformer.views.formula_converter import convert_with_status
 
 _CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "looker_reserved_words.yaml"
 

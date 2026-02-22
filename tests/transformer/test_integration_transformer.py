@@ -2,7 +2,7 @@
 
 import pytest
 
-from powerbi_to_looker.transformer.semantic.orchestrator import run as run_transformer
+from powerbi_to_looker.transformer.orchestrator import run as run_transformer
 
 
 MINIMAL_METADATA = {

@@ -1,4 +1,4 @@
-"""canonical semantic -> explores, joins."""
+"""Canonical semantic -> explores, joins. Placeholder."""
 
 from typing import Any
 
