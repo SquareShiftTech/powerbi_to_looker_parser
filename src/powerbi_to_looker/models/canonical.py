@@ -21,6 +21,8 @@ class Table(BaseModel):
     table_name: str
     table_type: Optional[str] = None  # "physical" | "calculated"
     formula: Optional[str] = None  # DAX expression for calculated tables (for later conversion to SQL/LookML)
+    formula_ast: Optional[dict] = None  # Parsed DAX AST (dict) when formula parses successfully
+    formula_parse_error: Optional[str] = None  # Short error message when formula fails to parse
     extended_properties: Optional[dict] = None  # e.g. isHidden, hierarchies
 
 

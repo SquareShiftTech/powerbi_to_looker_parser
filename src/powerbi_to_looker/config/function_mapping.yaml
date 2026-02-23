@@ -227,8 +227,9 @@ unsupported:
   - name: FILTER
     message: "FILTER returns a filtered table — rewrite as subquery SELECT ... WHERE ... or CTE."
 
-  - name: SUMMARIZE
-    message: "SUMMARIZE produces a virtual grouped table — rewrite as SELECT with GROUP BY in BigQuery or a Looker derived table."
+  # SUMMARIZE is now handled by code handler (_convert_summarize) - removed from unsupported
+  # - name: SUMMARIZE
+  #   message: "SUMMARIZE produces a virtual grouped table — rewrite as SELECT with GROUP BY in BigQuery or a Looker derived table."
 
   - name: SUMMARIZECOLUMNS
     message: "SUMMARIZECOLUMNS — rewrite as SELECT with GROUP BY."

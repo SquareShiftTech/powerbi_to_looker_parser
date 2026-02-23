@@ -58,6 +58,17 @@ def build_explores(
             to_t = (rel.get("to_table") or "").strip()
             if from_t != table_name:
                 continue
+            
+            # Skip joins to hidden tables
+            to_table_obj = next(
+                (tbl for tbl in tables if (tbl.get("table_name") or tbl.get("name") or "").strip() == to_t),
+                None
+            )
+            if to_table_obj:
+                to_extended_props = to_table_obj.get("extended_properties") or {}
+                if to_extended_props.get("isHidden", False):
+                    continue  # Skip joins to hidden tables
+            
             to_view = table_to_view.get(to_t)
             if not to_view:
                 continue

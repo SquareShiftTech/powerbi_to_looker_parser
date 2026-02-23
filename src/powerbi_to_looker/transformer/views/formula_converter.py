@@ -111,9 +111,20 @@ def _normalize_node_type(ast: dict[str, Any]) -> str:
 # LEAF NODE CONVERTERS
 # ============================================================
 
-def _convert_table_ref(ast: dict[str, Any]) -> str:
+def _convert_table_ref(ast: dict[str, Any], res_map: dict[str, str] | None = None) -> str:
+    """Convert table reference. Uses resolution map if provided (for table-level formulas)."""
     name = (ast.get("name") or "").strip()
-    return clean_ref_name(name) if name else ""
+    if not name:
+        return ""
+    
+    # Check resolution map first (for table-level formulas)
+    if res_map:
+        resolved = res_map.get(name) or res_map.get(f"'{name}'")
+        if resolved:
+            return resolved
+    
+    # Fallback to cleaned name
+    return clean_ref_name(name)
 
 
 def _convert_column_ref(ast: dict[str, Any], res_map: dict[str, str]) -> str:
@@ -491,13 +502,17 @@ def _convert_summarize(
     res_map: dict[str, str],
     cfg: dict[str, Any],
     convert_fn: Any,
-) -> str:
+) -> ConversionResult:
     """SUMMARIZE as a standalone function call (outside VAR).
     Returns subquery wrapped in parens. Status = partial.
     """
     ast = {"name": "SUMMARIZE", "args": args}
     subquery = _convert_summarize_to_subquery(ast, res_map, cfg)
-    return f"({subquery})"
+    return ConversionResult(
+        f"({subquery})",
+        "partial",
+        "SUMMARIZE converted to subquery — verify GROUP BY columns and aggregations are correct.",
+    )
 
 
 # ============================================================
@@ -1001,7 +1016,7 @@ def _convert_node(
     if node_type == "column_ref":
         return _convert_column_ref(ast, res_map)
     if node_type == "table_ref":
-        return _convert_table_ref(ast)
+        return _convert_table_ref(ast, res_map)
     if node_type in ("literal", "blank", "interval"):
         return _convert_literal(ast)
     if node_type == "var_ref":

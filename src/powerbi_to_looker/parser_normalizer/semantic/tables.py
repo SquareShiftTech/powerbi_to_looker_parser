@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from powerbi_to_looker.common.yaml_loader import load_yaml
+from powerbi_to_looker.dax.parser import parse_formula
 from powerbi_to_looker.models.canonical import (
     Connection,
     Table,
@@ -111,6 +112,13 @@ def run(raw: dict[str, Any]) -> TablesResult:
                 if (part.get("source") or {}).get("type") == "m":
                     table_type = "physical"
                     break
+        
+        # Parse formula AST for calculated tables
+        formula_ast = None
+        formula_parse_error = None
+        if formula_val:
+            formula_ast, formula_parse_error = parse_formula(formula_val)
+        
         tables.append(
             Table(
                 id=table_id,
@@ -119,6 +127,8 @@ def run(raw: dict[str, Any]) -> TablesResult:
                 table_name=table_name,
                 table_type=table_type,
                 formula=formula_val,
+                formula_ast=formula_ast,
+                formula_parse_error=formula_parse_error,
                 extended_properties={
                     "isHidden": t.get("isHidden"),
                     "hierarchies": t.get("hierarchies"),

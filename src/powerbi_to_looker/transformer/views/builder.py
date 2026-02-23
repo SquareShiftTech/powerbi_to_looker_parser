@@ -63,6 +63,13 @@ def build_views(
         table_name = (t.get("table_name") or t.get("name") or "").strip()
         if not table_name:
             continue
+        
+        # Skip hidden system tables (DateTableTemplate, LocalDateTable)
+        extended_props = t.get("extended_properties") or {}
+        is_hidden = extended_props.get("isHidden", False)
+        if is_hidden:
+            continue  # Skip hidden tables
+        
         table_type = (t.get("table_type") or "physical").strip().lower()
         view_name = _clean_table_name(table_name, reserved)
         table_fields = by_table.get(table_name) or []
@@ -171,9 +178,51 @@ def build_views(
         # 5) View-level sql_table_name / derived_table_sql
         sql_table_name = None
         derived_table_sql = None
+        conversion_status = "auto"
+        message = None
+        
         if table_type == "physical":
             sql_table_name = _sql_table_name(database, schema, table_name)
-        # Calculated table: derived_table_sql in a later pass if formula is simple; else manual
+        elif table_type == "calculated":
+            # Use formula_ast from canonical model (already parsed)
+            formula_ast = t.get("formula_ast")
+            formula_parse_error = t.get("formula_parse_error")
+            
+            if formula_parse_error:
+                conversion_status = "manual"
+                message = f"Formula parse error: {formula_parse_error}"
+            elif formula_ast:
+                # Build resolution map for table-level conversion
+                # Map table names to their SQL table names for formula conversion
+                table_res_map = {}
+                for other_table in tables:
+                    other_table_name = (other_table.get("table_name") or other_table.get("name") or "").strip()
+                    if other_table_name and other_table.get("table_type") == "physical":
+                        sql_name = _sql_table_name(database, schema, other_table_name)
+                        table_res_map[other_table_name] = sql_name
+                        # Also add with quotes (DAX uses 'table_name')
+                        table_res_map[f"'{other_table_name}'"] = sql_name
+                
+                # Convert formula AST to SQL
+                result = convert_with_status(formula_ast, table_res_map)
+                bq_sql = result.get("bq_formula")
+                status = result.get("conversion_status", "auto")
+                msg = result.get("message")
+                
+                if bq_sql and status in ("auto", "partial"):
+                    # Remove outer parens if present (SUMMARIZE returns subquery in parens)
+                    if bq_sql.startswith("(") and bq_sql.endswith(")"):
+                        derived_table_sql = bq_sql[1:-1]
+                    else:
+                        derived_table_sql = bq_sql
+                    conversion_status = status
+                    message = msg
+                else:
+                    conversion_status = "manual"
+                    message = msg or "Formula conversion failed or returned manual status"
+            else:
+                conversion_status = "manual"
+                message = "No formula AST available (formula may be empty or not parsed)"
 
         views.append(
             ArtifactView(
@@ -183,8 +232,8 @@ def build_views(
                 view_type=table_type,
                 sql_table_name=sql_table_name,
                 derived_table_sql=derived_table_sql,
-                conversion_status="auto",
-                message=None,
+                conversion_status=conversion_status,
+                message=message,
                 fields=artifact_fields,
             )
         )
