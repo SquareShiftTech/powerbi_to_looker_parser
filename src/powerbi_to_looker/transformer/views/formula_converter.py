@@ -1,5 +1,6 @@
 """Convert DAX formula AST to BigQuery SQL. Uses resolution_map for unqualified column refs."""
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -26,12 +27,133 @@ def _unsupported_list(config: dict[str, Any]) -> dict[str, str]:
     return out
 
 
+def _normalize_node_type(ast: dict[str, Any]) -> str:
+    """Return one of: column_ref, literal, blank, binop, table_ref, func."""
+    t = (ast.get("type") or "").strip() if isinstance(ast.get("type"), str) else ""
+    if t == "FunctionCall":
+        return "func"
+    if t == "ColumnRef":
+        return "column_ref"
+    if t == "TableRef":
+        return "table_ref"
+    if t == "BinOp":
+        return "binop"
+    if t in ("Number", "String", "Boolean"):
+        return "literal"
+    if t == "Blank":
+        return "blank"
+    return "func"  # default for unknown type
+
+
+def _convert_table_ref(ast: dict[str, Any]) -> str:
+    """Return BQ-safe table name for use in FROM clause."""
+    name = (ast.get("name") or "").strip()
+    return clean_ref_name(name) if name else ""
+
+
+def _convert_column_ref(
+    ast: dict[str, Any],
+    res_map: dict[str, str],
+) -> str:
+    """Unqualified -> ${field_name}; qualified -> table.column."""
+    table = ast.get("table")
+    col = ast.get("column") or ""
+    col_clean = str(col).strip()
+    if not table or table is None:
+        final = res_map.get(col_clean) or res_map.get(col) or clean_ref_name(col_clean)
+        return f"${{{final}}}"
+    tbl = str(table).strip().lower().replace(" ", "_").replace("-", "_")
+    return f"{tbl}.{col_clean.lower()}"
+
+
+def _convert_literal(ast: dict[str, Any]) -> str:
+    """Number, string, boolean, blank -> BQ literal or NULL."""
+    if ast.get("type") == "Blank":
+        return "NULL"
+    v = ast.get("value")
+    if isinstance(v, bool):
+        return "TRUE" if v else "FALSE"
+    if isinstance(v, (int, float)):
+        return str(v)
+    if isinstance(v, str):
+        return "'" + v.replace("'", "''") + "'"
+    return "NULL"
+
+
+def _apply_direct_template(
+    template: str,
+    args: list[Any],
+    res_map: dict[str, str],
+    cfg: dict[str, Any],
+    convert_fn: Any,
+) -> str:
+    """Convert each arg with convert_fn and substitute {0}, {1}, ... in template.
+    Any placeholder with no matching arg (e.g. optional 3rd arg) is replaced with NULL."""
+    parts = [convert_fn(a, res_map, cfg) for a in args]
+    out = template
+    for i, p in enumerate(parts):
+        out = out.replace("{" + str(i) + "}", p)
+    # Replace any remaining placeholders (optional args) with NULL
+    out = re.sub(r"\{\d+\}", "NULL", out)
+    return out
+
+
+def _convert_binop(
+    ast: dict[str, Any],
+    res_map: dict[str, str],
+    cfg: dict[str, Any],
+    convert_fn: Any,
+) -> str:
+    """Left/right via convert_fn; op from operator_mapping; return (left op right) or POW(left, right)."""
+    op_map = cfg.get("operator_mapping") or {}
+    op = (ast.get("op") or "").strip()
+    left = convert_fn(ast.get("left"), res_map, cfg)
+    right = convert_fn(ast.get("right"), res_map, cfg)
+    bq_op = op_map.get(op) or op
+    if bq_op == "POW":
+        return f"POW({left}, {right})"
+    return f"({left} {bq_op} {right})"
+
+
+def _convert_function(
+    ast: dict[str, Any],
+    res_map: dict[str, str],
+    cfg: dict[str, Any],
+    convert_fn: Any,
+) -> str:
+    """Resolution order: unsupported -> extract_mapping -> direct_mapping -> unknown."""
+    name = (ast.get("name") or "").upper().strip()
+    args = ast.get("args") or []
+    unsupported = _unsupported_list(cfg)
+    extract_map = cfg.get("extract_mapping") or {}
+    direct = cfg.get("direct_mapping") or {}
+
+    if name in unsupported:
+        raise ValueError(unsupported[name])
+    if name in extract_map:
+        unit = extract_map[name]
+        if unit and len(args) >= 1:
+            arg_sql = convert_fn(args[0], res_map, cfg)
+            return f"EXTRACT({unit} FROM {arg_sql})"
+    if name in direct:
+        template = direct[name]
+        if template is None:
+            raise ValueError(f"Function {name} has no mapping")
+        if isinstance(template, str) and "{" in template:
+            return _apply_direct_template(template, args, res_map, cfg, convert_fn)
+        if isinstance(template, str) and len(args) == 0:
+            return template
+        args_sql = ", ".join(convert_fn(a, res_map, cfg) for a in args)
+        return f"{template}({args_sql})"
+    raise ValueError(f"Unknown function: {name}")
+
+
 def convert(
     ast: dict[str, Any] | None,
     resolution_map: dict[str, str] | None = None,
     config: dict[str, Any] | None = None,
 ) -> str:
-    """Convert DAX AST node to BigQuery SQL string. Unqualified column refs use resolution_map -> ${field_name}.
+    """Convert DAX AST node to BigQuery SQL. Unqualified column refs use resolution_map -> ${field_name}.
 
     resolution_map: original_name (or key used in DAX) -> final field_name in view.
     Raises on unsupported/unknown; use convert_with_status for conversion_status + message.
@@ -40,82 +162,18 @@ def convert(
         return "NULL"
     res_map = resolution_map or {}
     cfg = config or _get_config()
-    direct = cfg.get("direct_mapping") or {}
-    extract_map = cfg.get("extract_mapping") or {}
-    op_map = cfg.get("operator_mapping") or {}
-    unsupported = _unsupported_list(cfg)
+    node_type = _normalize_node_type(ast)
 
-    def _type(t: Any) -> str:
-        return (t or "").strip() if isinstance(t, str) else ""
-
-    node_type = _type(ast.get("type"))
-    # Normalize: support both Pydantic (FunctionCall) and test (func) style
-    if node_type == "FunctionCall":
-        node_type = "func"
-    elif node_type == "ColumnRef":
-        node_type = "column_ref"
-    elif node_type == "BinOp":
-        node_type = "binop"
-    elif node_type in ("Number", "String", "Boolean", "Blank"):
-        node_type = "literal" if node_type in ("Number", "String", "Boolean") else "blank"
-
-    if node_type == "column_ref" or ast.get("type") == "ColumnRef":
-        table = ast.get("table")
-        col = ast.get("column") or ""
-        col_clean = str(col).strip()
-        if not table or table is None:
-            # Unqualified: resolve to final field_name
-            final = res_map.get(col_clean) or res_map.get(col) or clean_ref_name(col_clean)
-            return f"${{{final}}}"
-        tbl = str(table).strip().lower().replace(" ", "_").replace("-", "_")
-        return f"{tbl}.{col_clean.lower()}"
-    if node_type == "blank" or ast.get("type") == "Blank":
-        return "NULL"
-    if node_type == "literal" or ast.get("type") in ("Number", "String", "Boolean"):
-        v = ast.get("value")
-        if isinstance(v, bool):
-            return "TRUE" if v else "FALSE"
-        if isinstance(v, (int, float)):
-            return str(v)
-        if isinstance(v, str):
-            return "'" + v.replace("'", "''") + "'"
-        return "NULL"
-    if node_type == "binop" or ast.get("type") == "BinOp":
-        op = ast.get("op") or ""
-        left = convert(ast.get("left"), res_map, cfg)
-        right = convert(ast.get("right"), res_map, cfg)
-        bq_op = op_map.get(op) or op
-        if bq_op == "POW":
-            return f"POW({left}, {right})"
-        return f"({left} {bq_op} {right})"
-    if node_type == "func" or ast.get("type") == "FunctionCall":
-        name = (ast.get("name") or "").upper().strip()
-        args = ast.get("args") or []
-        if name == "BLANK" and not args:
-            return "NULL"
-        if name in unsupported:
-            raise ValueError(unsupported[name])
-        if name in extract_map:
-            unit = extract_map[name]
-            if unit and len(args) >= 1:
-                arg_sql = convert(args[0], res_map, cfg)
-                return f"EXTRACT({unit} FROM {arg_sql})"
-        if name in direct:
-            template = direct[name]
-            if template is None:
-                raise ValueError(f"Function {name} has no mapping")
-            if isinstance(template, str) and "{" in template:
-                parts = []
-                for i, a in enumerate(args):
-                    parts.append(convert(a, res_map, cfg))
-                out = template
-                for i, p in enumerate(parts):
-                    out = out.replace("{" + str(i) + "}", p)
-                return out
-            args_sql = ", ".join(convert(a, res_map, cfg) for a in args)
-            return f"{template}({args_sql})"
-        # Unknown function
-        raise ValueError(f"Unknown function: {name}")
+    if node_type == "column_ref":
+        return _convert_column_ref(ast, res_map)
+    if node_type == "table_ref":
+        return _convert_table_ref(ast)
+    if node_type in ("literal", "blank"):
+        return _convert_literal(ast)
+    if node_type == "binop":
+        return _convert_binop(ast, res_map, cfg, convert)
+    if node_type == "func":
+        return _convert_function(ast, res_map, cfg, convert)
     return "NULL"
 
 

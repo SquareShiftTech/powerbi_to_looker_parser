@@ -1,0 +1,1143 @@
+--- Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Education_24b04535 | fact_enrollments.Total Enrollments ---
+  DAX:   COUNT(fact_enrollments[enrollment_id])
+  Output: COUNT(fact_enrollments.enrollment_id)
+
+--- Education_24b04535 | fact_enrollments.Avg Total Marks ---
+  DAX:   AVERAGE(fact_enrollments[total_marks])
+  Output: AVG(fact_enrollments.total_marks)
+
+--- Education_24b04535 | fact_enrollments.Pass Rate ---
+  DAX:   DIVIDE(
+    CALCULATE(COUNT(fact_enrollments[enrollment_id]), fact_enrollments[status] = "Passed"),
+    COUNT(fact_enrollments[enrollment_id])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Education_24b04535 | fact_enrollments.Avg Attendance ---
+  DAX:   AVERAGE(fact_enrollments[attendance_percentage])
+  Output: AVG(fact_enrollments.attendance_percentage)
+
+--- Education_24b04535 | fact_enrollments.sum marks ---
+  DAX:   SUM(fact_enrollments[total_marks])
+  Output: SUM(fact_enrollments.total_marks)
+
+--- Education_24b04535 | dim_faculty.Total Faculty ---
+  DAX:   COUNT(dim_faculty[faculty_id])
+  Output: COUNT(dim_faculty.faculty_id)
+
+--- Education_24b04535 | dim_faculty.Avg Salary ---
+  DAX:   AVERAGE(dim_faculty[salary])
+  Output: AVG(dim_faculty.salary)
+
+--- Education_24b04535 | dim_faculty.Avg Experience ---
+  DAX:   AVERAGE(dim_faculty[years_of_experience])
+  Output: AVG(dim_faculty.years_of_experience)
+
+--- Education_24b04535 | dim_faculty.Total Publications ---
+  DAX:   SUM(dim_faculty[publications])
+  Output: SUM(dim_faculty.publications)
+
+--- Education_24b04535 | dim_faculty.Salary Rank ---
+  DAX:   RANK(ORDERBY([salary], DESC))
+  Output: manual
+  Message: Unknown function: ORDERBY
+
+--- Education_24b04535 | dim_faculty.Faculty Hired YTD ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATESYTD(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Education_24b04535 | dim_faculty.Faculty Hired MTD ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATESMTD(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Education_24b04535 | dim_faculty.Faculty Hired QTD ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATESQTD(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Education_24b04535 | dim_faculty.Faculty Hired Last Year ---
+  DAX:   CALCULATE(
+    [sum salary],
+    SAMEPERIODLASTYEAR(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Education_24b04535 | dim_faculty.Faculty Hired Last Month ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATEADD(dim_faculty[joining_date].[Date], -1, MONTH)
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Education_24b04535 | dim_faculty.sum salary ---
+  DAX:   SUM(dim_faculty[salary])
+  Output: SUM(dim_faculty.salary)
+
+--- Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Education_24b04535 | dim_departments.Total Departments ---
+  DAX:   COUNT(dim_departments[department_id])
+  Output: COUNT(dim_departments.department_id)
+
+--- Education_24b04535 | dim_departments.Total Budget ---
+  DAX:   SUM(dim_departments[budget_allocated])
+  Output: SUM(dim_departments.budget_allocated)
+
+--- Education_24b04535 | dim_departments.Avg Department Budget ---
+  DAX:   AVERAGE(dim_departments[budget_allocated])
+  Output: AVG(dim_departments.budget_allocated)
+
+--- Education_24b04535 | dim_departments.Faculty Student Ratio ---
+  DAX:   DIVIDE(SUM(dim_departments[total_faculty]), SUM(dim_departments[total_students]), 0)
+  Output: IFNULL(SAFE_DIVIDE(SUM(dim_departments.total_faculty), SUM(dim_departments.total_students)), 0.0)
+
+--- Education_24b04535 | dim_courses.Total Courses ---
+  DAX:   COUNT(dim_courses[course_id])
+  Output: COUNT(dim_courses.course_id)
+
+--- Education_24b04535 | dim_courses.Avg Credits ---
+  DAX:   AVERAGE(dim_courses[credits])
+  Output: AVG(dim_courses.credits)
+
+--- Education_24b04535 | dim_courses.Total Course Capacity ---
+  DAX:   SUM(dim_courses[max_students])
+  Output: SUM(dim_courses.max_students)
+
+--- Education_24b04535 | dim_courses.Course Utilization ---
+  DAX:   DIVIDE([Total Enrollments], [Total Course Capacity], 0) *100
+  Output: (IFNULL(SAFE_DIVIDE(${total_enrollments}, ${total_course_capacity}), 0.0) * 100.0)
+
+--- Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | campaign_products.Customers Who Converted ---
+  DAX:   CALCULATE(
+    DISTINCTCOUNT('marketing_campaign_data'[CustomerID]),
+    FILTER('marketing_campaign_data', 'marketing_campaign_data'[Conversions] > 0)
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Global Marketing & Custome_ad094011 | campaign_products.Conversions per Customer ---
+  DAX:   SUMX(
+    FILTER(VALUES(marketing_campaign_data[CustomerID]), 
+        CALCULATE(SUM(marketing_campaign_data[Conversions])) > 0),
+    1
+)
+  Output: manual
+  Message: Unknown function: SUMX
+
+--- Global Marketing & Custome_ad094011 | campaign_products.Conversion Rate by Exposure ---
+  DAX:   VAR custs =
+    SUMMARIZE(
+        'marketing_campaign_data',
+        'marketing_campaign_data'[CustomerID],
+        "Exposures", DISTINCTCOUNT('marketing_campaign_data'[CampaignID]),
+        "ConvertedFlag", IF(SUM('marketing_campaign_data'[Conversions]) > 0, 1, 0)
+    )
+VAR summary =
+    SUMMARIZE(
+        custs,
+        [Exposures],
+        "TotalCustomers", COUNTROWS(custs),
+        "ConvertedCustomers", SUMX(custs, [ConvertedFlag])
+    )
+RETURN
+AVERAGEX(summary, DIVIDE([ConvertedCustomers], [TotalCustomers]))
+  Output: manual
+  Message: Unknown function: 
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Campaigns Exposed1 ---
+  DAX:   CALCULATE(
+    DISTINCTCOUNT(marketing_campaign_data[CampaignID]),
+    ALLEXCEPT(marketing_campaign_data, marketing_campaign_data[CustomerID])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Revenue ---
+  DAX:   SUM(marketing_campaign_data[Revenue])
+  Output: SUM(marketing_campaign_data.revenue)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Spend ---
+  DAX:   SUM(marketing_campaign_data[Spend])
+  Output: SUM(marketing_campaign_data.spend)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.ROI Ratio ---
+  DAX:   DIVIDE([Total Revenue]-[Total Spend], [Total Spend], 0)
+  Output: IFNULL(SAFE_DIVIDE((${total_revenue} - ${total_spend}), ${total_spend}), 0.0)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Conversion Rate % ---
+  DAX:   DIVIDE([Total Conversions], [Total Clicks], 0)
+  Output: IFNULL(SAFE_DIVIDE(${total_conversions}, ${total_clicks}), 0.0)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Conversion Count ---
+  DAX:   COUNT(marketing_campaign_data[Conversions])
+  Output: COUNT(marketing_campaign_data.conversions)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Channel Conversion Rate % ---
+  DAX:   VAR Conv =
+    CALCULATE(
+        SUM('marketing_campaign_data'[Conversions]),
+        ALLEXCEPT('marketing_campaign_data', 'marketing_campaign_data'[Channel])
+    )
+VAR Cust =
+    CALCULATE(
+        DISTINCTCOUNT('marketing_campaign_data'[CustomerID]),
+        ALLEXCEPT('marketing_campaign_data', 'marketing_campaign_data'[Channel])
+    )
+RETURN
+DIVIDE(Conv, Cust, 0)
+  Output: manual
+  Message: Unknown function: 
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Campaigns Exposed ---
+  DAX:   CALCULATE(
+    DISTINCTCOUNT(marketing_campaign_data[CampaignID]),
+    ALLEXCEPT(marketing_campaign_data, marketing_campaign_data[CustomerID]))
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Avg Spend per Customer ---
+  DAX:   DIVIDE([Total Spend], [Total Customers], 0)
+  Output: IFNULL(SAFE_DIVIDE(${total_spend}, ${total_customers}), 0.0)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Avg Revenue per Customer ---
+  DAX:   VAR custs =
+    SUMMARIZE(
+        'marketing_campaign_data',
+        'marketing_campaign_data'[CustomerID],
+        "Exposures", DISTINCTCOUNT('marketing_campaign_data'[CampaignID]),
+        "Revenue", SUM('marketing_campaign_data'[Revenue])
+    )
+VAR summary =
+    SUMMARIZE(
+        custs,
+        [Exposures],
+        "AvgRevenue", AVERAGEX(custs, [Revenue])
+    )
+RETURN
+AVERAGEX(summary, [AvgRevenue])
+  Output: manual
+  Message: Unknown function: 
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Age Group ---
+  DAX:   SWITCH(
+    TRUE(),
+    SELECTEDVALUE(customers[Age]) < 25, "<25",
+    SELECTEDVALUE(customers[Age]) >= 25 && SELECTEDVALUE(customers[Age]) < 35, "25-34",
+    SELECTEDVALUE(customers[Age]) >= 35 && SELECTEDVALUE(customers[Age]) < 45, "35-44",
+    SELECTEDVALUE(customers[Age]) >= 45 && SELECTEDVALUE(customers[Age]) < 55, "45-54",
+    SELECTEDVALUE(customers[Age]) >= 55, "55+",
+    "Unknown"
+)
+  Output: manual
+  Message: Unknown function: SWITCH
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.CAC ---
+  DAX:   DIVIDE([Total Spend], [Conversion Count], 0)
+  Output: IFNULL(SAFE_DIVIDE(${total_spend}, ${conversion_count}), 0.0)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Conversions ---
+  DAX:   SUM ( marketing_campaign_data[Conversions] )
+  Output: SUM(marketing_campaign_data.conversions)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Impressions ---
+  DAX:   SUM ( marketing_campaign_data[Impressions] )
+  Output: SUM(marketing_campaign_data.impressions)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Clicks ---
+  DAX:   SUM ( marketing_campaign_data[Clicks] )
+  Output: SUM(marketing_campaign_data.clicks)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.conversion rate per channel ---
+  DAX:   DIVIDE( [Total Conversions],sum(marketing_campaign_data[Impressions]),0)
+  Output: IFNULL(SAFE_DIVIDE(${total_conversions}, SUM(marketing_campaign_data.impressions)), 0.0)
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Revenue_YTD ---
+  DAX:   TOTALYTD([Total Revenue],marketing_campaign_data[Date].[Date])
+  Output: manual
+  Message: TOTALYTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, YEAR) AND date <= current_date
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Conversions YTD ---
+  DAX:   TOTALYTD(
+    [Total Conversions],
+    marketing_campaign_data[Date])
+  Output: manual
+  Message: TOTALYTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, YEAR) AND date <= current_date
+
+--- Global Marketing & Custome_ad094011 | marketing_campaign_data.Revenue PYTD ---
+  DAX:   CALCULATE(
+    [Total Revenue],
+    SAMEPERIODLASTYEAR(
+        DATESYTD(marketing_campaign_data[Date].[Date])
+    )
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | customers.Age Group ---
+  DAX:   SWITCH(
+    TRUE(),
+    ISBLANK(customers[Age]), "Unknown",
+    customers[Age] < 25, "<25",
+    customers[Age] >= 25 && customers[Age] < 35, "25-34",
+    customers[Age] >= 35 && customers[Age] < 45, "35-44",
+    customers[Age] >= 45 && customers[Age] < 55, "45-54",
+    customers[Age] >= 55, "55+",
+    "Unknown"
+)
+  Output: manual
+  Message: Unknown function: SWITCH
+
+--- Global Marketing & Custome_ad094011 | customers.Total Customers ---
+  DAX:   DISTINCTCOUNT(customers[CustomerID])
+  Output: COUNT(DISTINCT customers.customerid)
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- HR Dashboard_b3b63455 | All Measures.Total Emp ---
+  DAX:   COUNTROWS('HR Analytics Data')
+  Output: (SELECT COUNT(*) FROM hr_analytics_data)
+
+--- HR Dashboard_b3b63455 | All Measures.Male ---
+  DAX:   CALCULATE([Total Emp],'HR Analytics Data'[Gender]="male")
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.Male % ---
+  DAX:   DIVIDE([Male],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${male}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.Female ---
+  DAX:   CALCULATE([Total Emp],'HR Analytics Data'[Gender]="female")
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.Female % ---
+  DAX:   DIVIDE([Female],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${female}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.Due for retrenchment ---
+  DAX:   IF(ISBLANK( CALCULATE([Total Emp],'HR Analytics Data'[Retirement]="due for retirement")),"0", CALCULATE([Total Emp],'HR Analytics Data'[Retirement]="due for retirement"))
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.Active workers ---
+  DAX:   CALCULATE([Total Emp],'HR Analytics Data'[Retirement]="on service")
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.% Active workers ---
+  DAX:   DIVIDE([Active workers],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${active_workers}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.% Due for retirment ---
+  DAX:   DIVIDE([Due for retrenchment],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${due_for_retrenchment}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.Due for promotion ---
+  DAX:   IF(ISBLANK(CALCULATE([Total Emp],'HR Analytics Data'[Promotion status]="due for promotion")),0,CALCULATE([Total Emp],'HR Analytics Data'[Promotion status]="due for promotion"))
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.Not Due ---
+  DAX:   CALCULATE([Total Emp],'HR Analytics Data'[Promotion status]="not due")
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.% Due for promotion ---
+  DAX:   DIVIDE([Due for promotion],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${due_for_promotion}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.% Not due for promotion ---
+  DAX:   DIVIDE([Not Due],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${not_due}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.High emp rating ---
+  DAX:   CALCULATE([Total Emp],'HR Analytics Data'[Performance Rating]="High ratings")
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.Low emp rating ---
+  DAX:   CALCULATE([Total Emp],'HR Analytics Data'[Performance Rating]="low ratings")
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- HR Dashboard_b3b63455 | All Measures.% High emp rating ---
+  DAX:   DIVIDE([High emp rating],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${high_emp_rating}, ${total_emp}), 0.0)
+
+--- HR Dashboard_b3b63455 | All Measures.% Low emp rating ---
+  DAX:   DIVIDE([Low emp rating],[Total Emp],0)
+  Output: IFNULL(SAFE_DIVIDE(${low_emp_rating}, ${total_emp}), 0.0)
+
+--- hr_recruiting_f6be5222 | applications.funnel_stages ---
+  DAX:   SWITCH (
+    TRUE(),
+    NOT ISBLANK ( MAX ( 'applications'[offer_date] ) ),   "4-Offer",
+    NOT ISBLANK ( MAX ( 'applications'[onsite_date] ) ),  "3-Onsite",
+    NOT ISBLANK ( MAX ( 'applications'[screen_date] ) ),  "2-Screen",
+    "1-Applied"
+)
+  Output: manual
+  Message: Unknown function: SWITCH
+
+--- hr_recruiting_f6be5222 | applications.Applications with Screen ---
+  DAX:   CALCULATE(
+    COUNTROWS(Applications),
+    NOT ISBLANK(Applications[screen_date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | applications.Applications with Onsite ---
+  DAX:   CALCULATE(
+    COUNTROWS(Applications),
+    NOT ISBLANK(Applications[onsite_date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | applications.Applications with Offer ---
+  DAX:   CALCULATE(
+    COUNTROWS(Applications),
+    NOT ISBLANK(Applications[offer_date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | applications.Applications Count ---
+  DAX:   COUNTROWS(Applications)
+  Output: (SELECT COUNT(*) FROM applications)
+
+--- hr_recruiting_f6be5222 | applications.Screen Rate ---
+  DAX:   DIVIDE(
+    [Applications with Screen],
+    [Applications Count]
+)
+  Output: IFNULL(SAFE_DIVIDE(${applications_with_screen}, ${applications_count}), NULL)
+
+--- hr_recruiting_f6be5222 | applications.Onsite Rate ---
+  DAX:   DIVIDE(
+    [Applications with Onsite],
+    [Applications with Screen]
+    )
+  Output: IFNULL(SAFE_DIVIDE(${applications_with_onsite}, ${applications_with_screen}), NULL)
+
+--- hr_recruiting_f6be5222 | applications.Offer Rate ---
+  DAX:   DIVIDE(
+        [Applications with Offer],
+        [Applications with Onsite]
+        
+    
+)
+  Output: IFNULL(SAFE_DIVIDE(${applications_with_offer}, ${applications_with_onsite}), NULL)
+
+--- hr_recruiting_f6be5222 | applications.Archived Applications ---
+  DAX:   CALCULATE(
+    COUNTROWS(Applications),
+    Applications[application_archived] = TRUE()
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | applications.Active Applications ---
+  DAX:   CALCULATE(
+    COUNTROWS(Applications),
+    Applications[application_archived] = FALSE()
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | candidates.Candidates Count ---
+  DAX:   COUNTROWS(Applications)
+  Output: (SELECT COUNT(*) FROM applications)
+
+--- hr_recruiting_f6be5222 | candidates.Total Candidates ---
+  DAX:   DISTINCTCOUNT(candidates[candidate_id_hashed])
+  Output: COUNT(DISTINCT candidates.candidate_id_hashed)
+
+--- hr_recruiting_f6be5222 | employees.Avg Salarys ---
+  DAX:   AVERAGE(Employees[current_salary])
+  Output: AVG(employees.current_salary)
+
+--- hr_recruiting_f6be5222 | employees.Employee Count ---
+  DAX:   COUNTROWS(Employees)
+  Output: (SELECT COUNT(*) FROM employees)
+
+--- hr_recruiting_f6be5222 | employees.Avg Salary ---
+  DAX:   AVERAGE(Employees[current_salary])
+  Output: AVG(employees.current_salary)
+
+--- hr_recruiting_f6be5222 | employees.Avg Quota Attainment ---
+  DAX:   AVERAGE(Employees[quota_attainment])
+  Output: AVG(employees.quota_attainment)
+
+--- hr_recruiting_f6be5222 | employees.Active Employees ---
+  DAX:   CALCULATE(
+    COUNTROWS(Employees),
+    Employees[user_status] = "Active"
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | employees.Departed Employees ---
+  DAX:   CALCULATE(
+    COUNTROWS(Employees),
+    NOT ISBLANK(Employees[departure_date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- hr_recruiting_f6be5222 | feedback.Feedback Count ---
+  DAX:   COUNTROWS(Feedback)
+  Output: (SELECT COUNT(*) FROM feedback)
+
+--- hr_recruiting_f6be5222 | interviews.interview_timestamp_month ---
+  DAX:   YEAR(interviews[interview_timestamp]) + "-" + MONTH(interviews[interview_timestamp])
+  Output: ((EXTRACT(YEAR FROM interviews.interview_timestamp) + '-') + EXTRACT(MONTH FROM interviews.interview_timestamp))
+
+--- hr_recruiting_f6be5222 | interviews.Interview Count ---
+  DAX:   COUNTROWS(Interviews)
+  Output: (SELECT COUNT(*) FROM interviews)
+
+--- hr_recruiting_f6be5222 | interviews.Avg Interviews per Application ---
+  DAX:   DIVIDE(
+    [Interview Count],
+    DISTINCTCOUNT(Interviews[application_id])
+)
+  Output: IFNULL(SAFE_DIVIDE(${interview_count}, COUNT(DISTINCT interviews.application_id)), NULL)
+
+--- hr_recruiting_f6be5222 | postings.Posting Count ---
+  DAX:   COUNTROWS(Postings)
+  Output: (SELECT COUNT(*) FROM postings)
+
+--- hr_recruiting_f6be5222 | salary.Min Salary ---
+  DAX:   MIN(salary[salary])
+  Output: MIN(salary.salary)
+
+--- hr_recruiting_f6be5222 | salary.Max Salary ---
+  DAX:   MAX(salary[salary])
+  Output: MAX(salary.salary)
+
+--- Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Donation Tier ---
+  DAX:   IF(
+    'museum_cultural_analytics_dataset'[Donation_Amount] >= 100,
+    "Gold Donor",
+    IF(
+        'museum_cultural_analytics_dataset'[Donation_Amount] >= 50,
+        "Silver Donor",
+        "Bronze Donor"
+    )
+)
+  Output: CASE WHEN (museum_cultural_analytics_dataset.donation_amount >= 100.0) THEN 'Gold Donor' ELSE CASE WHEN (museum_cultural_analytics_dataset.donation_amount >= 50.0) THEN 'Silver Donor' ELSE 'Bronze Donor' END END
+
+--- Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Audio Guide Flag ---
+  DAX:   IF(
+    'museum_cultural_analytics_dataset'[Audio_Guide_Used] = "Yes",
+    1,
+    0
+)
+  Output: CASE WHEN (museum_cultural_analytics_dataset.audio_guide_used = 'Yes') THEN 1.0 ELSE 0.0 END
+
+--- Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Event Impact Score ---
+  DAX:   VAR Attendance =
+    SUM('museum_cultural_analytics_dataset'[Event_Attendance])
+
+VAR Donations =
+    SUM('museum_cultural_analytics_dataset'[Donation_Amount])
+
+VAR AudioUsage =
+    DIVIDE(
+        SUM('museum_cultural_analytics_dataset'[Audio Guide Flag]),
+        COUNT('museum_cultural_analytics_dataset'[Visitor_ID])
+    )
+
+RETURN
+IF(
+    Attendance > 150000 && Donations > 60000,
+    "High Impact",
+    IF(
+        Attendance > 10000 && AudioUsage > 0.6,
+        "Medium Impact",
+        "Low Impact"
+    )
+)
+  Output: manual
+  Message: Unknown function: 
+
+--- Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Total Attendance ---
+  DAX:   SUM('museum_cultural_analytics_dataset'[Event_Attendance])
+  Output: SUM(museum_cultural_analytics_dataset.event_attendance)
+
+--- Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Total Donations ---
+  DAX:   SUM('museum_cultural_analytics_dataset'[Donation_Amount])
+  Output: SUM(museum_cultural_analytics_dataset.donation_amount)
+
+--- Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Total Visitors ---
+  DAX:   DISTINCTCOUNT('museum_cultural_analytics_dataset'[Visitor_ID])
+  Output: COUNT(DISTINCT museum_cultural_analytics_dataset.visitor_id)
+
+--- Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Energy-Acoustic Quadrant ---
+  DAX:   SWITCH(
+    TRUE(),
+    'spotify_prod'[energy] >= 0.5 && 'spotify_prod'[acousticness] >= 0.5, "High Energy + High Acoustic",
+    'spotify_prod'[energy] >= 0.5 && 'spotify_prod'[acousticness] < 0.5, "High Energy + Low Acoustic",
+    'spotify_prod'[energy] < 0.5 && 'spotify_prod'[acousticness] >= 0.5, "Low Energy + High Acoustic",
+    "Low Energy + Low Acoustic"
+)
+  Output: manual
+  Message: Unknown function: SWITCH
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks ---
+  DAX:   SUM('spotify_prod'[weeks_on_chart])
+  Output: SUM(spotify_prod.weeks_on_chart)
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks PY ---
+  DAX:   CALCULATE(
+    [Total Weeks],
+    SAMEPERIODLASTYEAR('Dim_Date'[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.YoY % ---
+  DAX:   DIVIDE(
+    [Total Weeks] - [Total Weeks PY],
+    [Total Weeks PY]
+)
+  Output: IFNULL(SAFE_DIVIDE((${total_weeks} - ${total_weeks_py}), ${total_weeks_py}), NULL)
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks PM ---
+  DAX:   CALCULATE(
+    [Total Weeks],
+    PREVIOUSMONTH('Dim_Date'[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.MoM % ---
+  DAX:   DIVIDE(
+    [Total Weeks] - [Total Weeks PM],
+    [Total Weeks PM]
+)
+  Output: IFNULL(SAFE_DIVIDE((${total_weeks} - ${total_weeks_pm}), ${total_weeks_pm}), NULL)
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks YTD ---
+  DAX:   TOTALYTD(
+    [Total Weeks],
+    'Dim_Date'[Date]
+)
+  Output: manual
+  Message: TOTALYTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, YEAR) AND date <= current_date
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks QTD ---
+  DAX:   TOTALQTD(
+    [Total Weeks],
+    'Dim_Date'[Date]
+)
+  Output: manual
+  Message: TOTALQTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, QUARTER)
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks MTD ---
+  DAX:   TOTALMTD(
+    [Total Weeks],
+    'Dim_Date'[Date]
+)
+  Output: manual
+  Message: TOTALMTD — rewrite as: SUM(metric) WHERE date >= DATE_TRUNC(current_date, MONTH)
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Rolling 3M Avg ---
+  DAX:   AVERAGEX(
+    DATESINPERIOD(
+        'Dim_Date'[Date],
+        MAX('Dim_Date'[Date]),
+        -3,
+        MONTH
+    ),
+    [Total Weeks]
+)
+  Output: manual
+  Message: Unknown function: AVERAGEX
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.YoY Change ---
+  DAX:   [Total Weeks] - [Total Weeks PY]
+  Output: (${total_weeks} - ${total_weeks_py})
+
+--- Spotify Performance Intell_6a57bb91 | spotify_prod.Duration (Min) ---
+  DAX:   AVERAGE('spotify_prod'[duration_ms]) / 60000
+  Output: (AVG(spotify_prod.duration_ms) / 60000.0)
+
+--- Spotify Performance Intell_6a57bb91 | Dim_Date.Check Type ---
+  DAX:   MAX('spotify_prod'[danceability])
+  Output: MAX(spotify_prod.danceability)
+
+--- Spotify Performance Intell_6a57bb91 | Danceability Threshold.Danceability Threshold Value ---
+  DAX:   SELECTEDVALUE('Danceability Threshold'[Danceability Threshold], 0.7)
+  Output: COALESCE(MAX(danceability_threshold.danceability threshold), 0.7)
+
+--- Spotify Performance Intell_6a57bb91 | Danceability Threshold.Dynamic HP Weeks ---
+  DAX:   CALCULATE(
+    [Total Weeks],
+    'spotify_prod'[danceability] >
+    SELECTEDVALUE('Danceability Threshold'[Danceability Threshold])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- Spotify Performance Intell_6a57bb91 | Danceability Threshold.Above Threshold ---
+  DAX:   VAR Threshold =
+    SELECTEDVALUE('Danceability Threshold'[Danceability Threshold])
+RETURN
+CALCULATE(
+    [Total Weeks],
+    FILTER(
+        'spotify_prod',
+        'spotify_prod'[danceability] > Threshold
+    )
+)
+  Output: manual
+  Message: Unknown function: 
+
+--- University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | fact_enrollments.Total Enrollments ---
+  DAX:   COUNT(fact_enrollments[enrollment_id])
+  Output: COUNT(fact_enrollments.enrollment_id)
+
+--- University Analytics Dashb_d4dfc6d7 | fact_enrollments.Avg Total Marks ---
+  DAX:   AVERAGE(fact_enrollments[total_marks])
+  Output: AVG(fact_enrollments.total_marks)
+
+--- University Analytics Dashb_d4dfc6d7 | fact_enrollments.Pass Rate ---
+  DAX:   DIVIDE(
+    CALCULATE(COUNT(fact_enrollments[enrollment_id]), fact_enrollments[status] = "Passed"),
+    COUNT(fact_enrollments[enrollment_id])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- University Analytics Dashb_d4dfc6d7 | fact_enrollments.Avg Attendance ---
+  DAX:   AVERAGE(fact_enrollments[attendance_percentage])
+  Output: AVG(fact_enrollments.attendance_percentage)
+
+--- University Analytics Dashb_d4dfc6d7 | fact_enrollments.sum marks ---
+  DAX:   SUM(fact_enrollments[total_marks])
+  Output: SUM(fact_enrollments.total_marks)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Total Faculty ---
+  DAX:   COUNT(dim_faculty[faculty_id])
+  Output: COUNT(dim_faculty.faculty_id)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Avg Salary ---
+  DAX:   AVERAGE(dim_faculty[salary])
+  Output: AVG(dim_faculty.salary)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Avg Experience ---
+  DAX:   AVERAGE(dim_faculty[years_of_experience])
+  Output: AVG(dim_faculty.years_of_experience)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Total Publications ---
+  DAX:   SUM(dim_faculty[publications])
+  Output: SUM(dim_faculty.publications)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Salary Rank ---
+  DAX:   RANK(ORDERBY([salary], DESC))
+  Output: manual
+  Message: Unknown function: ORDERBY
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired YTD ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATESYTD(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired MTD ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATESMTD(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired QTD ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATESQTD(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired Last Year ---
+  DAX:   CALCULATE(
+    [sum salary],
+    SAMEPERIODLASTYEAR(dim_faculty[joining_date].[Date])
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired Last Month ---
+  DAX:   CALCULATE(
+    [sum salary],
+    DATEADD(dim_faculty[joining_date].[Date], -1, MONTH)
+)
+  Output: manual
+  Message: CALCULATE modifies filter context — rewrite as SQL WHERE clause or window function. Review filter arguments manually.
+
+--- University Analytics Dashb_d4dfc6d7 | dim_faculty.sum salary ---
+  DAX:   SUM(dim_faculty[salary])
+  Output: SUM(dim_faculty.salary)
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | dim_departments.Total Departments ---
+  DAX:   COUNT(dim_departments[department_id])
+  Output: COUNT(dim_departments.department_id)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_departments.Total Budget ---
+  DAX:   SUM(dim_departments[budget_allocated])
+  Output: SUM(dim_departments.budget_allocated)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_departments.Avg Department Budget ---
+  DAX:   AVERAGE(dim_departments[budget_allocated])
+  Output: AVG(dim_departments.budget_allocated)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_departments.Faculty Student Ratio ---
+  DAX:   DIVIDE(SUM(dim_departments[total_faculty]), SUM(dim_departments[total_students]), 0)
+  Output: IFNULL(SAFE_DIVIDE(SUM(dim_departments.total_faculty), SUM(dim_departments.total_students)), 0.0)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_courses.Total Courses ---
+  DAX:   COUNT(dim_courses[course_id])
+  Output: COUNT(dim_courses.course_id)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_courses.Avg Credits ---
+  DAX:   AVERAGE(dim_courses[credits])
+  Output: AVG(dim_courses.credits)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_courses.Total Course Capacity ---
+  DAX:   SUM(dim_courses[max_students])
+  Output: SUM(dim_courses.max_students)
+
+--- University Analytics Dashb_d4dfc6d7 | dim_courses.Course Utilization ---
+  DAX:   DIVIDE([Total Enrollments], [Total Course Capacity], 0) *100
+  Output: (IFNULL(SAFE_DIVIDE(${total_enrollments}, ${total_course_capacity}), 0.0) * 100.0)
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Year ---
+  DAX:   YEAR([Date])
+  Output: EXTRACT(YEAR FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.MonthNo ---
+  DAX:   MONTH([Date])
+  Output: EXTRACT(MONTH FROM ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Month ---
+  DAX:   FORMAT([Date], "MMMM")
+  Output: FORMAT_DATE('%B', ${date})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.QuarterNo ---
+  DAX:   INT(([MonthNo] + 2) / 3)
+  Output: CAST(((${monthno} + 2.0) / 3.0) AS INT64)
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Quarter ---
+  DAX:   "Qtr " & [QuarterNo]
+  Output: ('Qtr ' || ${quarterno})
+
+--- University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Day ---
+  DAX:   DAY([Date])
+  Output: EXTRACT(DAY FROM ${date})
+
+(Total: 214 formulas | manual: 52 | parse errors: 0)

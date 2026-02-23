@@ -1,0 +1,1072 @@
+[
+  {
+    "name": "Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | fact_enrollments.Total Enrollments",
+    "dax": "COUNT(fact_enrollments[enrollment_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | fact_enrollments.Avg Total Marks",
+    "dax": "AVERAGE(fact_enrollments[total_marks])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | fact_enrollments.Pass Rate",
+    "dax": "DIVIDE(\n    CALCULATE(COUNT(fact_enrollments[enrollment_id]), fact_enrollments[status] = \"Passed\"),\n    COUNT(fact_enrollments[enrollment_id])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | fact_enrollments.Avg Attendance",
+    "dax": "AVERAGE(fact_enrollments[attendance_percentage])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | fact_enrollments.sum marks",
+    "dax": "SUM(fact_enrollments[total_marks])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Total Faculty",
+    "dax": "COUNT(dim_faculty[faculty_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Avg Salary",
+    "dax": "AVERAGE(dim_faculty[salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Avg Experience",
+    "dax": "AVERAGE(dim_faculty[years_of_experience])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Total Publications",
+    "dax": "SUM(dim_faculty[publications])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Salary Rank",
+    "dax": "RANK(ORDERBY([salary], DESC))",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Faculty Hired YTD",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATESYTD(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Faculty Hired MTD",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATESMTD(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Faculty Hired QTD",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATESQTD(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Faculty Hired Last Year",
+    "dax": "CALCULATE(\n    [sum salary],\n    SAMEPERIODLASTYEAR(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.Faculty Hired Last Month",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATEADD(dim_faculty[joining_date].[Date], -1, MONTH)\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_faculty.sum salary",
+    "dax": "SUM(dim_faculty[salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_departments.Total Departments",
+    "dax": "COUNT(dim_departments[department_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_departments.Total Budget",
+    "dax": "SUM(dim_departments[budget_allocated])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_departments.Avg Department Budget",
+    "dax": "AVERAGE(dim_departments[budget_allocated])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_departments.Faculty Student Ratio",
+    "dax": "DIVIDE(SUM(dim_departments[total_faculty]), SUM(dim_departments[total_students]), 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_courses.Total Courses",
+    "dax": "COUNT(dim_courses[course_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_courses.Avg Credits",
+    "dax": "AVERAGE(dim_courses[credits])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_courses.Total Course Capacity",
+    "dax": "SUM(dim_courses[max_students])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | dim_courses.Course Utilization",
+    "dax": "DIVIDE([Total Enrollments], [Total Course Capacity], 0) *100",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Education_24b04535 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | campaign_products.Customers Who Converted",
+    "dax": "CALCULATE(\n    DISTINCTCOUNT('marketing_campaign_data'[CustomerID]),\n    FILTER('marketing_campaign_data', 'marketing_campaign_data'[Conversions] > 0)\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | campaign_products.Conversions per Customer",
+    "dax": "SUMX(\n    FILTER(VALUES(marketing_campaign_data[CustomerID]), \n        CALCULATE(SUM(marketing_campaign_data[Conversions])) > 0),\n    1\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | campaign_products.Conversion Rate by Exposure",
+    "dax": "VAR custs =\n    SUMMARIZE(\n        'marketing_campaign_data',\n        'marketing_campaign_data'[CustomerID],\n        \"Exposures\", DISTINCTCOUNT('marketing_campaign_data'[CampaignID]),\n        \"ConvertedFlag\", IF(SUM('marketing_campaign_data'[Conversions]) > 0, 1, 0)\n    )\nVAR summary =\n    SUMMARIZE(\n        custs,\n        [Exposures],\n        \"TotalCustomers\", COUNTROWS(custs),\n        \"ConvertedCustomers\", SUMX(custs, [ConvertedFlag])\n    )\nRETURN\nAVERAGEX(summary, DIVIDE([ConvertedCustomers], [TotalCustomers]))",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Campaigns Exposed1",
+    "dax": "CALCULATE(\n    DISTINCTCOUNT(marketing_campaign_data[CampaignID]),\n    ALLEXCEPT(marketing_campaign_data, marketing_campaign_data[CustomerID])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Revenue",
+    "dax": "SUM(marketing_campaign_data[Revenue])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Spend",
+    "dax": "SUM(marketing_campaign_data[Spend])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.ROI Ratio",
+    "dax": "DIVIDE([Total Revenue]-[Total Spend], [Total Spend], 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Conversion Rate %",
+    "dax": "DIVIDE([Total Conversions], [Total Clicks], 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Conversion Count",
+    "dax": "COUNT(marketing_campaign_data[Conversions])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Channel Conversion Rate %",
+    "dax": "VAR Conv =\n    CALCULATE(\n        SUM('marketing_campaign_data'[Conversions]),\n        ALLEXCEPT('marketing_campaign_data', 'marketing_campaign_data'[Channel])\n    )\nVAR Cust =\n    CALCULATE(\n        DISTINCTCOUNT('marketing_campaign_data'[CustomerID]),\n        ALLEXCEPT('marketing_campaign_data', 'marketing_campaign_data'[Channel])\n    )\nRETURN\nDIVIDE(Conv, Cust, 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Campaigns Exposed",
+    "dax": "CALCULATE(\n    DISTINCTCOUNT(marketing_campaign_data[CampaignID]),\n    ALLEXCEPT(marketing_campaign_data, marketing_campaign_data[CustomerID]))",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Avg Spend per Customer",
+    "dax": "DIVIDE([Total Spend], [Total Customers], 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Avg Revenue per Customer",
+    "dax": "VAR custs =\n    SUMMARIZE(\n        'marketing_campaign_data',\n        'marketing_campaign_data'[CustomerID],\n        \"Exposures\", DISTINCTCOUNT('marketing_campaign_data'[CampaignID]),\n        \"Revenue\", SUM('marketing_campaign_data'[Revenue])\n    )\nVAR summary =\n    SUMMARIZE(\n        custs,\n        [Exposures],\n        \"AvgRevenue\", AVERAGEX(custs, [Revenue])\n    )\nRETURN\nAVERAGEX(summary, [AvgRevenue])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Age Group",
+    "dax": "SWITCH(\n    TRUE(),\n    SELECTEDVALUE(customers[Age]) < 25, \"<25\",\n    SELECTEDVALUE(customers[Age]) >= 25 && SELECTEDVALUE(customers[Age]) < 35, \"25-34\",\n    SELECTEDVALUE(customers[Age]) >= 35 && SELECTEDVALUE(customers[Age]) < 45, \"35-44\",\n    SELECTEDVALUE(customers[Age]) >= 45 && SELECTEDVALUE(customers[Age]) < 55, \"45-54\",\n    SELECTEDVALUE(customers[Age]) >= 55, \"55+\",\n    \"Unknown\"\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.CAC",
+    "dax": "DIVIDE([Total Spend], [Conversion Count], 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Conversions",
+    "dax": "SUM ( marketing_campaign_data[Conversions] )",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Impressions",
+    "dax": "SUM ( marketing_campaign_data[Impressions] )",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Total Clicks",
+    "dax": "SUM ( marketing_campaign_data[Clicks] )",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.conversion rate per channel",
+    "dax": "DIVIDE( [Total Conversions],sum(marketing_campaign_data[Impressions]),0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Revenue_YTD",
+    "dax": "TOTALYTD([Total Revenue],marketing_campaign_data[Date].[Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Conversions YTD",
+    "dax": "TOTALYTD(\n    [Total Conversions],\n    marketing_campaign_data[Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | marketing_campaign_data.Revenue PYTD",
+    "dax": "CALCULATE(\n    [Total Revenue],\n    SAMEPERIODLASTYEAR(\n        DATESYTD(marketing_campaign_data[Date].[Date])\n    )\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | DateTableTemplate_090e92ef-e457-4bc1-a245-6cdef395ac0b.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_40f17b72-d9c2-4070-9b59-f74aaedf3e72.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | customers.Age Group",
+    "dax": "SWITCH(\n    TRUE(),\n    ISBLANK(customers[Age]), \"Unknown\",\n    customers[Age] < 25, \"<25\",\n    customers[Age] >= 25 && customers[Age] < 35, \"25-34\",\n    customers[Age] >= 35 && customers[Age] < 45, \"35-44\",\n    customers[Age] >= 45 && customers[Age] < 55, \"45-54\",\n    customers[Age] >= 55, \"55+\",\n    \"Unknown\"\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | customers.Total Customers",
+    "dax": "DISTINCTCOUNT(customers[CustomerID])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_ea724443-5c11-421e-916b-4aee8a87d30b.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Global Marketing & Custome_ad094011 | LocalDateTable_cd172c05-19c5-40fd-b313-32ef5bf17f1e.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | DateTableTemplate_bce793e1-4c64-4fba-9a0d-e765665a26d1.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Total Emp",
+    "dax": "COUNTROWS('HR Analytics Data')",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Male",
+    "dax": "CALCULATE([Total Emp],'HR Analytics Data'[Gender]=\"male\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Male %",
+    "dax": "DIVIDE([Male],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Female",
+    "dax": "CALCULATE([Total Emp],'HR Analytics Data'[Gender]=\"female\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Female %",
+    "dax": "DIVIDE([Female],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Due for retrenchment",
+    "dax": "IF(ISBLANK( CALCULATE([Total Emp],'HR Analytics Data'[Retirement]=\"due for retirement\")),\"0\", CALCULATE([Total Emp],'HR Analytics Data'[Retirement]=\"due for retirement\"))",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Active workers",
+    "dax": "CALCULATE([Total Emp],'HR Analytics Data'[Retirement]=\"on service\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.% Active workers",
+    "dax": "DIVIDE([Active workers],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.% Due for retirment",
+    "dax": "DIVIDE([Due for retrenchment],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Due for promotion",
+    "dax": "IF(ISBLANK(CALCULATE([Total Emp],'HR Analytics Data'[Promotion status]=\"due for promotion\")),0,CALCULATE([Total Emp],'HR Analytics Data'[Promotion status]=\"due for promotion\"))",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Not Due",
+    "dax": "CALCULATE([Total Emp],'HR Analytics Data'[Promotion status]=\"not due\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.% Due for promotion",
+    "dax": "DIVIDE([Due for promotion],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.% Not due for promotion",
+    "dax": "DIVIDE([Not Due],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.High emp rating",
+    "dax": "CALCULATE([Total Emp],'HR Analytics Data'[Performance Rating]=\"High ratings\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.Low emp rating",
+    "dax": "CALCULATE([Total Emp],'HR Analytics Data'[Performance Rating]=\"low ratings\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.% High emp rating",
+    "dax": "DIVIDE([High emp rating],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "HR Dashboard_b3b63455 | All Measures.% Low emp rating",
+    "dax": "DIVIDE([Low emp rating],[Total Emp],0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.funnel_stages",
+    "dax": "SWITCH (\n    TRUE(),\n    NOT ISBLANK ( MAX ( 'applications'[offer_date] ) ),   \"4-Offer\",\n    NOT ISBLANK ( MAX ( 'applications'[onsite_date] ) ),  \"3-Onsite\",\n    NOT ISBLANK ( MAX ( 'applications'[screen_date] ) ),  \"2-Screen\",\n    \"1-Applied\"\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Applications with Screen",
+    "dax": "CALCULATE(\n    COUNTROWS(Applications),\n    NOT ISBLANK(Applications[screen_date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Applications with Onsite",
+    "dax": "CALCULATE(\n    COUNTROWS(Applications),\n    NOT ISBLANK(Applications[onsite_date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Applications with Offer",
+    "dax": "CALCULATE(\n    COUNTROWS(Applications),\n    NOT ISBLANK(Applications[offer_date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Applications Count",
+    "dax": "COUNTROWS(Applications)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Screen Rate",
+    "dax": "DIVIDE(\n    [Applications with Screen],\n    [Applications Count]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Onsite Rate",
+    "dax": "DIVIDE(\n    [Applications with Onsite],\n    [Applications with Screen]\n    )",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Offer Rate",
+    "dax": "DIVIDE(\n        [Applications with Offer],\n        [Applications with Onsite]\n        \n    \n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Archived Applications",
+    "dax": "CALCULATE(\n    COUNTROWS(Applications),\n    Applications[application_archived] = TRUE()\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | applications.Active Applications",
+    "dax": "CALCULATE(\n    COUNTROWS(Applications),\n    Applications[application_archived] = FALSE()\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | candidates.Candidates Count",
+    "dax": "COUNTROWS(Applications)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | candidates.Total Candidates",
+    "dax": "DISTINCTCOUNT(candidates[candidate_id_hashed])",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | employees.Avg Salarys",
+    "dax": "AVERAGE(Employees[current_salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | employees.Employee Count",
+    "dax": "COUNTROWS(Employees)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | employees.Avg Salary",
+    "dax": "AVERAGE(Employees[current_salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | employees.Avg Quota Attainment",
+    "dax": "AVERAGE(Employees[quota_attainment])",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | employees.Active Employees",
+    "dax": "CALCULATE(\n    COUNTROWS(Employees),\n    Employees[user_status] = \"Active\"\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | employees.Departed Employees",
+    "dax": "CALCULATE(\n    COUNTROWS(Employees),\n    NOT ISBLANK(Employees[departure_date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | feedback.Feedback Count",
+    "dax": "COUNTROWS(Feedback)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | interviews.interview_timestamp_month",
+    "dax": "YEAR(interviews[interview_timestamp]) + \"-\" + MONTH(interviews[interview_timestamp])",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | interviews.Interview Count",
+    "dax": "COUNTROWS(Interviews)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | interviews.Avg Interviews per Application",
+    "dax": "DIVIDE(\n    [Interview Count],\n    DISTINCTCOUNT(Interviews[application_id])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | postings.Posting Count",
+    "dax": "COUNTROWS(Postings)",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | salary.Min Salary",
+    "dax": "MIN(salary[salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "hr_recruiting_f6be5222 | salary.Max Salary",
+    "dax": "MAX(salary[salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Donation Tier",
+    "dax": "IF(\n    'museum_cultural_analytics_dataset'[Donation_Amount] >= 100,\n    \"Gold Donor\",\n    IF(\n        'museum_cultural_analytics_dataset'[Donation_Amount] >= 50,\n        \"Silver Donor\",\n        \"Bronze Donor\"\n    )\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Audio Guide Flag",
+    "dax": "IF(\n    'museum_cultural_analytics_dataset'[Audio_Guide_Used] = \"Yes\",\n    1,\n    0\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Event Impact Score",
+    "dax": "VAR Attendance =\n    SUM('museum_cultural_analytics_dataset'[Event_Attendance])\n\nVAR Donations =\n    SUM('museum_cultural_analytics_dataset'[Donation_Amount])\n\nVAR AudioUsage =\n    DIVIDE(\n        SUM('museum_cultural_analytics_dataset'[Audio Guide Flag]),\n        COUNT('museum_cultural_analytics_dataset'[Visitor_ID])\n    )\n\nRETURN\nIF(\n    Attendance > 150000 && Donations > 60000,\n    \"High Impact\",\n    IF(\n        Attendance > 10000 && AudioUsage > 0.6,\n        \"Medium Impact\",\n        \"Low Impact\"\n    )\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Total Attendance",
+    "dax": "SUM('museum_cultural_analytics_dataset'[Event_Attendance])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Total Donations",
+    "dax": "SUM('museum_cultural_analytics_dataset'[Donation_Amount])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | museum_cultural_analytics_dataset.Total Visitors",
+    "dax": "DISTINCTCOUNT('museum_cultural_analytics_dataset'[Visitor_ID])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | DateTableTemplate_418c84ed-a7a6-4552-98a7-6326594544ec.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Museum Events Analytics_8ff0a2ab | LocalDateTable_2491c610-77f9-4801-97a1-5624ff8d7b00.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Energy-Acoustic Quadrant",
+    "dax": "SWITCH(\n    TRUE(),\n    'spotify_prod'[energy] >= 0.5 && 'spotify_prod'[acousticness] >= 0.5, \"High Energy + High Acoustic\",\n    'spotify_prod'[energy] >= 0.5 && 'spotify_prod'[acousticness] < 0.5, \"High Energy + Low Acoustic\",\n    'spotify_prod'[energy] < 0.5 && 'spotify_prod'[acousticness] >= 0.5, \"Low Energy + High Acoustic\",\n    \"Low Energy + Low Acoustic\"\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks",
+    "dax": "SUM('spotify_prod'[weeks_on_chart])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks PY",
+    "dax": "CALCULATE(\n    [Total Weeks],\n    SAMEPERIODLASTYEAR('Dim_Date'[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.YoY %",
+    "dax": "DIVIDE(\n    [Total Weeks] - [Total Weeks PY],\n    [Total Weeks PY]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks PM",
+    "dax": "CALCULATE(\n    [Total Weeks],\n    PREVIOUSMONTH('Dim_Date'[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.MoM %",
+    "dax": "DIVIDE(\n    [Total Weeks] - [Total Weeks PM],\n    [Total Weeks PM]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks YTD",
+    "dax": "TOTALYTD(\n    [Total Weeks],\n    'Dim_Date'[Date]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks QTD",
+    "dax": "TOTALQTD(\n    [Total Weeks],\n    'Dim_Date'[Date]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Total Weeks MTD",
+    "dax": "TOTALMTD(\n    [Total Weeks],\n    'Dim_Date'[Date]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Rolling 3M Avg",
+    "dax": "AVERAGEX(\n    DATESINPERIOD(\n        'Dim_Date'[Date],\n        MAX('Dim_Date'[Date]),\n        -3,\n        MONTH\n    ),\n    [Total Weeks]\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.YoY Change",
+    "dax": "[Total Weeks] - [Total Weeks PY]",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | spotify_prod.Duration (Min)",
+    "dax": "AVERAGE('spotify_prod'[duration_ms]) / 60000",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | Dim_Date.Check Type",
+    "dax": "MAX('spotify_prod'[danceability])",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | Danceability Threshold.Danceability Threshold Value",
+    "dax": "SELECTEDVALUE('Danceability Threshold'[Danceability Threshold], 0.7)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | Danceability Threshold.Dynamic HP Weeks",
+    "dax": "CALCULATE(\n    [Total Weeks],\n    'spotify_prod'[danceability] >\n    SELECTEDVALUE('Danceability Threshold'[Danceability Threshold])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "Spotify Performance Intell_6a57bb91 | Danceability Threshold.Above Threshold",
+    "dax": "VAR Threshold =\n    SELECTEDVALUE('Danceability Threshold'[Danceability Threshold])\nRETURN\nCALCULATE(\n    [Total Weeks],\n    FILTER(\n        'spotify_prod',\n        'spotify_prod'[danceability] > Threshold\n    )\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | DateTableTemplate_909fff8c-ecd5-47ee-ab1a-be46cb60e490.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | fact_enrollments.Total Enrollments",
+    "dax": "COUNT(fact_enrollments[enrollment_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | fact_enrollments.Avg Total Marks",
+    "dax": "AVERAGE(fact_enrollments[total_marks])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | fact_enrollments.Pass Rate",
+    "dax": "DIVIDE(\n    CALCULATE(COUNT(fact_enrollments[enrollment_id]), fact_enrollments[status] = \"Passed\"),\n    COUNT(fact_enrollments[enrollment_id])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | fact_enrollments.Avg Attendance",
+    "dax": "AVERAGE(fact_enrollments[attendance_percentage])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | fact_enrollments.sum marks",
+    "dax": "SUM(fact_enrollments[total_marks])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Total Faculty",
+    "dax": "COUNT(dim_faculty[faculty_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Avg Salary",
+    "dax": "AVERAGE(dim_faculty[salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Avg Experience",
+    "dax": "AVERAGE(dim_faculty[years_of_experience])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Total Publications",
+    "dax": "SUM(dim_faculty[publications])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Salary Rank",
+    "dax": "RANK(ORDERBY([salary], DESC))",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired YTD",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATESYTD(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired MTD",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATESMTD(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired QTD",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATESQTD(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired Last Year",
+    "dax": "CALCULATE(\n    [sum salary],\n    SAMEPERIODLASTYEAR(dim_faculty[joining_date].[Date])\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.Faculty Hired Last Month",
+    "dax": "CALCULATE(\n    [sum salary],\n    DATEADD(dim_faculty[joining_date].[Date], -1, MONTH)\n)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_faculty.sum salary",
+    "dax": "SUM(dim_faculty[salary])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_a5fd9646-2978-429d-bb4f-ce757eecfbb5.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_departments.Total Departments",
+    "dax": "COUNT(dim_departments[department_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_departments.Total Budget",
+    "dax": "SUM(dim_departments[budget_allocated])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_departments.Avg Department Budget",
+    "dax": "AVERAGE(dim_departments[budget_allocated])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_departments.Faculty Student Ratio",
+    "dax": "DIVIDE(SUM(dim_departments[total_faculty]), SUM(dim_departments[total_students]), 0)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_courses.Total Courses",
+    "dax": "COUNT(dim_courses[course_id])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_courses.Avg Credits",
+    "dax": "AVERAGE(dim_courses[credits])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_courses.Total Course Capacity",
+    "dax": "SUM(dim_courses[max_students])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | dim_courses.Course Utilization",
+    "dax": "DIVIDE([Total Enrollments], [Total Course Capacity], 0) *100",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Year",
+    "dax": "YEAR([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.MonthNo",
+    "dax": "MONTH([Date])",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Month",
+    "dax": "FORMAT([Date], \"MMMM\")",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.QuarterNo",
+    "dax": "INT(([MonthNo] + 2) / 3)",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Quarter",
+    "dax": "\"Qtr \" & [QuarterNo]",
+    "resolution_map": {}
+  },
+  {
+    "name": "University Analytics Dashb_d4dfc6d7 | LocalDateTable_9f303140-d25a-49b9-9054-89a40283ed3c.Day",
+    "dax": "DAY([Date])",
+    "resolution_map": {}
+  }
+]

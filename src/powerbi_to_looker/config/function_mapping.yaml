@@ -29,6 +29,8 @@ direct_mapping:
   GEOMEAN:          "EXP(AVG(LN({0})))"
   PRODUCT:          "EXP(SUM(LN({0})))"
   COUNTA:           COUNT           # COUNT in BQ counts non-null same as COUNTA
+  COUNT:             "COUNT({0})"
+  DISTINCTCOUNT:     "COUNT(DISTINCT {0})"
 
   # --- Statistical -------------------------------------------
   STDEV.P:          "STDDEV_POP"
@@ -60,6 +62,7 @@ direct_mapping:
   GCD:              null                       # → special
   LCM:              null                       # → special
   QUOTIENT:         "DIV({0}, {1})"
+  DIVIDE:           "IFNULL(SAFE_DIVIDE({0}, {1}), {2})"   # DIVIDE(num, denom, alt)
   TRUNC:            "TRUNC({0})"
   INT:              "CAST({0} AS INT64)"
   PI:               "ACOS(-1)"
@@ -91,8 +94,17 @@ direct_mapping:
   AND:              "({0} AND {1})"
   OR:               "({0} OR {1})"
   NOT:              "(NOT {0})"
+  IF:               "CASE WHEN {0} THEN {1} ELSE {2} END"
   TRUE:             "TRUE"
   FALSE:            "FALSE"
+  BLANK:            "NULL"                    # 0 args
+  NULLIF:           "NULLIF({0}, {1})"
+  COALESCE:         "COALESCE({0}, {1})"     # 2-arg; 3+ use handler
+  IFERROR:          "IFNULL({0}, {1})"
+  CONCATENATE:      "CONCAT({0}, {1})"
+  ROUND:            "ROUND({0}, {1})"
+  SELECTEDVALUE:    "COALESCE(MAX({0}), {1})"  # 2-arg approximation
+  ISBLANK:          "({0} IS NULL OR {0} = '')"
 
   # --- Information -------------------------------------------
   ISNUMBER:         "({0} IS NOT NULL)"              # approximate
@@ -110,6 +122,13 @@ direct_mapping:
   CURRENCY:         "CAST({0} AS FLOAT64)"
   DATEVALUE:        "DATE({0})"
   TIMEVALUE:        "TIME({0})"
+  FORMAT:           "FORMAT_DATE('%B', {0})"         # date -> month name (MMMM); arg1 format ignored in this template
+
+  # --- Table row count ---------------------------------------
+  COUNTROWS:        "(SELECT COUNT(*) FROM {0})"     # COUNTROWS(table) -> subquery; {0} = table name
+
+  # --- Window / ranking --------------------------------------
+  RANK:             "RANK() OVER (ORDER BY {0})"
 
 
 # ============================================================

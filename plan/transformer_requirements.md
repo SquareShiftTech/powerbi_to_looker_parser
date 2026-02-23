@@ -103,15 +103,57 @@ Every field gets `conversion_status`: `auto`, `partial`, or `manual` and a `mess
 
 #### f. Formula Generation (DAX AST to BigQuery SQL)
 
-Walk `formula_ast` recursively using node type discriminator. Function resolution order:
-1. Check `direct_mapping` in function_mapping.yaml — swap name, recurse args
-2. Check `special_mapping` — call named handler in code
-3. Check `unsupported` — set conversion_status = manual
-4. Not found — conversion_status = manual, message = "Unknown function: X"
+**Target:** BigQuery only. All emitted SQL is valid BigQuery (e.g. `SAFE_DIVIDE`, `EXTRACT(unit FROM col)`). Multi-dialect support is out of scope for now.
 
-VAR/RETURN: inline if scalar, CTE if referencing another VAR, manual if contains CALCULATE/FILTER/SUMMARIZE.
+**Config:** `config/function_mapping.yaml` with:
+- **direct_mapping** — Function name → BigQuery expression. Either a simple name (args passed through as `FUNC(arg1, arg2)`) or a template string with `{0}`, `{1}`, … for positional args. Recursively convert each arg and substitute.
+- **extract_mapping** — DAX functions that become `EXTRACT(unit FROM col)` in BigQuery (e.g. YEAR, MONTH, DAY).
+- **rewrite_templates** (optional) — Same as direct_mapping but for formulas that need a structural rewrite (e.g. DIVIDE → `IFNULL(SAFE_DIVIDE({0}, {1}), {2})`, IF → `CASE WHEN {0} THEN {1} ELSE {2} END`). Implemented either as entries in direct_mapping or a separate section; converter substitutes converted args into the template.
+- **special_mapping** — Named handler in code for variable arity or non-template rewrites (e.g. SWITCH with N WHEN clauses). Call handler with (args, resolution_map, config).
+- **unsupported** — List of DAX functions that cannot be auto-converted; set conversion_status = manual and message from config.
 
-Unqualified column refs (e.g. `[Total Revenue]`) are resolved via the **view’s field name resolution map** (§a') to the **final** `field_name` (after cleanup and deduplication). Emit that in Looker syntax, e.g. `${total_revenue}` or `${total_revenue_4492}` when that is the final name. Never use raw or only-cleaned names that might not match the view.
+**Function resolution order (per FunctionCall node):**
+1. **unsupported** — if function in list → conversion_status = manual, message from config.
+2. **extract_mapping** — if present → emit `EXTRACT(unit FROM converted_arg)`.
+3. **direct_mapping** — if present → apply template or `FUNC(args)`; recurse on args.
+4. **rewrite_templates** — if used as separate section, same as direct (template + args).
+5. **special_mapping** — if present → call named handler in code.
+6. **Not found** — conversion_status = manual, message = "Unknown function: X".
+
+**VAR/RETURN:** Inline if scalar; CTE if one VAR references another; manual if contains CALCULATE/FILTER/SUMMARIZE. (Implementation may follow in a later phase.)
+
+**Unqualified column refs** (e.g. `[Total Revenue]`) are resolved via the **view’s field name resolution map** (§a') to the **final** `field_name`. Emit in Looker syntax, e.g. `${total_revenue}` or `${total_revenue_4492}`. Never emit raw or only-cleaned names that might not match the view.
+
+---
+
+#### f.1 Formula converter improvements (pending approval)
+
+The following requirements are proposed for implementation. **Approval is requested** before coding.
+
+**1. Refactor formula converter for readability**
+
+- The formula converter module (`transformer/views/formula_converter.py`) shall be refactored so that:
+  - A single top-level `convert(ast, resolution_map, config)` only normalizes node type and dispatches to small helper functions.
+  - One helper per AST node kind: e.g. `_convert_column_ref`, `_convert_literal`, `_convert_binop`, `_convert_function`.
+  - Function-call resolution (unsupported → extract → direct → special → unknown) lives inside `_convert_function`; template substitution may be in a small `_apply_direct_template` (or equivalent).
+- No new frameworks or visitor pattern; same file, same config, clearer control flow.
+
+**2. Template-based support for majority of formulas**
+
+- Template-based rewrites (via `direct_mapping` and optionally a dedicated `rewrite_templates` section in `function_mapping.yaml`) shall be the **primary** mechanism for DAX → BigQuery.
+- Extend `direct_mapping` (and implement `rewrite_templates` in code if used) so that the **majority** of formulas seen in real reports convert automatically. Add templates for common functions that are currently "Unknown" or manual where a fixed template fits (e.g. NULLIF, COALESCE, IFERROR, CONCATENATE, SELECTEDVALUE approximation, ROUND; SWITCH only where a fixed-arity pattern is documented).
+- Code handlers (`special_mapping`) remain only for variable arity or non-template cases (e.g. SWITCH with N WHENs, COUNTROWS with table context).
+
+**3. Test cases from real source formulas**
+
+- Add a test dataset and tests that use **real DAX formulas** from the repo to assert conversion to BigQuery:
+  - **Source:** Formulas (and when available `formula_ast`) from `canonical_output/<report_id>/metadata_model.json` and/or `parsed_output/...` (e.g. Model/database.json). Collect a representative list (e.g. 10–20 cases) covering DIVIDE, IF, COUNT, DISTINCTCOUNT, SWITCH, FORMAT, CALCULATE (expect manual), etc.
+  - **Fixture:** A structured fixture (e.g. `tests/transformer/fixtures/real_formulas.json` or YAML) listing: report/source, field identifier, original formula or AST reference, optional `resolution_map`, and expected BigQuery SQL (or a pattern to assert, e.g. `"SAFE_DIVIDE" in result`).
+  - **Tests:** In `tests/transformer/test_formula_converter.py` (or a dedicated `test_formula_converter_real.py`): load fixture, for each case call `convert(ast, resolution_map)` (or `convert_with_status`), assert result matches expected BQ or pattern. Ensures refactor and template additions do not regress real-world formulas.
+
+**Implementation order (after approval):** (1) Refactor converter for readability; (2) extend templates to support majority of formulas; (3) add real-formula fixture and tests.
+
+---
 
 #### g. Datetime Field to dimension_group
 
