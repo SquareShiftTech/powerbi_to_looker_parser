@@ -796,16 +796,6 @@ def _extract_calculate_condition(node, res_map, cfg, convert_fn):
 
 def _wrap_with_case_when(expr_node, condition, res_map, cfg, convert_fn):
     """Wrap a simple aggregate with CASE WHEN condition."""
-    node_type = _normalize_node_type(expr_node)
-    
-    # Handle column reference (measure reference) - apply condition directly
-    if node_type == "column_ref":
-        col_sql = convert_fn(expr_node, res_map, cfg)
-        # For a measure reference, we can't know the aggregation, so wrap in CASE WHEN
-        # This is a partial conversion - assumes the measure is an aggregation
-        return f"CASE WHEN {condition} THEN {col_sql} ELSE NULL END"
-    
-    # Handle function calls
     name = (expr_node.get("name") or "").upper()
     inner_args = expr_node.get("args") or []
 

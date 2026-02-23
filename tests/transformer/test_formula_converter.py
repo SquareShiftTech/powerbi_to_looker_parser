@@ -12,12 +12,15 @@ def test_sum_direct_mapping():
     assert "revenue" in convert(ast).lower()
 
 
-def test_calculate_is_unsupported():
-    ast = {"type": "FunctionCall", "name": "CALCULATE", "args": []}
+def test_calculate_is_partially_supported():
+    # CALCULATE with no filters - should convert
+    ast = {"type": "FunctionCall", "name": "CALCULATE", 
+           "args": [{"type": "FunctionCall", "name": "SUM", 
+                    "args": [{"type": "ColumnRef", "column": "Revenue"}]}]}
     result = convert_with_status(ast)
-    assert result["conversion_status"] == "manual"
-    assert result["bq_formula"] is None
-    assert "CALCULATE" in (result.get("message") or "")
+    assert result["conversion_status"] in ("auto", "partial")
+    assert result["bq_formula"] is not None
+    assert "SUM" in result["bq_formula"]
 
 
 def test_unknown_function_is_manual():

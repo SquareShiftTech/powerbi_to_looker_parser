@@ -22,6 +22,7 @@ Requires-Dist: pandas>=2.0.0
 Requires-Dist: pyyaml>=6.0.0
 Requires-Dist: pybix
 Requires-Dist: lark<2.0.0,>=1.1.0
+Requires-Dist: PyGithub>=2.0.0
 Provides-Extra: dev
 Requires-Dist: pytest<9.0.0,>=8.0.0; extra == "dev"
 Requires-Dist: ruff<1.0.0,>=0.3.0; extra == "dev"
@@ -73,6 +74,10 @@ result = engine.migrate_file(
 
 print(result["files_written"])  # paths to .view.lkml and .model.lkml
 ```
+
+## Demo
+
+See [docs/DEMO.md](docs/DEMO.md) for end-to-end demo: run integration pipeline → push LookML to GitHub.
 
 ## Development
 

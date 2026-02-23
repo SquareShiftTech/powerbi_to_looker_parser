@@ -6,6 +6,7 @@ pandas>=2.0.0
 pyyaml>=6.0.0
 pybix
 lark<2.0.0,>=1.1.0
+PyGithub>=2.0.0
 
 [dev]
 pytest<9.0.0,>=8.0.0

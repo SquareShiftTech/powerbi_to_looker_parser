@@ -46,6 +46,10 @@ result = engine.migrate_file(
 print(result["files_written"])  # paths to .view.lkml and .model.lkml
 ```
 
+## Demo
+
+See [docs/DEMO.md](docs/DEMO.md) for end-to-end demo: run integration pipeline → push LookML to GitHub.
+
 ## Development
 
 ```bash
