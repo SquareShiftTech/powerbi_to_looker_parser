@@ -10,10 +10,13 @@ uv sync
 # or: pip install -r requirements.txt
 
 # Set environment variables
-export GITHUB_TOKEN="your_github_token"
-export GITHUB_REPO_URL="https://github.com/owner/repo.git"
-export GITHUB_BRANCH="feat/looker-demo-phase1"
-export GITHUB_FOLDER="Education_24b04535"  # Optional: push only this folder
+$env:GITHUB_TOKEN="your_github_token_here"
+$env:GITHUB_REPO_URL="https://github.com/SquareShiftTech/looker_demo_repository.git"
+$env:GITHUB_BRANCH="feat/looker-demo-phase1"
+$env:GITHUB_FOLDER="Education_24b04535"
+python scripts/push_to_github.py --verbose
+
+folder
 ```
 
 ## Demo Steps
