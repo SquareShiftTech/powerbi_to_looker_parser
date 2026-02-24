@@ -18,6 +18,7 @@ Run from repo root:
   uv run python scripts/run_integration.py --skip-canonical  # stop after parse
   uv run python scripts/run_integration.py --skip-transformer # stop after step 3
   uv run python scripts/run_integration.py --skip-generator  # stop after step 4
+  uv run python scripts/run_integration.py --report MyReport  # run only for report named MyReport
 """
 
 import argparse
@@ -39,6 +40,7 @@ from powerbi_to_looker.parser_normalizer import discover_report_folders, load  #
 from powerbi_to_looker.parser_normalizer.dashboard.orchestrator import run_viz  # noqa: E402
 from powerbi_to_looker.parser_normalizer.semantic.orchestrator import run as run_semantic  # noqa: E402
 from powerbi_to_looker.transformer.orchestrator import run as run_transformer  # noqa: E402
+from powerbi_to_looker.generator._helpers import sanitize_report_name_for_looker  # noqa: E402
 from powerbi_to_looker.generator.writer import write as write_lookml  # noqa: E402
 from powerbi_to_looker.models.artifact import SemanticLayerArtifact  # noqa: E402
 
@@ -95,6 +97,7 @@ def step1_download(
     workspace_id: str | None,
     workspace_name: str | None,
     skip_name_contains: list[str],
+    report_filter: str | None = None,
 ) -> tuple[int, int]:
     """List and download .pbix into output_dir. Returns (ok_count, fail_count)."""
     collector: CollectorProtocol = Collector()
@@ -111,6 +114,8 @@ def step1_download(
         rid, name = r.get("id"), r.get("name") or "report"
         if not rid:
             fail += 1
+            continue
+        if report_filter and name != report_filter and _short_stem(name) != report_filter and report_filter not in name:
             continue
         if skip and any(s in name.lower() for s in skip):
             continue
@@ -132,6 +137,7 @@ def step2_parse(
     pbix_dir: Path,
     parsed_output_dir: Path,
     pbi_tools_exe: str | None,
+    report_filter: str | None = None,
 ) -> tuple[int, int]:
     """Parse all .pbix in pbix_dir into parsed_output_dir. Returns (ok_count, fail_count)."""
     if not pbi_tools_exe:
@@ -142,6 +148,8 @@ def step2_parse(
     ok, fail = 0, 0
     for pbix_path in pbix_files:
         if not pbix_path.is_file():
+            continue
+        if report_filter and pbix_path.stem != report_filter and _short_stem(pbix_path.stem) != report_filter:
             continue
         out_folder = parsed_output_dir / _short_stem(pbix_path.stem)
         out_folder.mkdir(parents=True, exist_ok=True)
@@ -279,7 +287,11 @@ def process_one_report_transformer(
     return entry
 
 
-def step4_transformer(canonical_output_dir: Path, transformer_output_dir: Path) -> tuple[int, int]:
+def step4_transformer(
+    canonical_output_dir: Path,
+    transformer_output_dir: Path,
+    report_filter: str | None = None,
+) -> tuple[int, int]:
     """
     For each report folder in canonical_output_dir that has metadata_model.json, run transformer.
     Writes to transformer_output_dir/report_id/semantic_layer_artifact.json. _manifest.json in transformer_output_dir.
@@ -290,6 +302,7 @@ def step4_transformer(canonical_output_dir: Path, transformer_output_dir: Path) 
     report_dirs = [
         p for p in canonical_output_dir.iterdir()
         if p.is_dir() and (p / "metadata_model.json").exists()
+        and (not report_filter or p.name == report_filter)
     ]
     if not report_dirs:
         return 0, 0
@@ -312,7 +325,8 @@ def process_one_report_generator(
 ) -> dict[str, Any]:
     """
     Run generator for one report: read transformer_output_dir/report_id/semantic_layer_artifact.json
-    -> write_lookml -> generator_output_dir/report_id/ (views/, models/, manifest.lkml).
+    -> write_lookml -> generator_output_dir/<clean_name>/ (views/, models/, manifest.lkml).
+    Output folder name is sanitized for Looker deployment (no spaces/special chars).
     Returns manifest entry.
     """
     entry: dict[str, Any] = {"report_id": report_id, "success": False}
@@ -338,10 +352,12 @@ def process_one_report_generator(
         entry["stage"] = "generator"
         return entry
     try:
-        out_dir = generator_output_dir / report_id
+        clean_name = sanitize_report_name_for_looker(report_id)
+        out_dir = generator_output_dir / clean_name
         out_dir.mkdir(parents=True, exist_ok=True)
         written = write_lookml(artifact, out_dir)
         entry["success"] = True
+        entry["output_folder"] = clean_name
         entry["generated"] = [str(p) for p in written]
     except Exception as e:
         entry["error"] = str(e)
@@ -349,7 +365,11 @@ def process_one_report_generator(
     return entry
 
 
-def step5_generator(transformer_output_dir: Path, generator_output_dir: Path) -> tuple[int, int]:
+def step5_generator(
+    transformer_output_dir: Path,
+    generator_output_dir: Path,
+    report_filter: str | None = None,
+) -> tuple[int, int]:
     """
     For each report in transformer_output_dir that has semantic_layer_artifact.json, run generator.
     Writes to generator_output_dir/report_id/ (views/, models/, manifest.lkml). Return (ok_count, fail_count).
@@ -359,6 +379,7 @@ def step5_generator(transformer_output_dir: Path, generator_output_dir: Path) ->
     report_dirs = [
         p for p in transformer_output_dir.iterdir()
         if p.is_dir() and (p / "semantic_layer_artifact.json").exists()
+        and (not report_filter or p.name == report_filter)
     ]
     if not report_dirs:
         return 0, 0
@@ -371,13 +392,19 @@ def step5_generator(transformer_output_dir: Path, generator_output_dir: Path) ->
     return ok, len(manifest) - ok
 
 
-def step3_canonical(parsed_output_dir: Path, canonical_output_dir: Path) -> tuple[int, int]:
+def step3_canonical(
+    parsed_output_dir: Path,
+    canonical_output_dir: Path,
+    report_filter: str | None = None,
+) -> tuple[int, int]:
     """
     Per-report canonical loop (Option B): discover folders → for each report run
     process_one_report_canonical → write _manifest.json. Returns (ok_count, fail_count).
     """
     canonical_output_dir.mkdir(parents=True, exist_ok=True)
     report_folders = discover_report_folders(parsed_output_dir)
+    if report_filter:
+        report_folders = [(rid, path) for rid, path in report_folders if rid == report_filter]
     if not report_folders:
         return 0, 0
 
@@ -408,6 +435,8 @@ def main() -> None:
     p.add_argument("--skip-generator", action="store_true", help="Stop after step 4 (skip generator)")
     p.add_argument("--workspace-name", type=str, default=os.environ.get("PBI_WORKSPACE_NAME") or DEFAULT_WORKSPACE_NAME)
     p.add_argument("--skip-name-contains", type=str, action="append", default=[], metavar="TEXT")
+    p.add_argument("--report", type=str, default=None, metavar="NAME",
+                   help="Run only for this report (report name, .pbix stem, or report folder name)")
     args = p.parse_args()
 
     output_dir = args.output_dir.resolve()
@@ -419,10 +448,14 @@ def main() -> None:
     workspace_id = os.environ.get("PBI_WORKSPACE_ID")
     workspace_name = args.workspace_name
 
+    report_filter = (args.report or "").strip() or None
+
     # Step 1 — Download (default: skipped)
     if args.download and (workspace_id or workspace_name):
         print("Step 1: List and download .pbix ...")
-        ok1, fail1 = step1_download(output_dir, workspace_id, workspace_name, args.skip_name_contains)
+        ok1, fail1 = step1_download(
+            output_dir, workspace_id, workspace_name, args.skip_name_contains, report_filter
+        )
         print(f"  Download: {ok1} ok, {fail1} failed")
     else:
         if not args.download and not output_dir.exists():
@@ -436,7 +469,7 @@ def main() -> None:
     if not pbi_tools:
         print("  PBI_TOOLS_EXE not set; skipping parse.", file=sys.stderr)
     else:
-        ok2, fail2 = step2_parse(output_dir, parsed_dir, pbi_tools)
+        ok2, fail2 = step2_parse(output_dir, parsed_dir, pbi_tools, report_filter)
         print(f"  Parse: {ok2} ok, {fail2} failed")
 
     # Step 3 — Canonical
@@ -444,7 +477,7 @@ def main() -> None:
         print("Step 3: Skipped (--skip-canonical).")
         return
     print("Step 3: Canonical mapping ...")
-    ok3, fail3 = step3_canonical(parsed_dir, canonical_dir)
+    ok3, fail3 = step3_canonical(parsed_dir, canonical_dir, report_filter)
     print(f"  Canonical: {ok3} ok, {fail3} failed")
     if fail3:
         print(f"  Manifest: {canonical_dir / '_manifest.json'}")
@@ -454,7 +487,7 @@ def main() -> None:
         print("Step 4: Skipped (--skip-transformer).")
         return
     print("Step 4: Transformer - metadata_model.json -> transformer_output/.../semantic_layer_artifact.json ...")
-    ok4, fail4 = step4_transformer(canonical_dir, transformer_dir)
+    ok4, fail4 = step4_transformer(canonical_dir, transformer_dir, report_filter)
     print(f"  Transformer: {ok4} ok, {fail4} failed")
 
     # Step 5 — Generator (transformer_output -> generator_output)
@@ -462,7 +495,7 @@ def main() -> None:
         print("Step 5: Skipped (--skip-generator).")
         return
     print("Step 5: Generator - semantic_layer_artifact.json -> generator_output/.../ (views, models, manifest) ...")
-    ok5, fail5 = step5_generator(transformer_dir, generator_dir)
+    ok5, fail5 = step5_generator(transformer_dir, generator_dir, report_filter)
     print(f"  Generator: {ok5} ok, {fail5} failed")
 
 
