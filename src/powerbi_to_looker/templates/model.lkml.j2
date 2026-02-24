@@ -1,7 +1,8 @@
-include: "*.view.lkml"
+include: "/views/*.view.lkml"                # include all views in the views/ folder in this project
+include: "/**/*.view.lkml"  
 include: "*.dashboard.lookml"
 
-connection: "{{ model.connection | default('t2l') }}"
+connection: "{{ model.connection | default('p2l'}"
 
 {% for exp in model.explores | default([]) %}
 explore: {{ exp.name }} {

@@ -24,6 +24,8 @@ class ArtifactField(BaseModel):
     message: str | None = None
     original_formula: str | None = None
     bq_formula: str | None = None
+    # two_step = hidden dimension + measure (aggregation set); one_step = single measure (model measure, no aggregation)
+    measure_pattern: str | None = None  # "two_step" | "one_step" for measures; None for dimensions
 
 
 class ArtifactView(BaseModel):

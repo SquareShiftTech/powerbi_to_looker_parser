@@ -18,6 +18,18 @@ def _get_config() -> dict[str, Any]:
         return {}
 
 
+def infer_measure_type_from_formula_ast(formula_ast: Any) -> str | None:
+    """Infer Looker measure type from model measure formula AST (e.g. COUNT -> count). Returns None if not inferrable."""
+    if not formula_ast or not isinstance(formula_ast, dict):
+        return None
+    name = (formula_ast.get("name") or "").strip().upper()
+    if not name:
+        return None
+    config = _get_config()
+    agg_to_measure = config.get("aggregation_to_measure_type") or {}
+    return agg_to_measure.get(name)
+
+
 def map_field_type(
     data_type: str | None,
     aggregation: str | None,

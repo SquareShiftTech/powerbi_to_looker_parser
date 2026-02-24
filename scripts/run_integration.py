@@ -78,6 +78,21 @@ def _short_stem(stem: str) -> str:
     return stem[: _MAX_STEM_LEN - 9] + "_" + stem[-8:]
 
 
+def _report_matches_filter(report_id: str, report_filter: str | None) -> bool:
+    """True if this report should be included given --report filter.
+
+    Handles full .pbix stem vs short folder name: parsed_output uses _short_stem(stem)
+    as folder name, so user can pass either full name or short name.
+    """
+    if not report_filter:
+        return True
+    if report_id == report_filter:
+        return True
+    if _short_stem(report_filter) == report_id:
+        return True
+    return False
+
+
 def _credentials() -> dict[str, str]:
     """Same logic as run_collector: env overrides, else DEFAULT_CREDENTIALS."""
     if os.environ.get("PBI_ACCESS_TOKEN"):
@@ -302,7 +317,7 @@ def step4_transformer(
     report_dirs = [
         p for p in canonical_output_dir.iterdir()
         if p.is_dir() and (p / "metadata_model.json").exists()
-        and (not report_filter or p.name == report_filter)
+        and _report_matches_filter(p.name, report_filter)
     ]
     if not report_dirs:
         return 0, 0
@@ -379,7 +394,7 @@ def step5_generator(
     report_dirs = [
         p for p in transformer_output_dir.iterdir()
         if p.is_dir() and (p / "semantic_layer_artifact.json").exists()
-        and (not report_filter or p.name == report_filter)
+        and _report_matches_filter(p.name, report_filter)
     ]
     if not report_dirs:
         return 0, 0
@@ -404,7 +419,7 @@ def step3_canonical(
     canonical_output_dir.mkdir(parents=True, exist_ok=True)
     report_folders = discover_report_folders(parsed_output_dir)
     if report_filter:
-        report_folders = [(rid, path) for rid, path in report_folders if rid == report_filter]
+        report_folders = [(rid, path) for rid, path in report_folders if _report_matches_filter(rid, report_filter)]
     if not report_folders:
         return 0, 0
 
@@ -435,7 +450,7 @@ def main() -> None:
     p.add_argument("--skip-generator", action="store_true", help="Stop after step 4 (skip generator)")
     p.add_argument("--workspace-name", type=str, default=os.environ.get("PBI_WORKSPACE_NAME") or DEFAULT_WORKSPACE_NAME)
     p.add_argument("--skip-name-contains", type=str, action="append", default=[], metavar="TEXT")
-    p.add_argument("--report", type=str, default=None, metavar="NAME",
+    p.add_argument("--report", type=str, default="Education_24b04535", metavar="NAME",
                    help="Run only for this report (report name, .pbix stem, or report folder name)")
     args = p.parse_args()
 

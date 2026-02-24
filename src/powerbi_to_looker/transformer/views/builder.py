@@ -6,7 +6,7 @@ from typing import Any
 from powerbi_to_looker.common.yaml_loader import load_yaml
 from powerbi_to_looker.models.artifact import ArtifactField, ArtifactView
 from powerbi_to_looker.transformer.views.field_cleanup import clean_field_name, deduplicate_field_names
-from powerbi_to_looker.transformer.views.field_type_mapping import map_field_type
+from powerbi_to_looker.transformer.views.field_type_mapping import infer_measure_type_from_formula_ast, map_field_type
 from powerbi_to_looker.transformer.views.formula_converter import convert_with_status
 
 _CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "looker_reserved_words.yaml"
@@ -79,31 +79,62 @@ def build_views(
             x["field_name"] = clean_field_name(x.get("name") or "", reserved)
         deduplicate_field_names(table_fields, name_key="name", id_key="id", reserved_words=reserved)
 
-        # 2) Resolution map: original name -> final field_name (first occurrence wins)
+        # 2) Pass 1: Classify each field (two_step vs one_step measure vs dimension/dimension_group)
+        for x in table_fields:
+            data_type = x.get("data_type")
+            aggregation = x.get("aggregation")
+            orig_name = (x.get("name") or "").strip()
+            type_info = map_field_type(data_type, aggregation, orig_name)
+            canonical_field_type = (x.get("field_type") or "").strip().lower()
+            if canonical_field_type in ("measure", "dimension", "dimension_group"):
+                field_type = canonical_field_type
+            else:
+                field_type = type_info["field_type"]
+            dt_lower = (data_type or "").strip().lower()
+            if field_type == "dimension" and dt_lower in ("datetime", "date", "time"):
+                field_type = "dimension_group"
+            if field_type == "measure":
+                x["_measure_pattern"] = "two_step" if aggregation else "one_step"
+            else:
+                x["_measure_pattern"] = None
+            x["_field_type"] = field_type
+            x["_looker_type"] = type_info["looker_type"]
+            x["_timeframes"] = type_info.get("timeframes")
+            x["_value_format"] = type_info.get("value_format")
+            x["_conversion_status"] = type_info.get("conversion_status") or "auto"
+            if field_type == "measure" and not aggregation and x.get("formula_ast"):
+                inferred = infer_measure_type_from_formula_ast(x["formula_ast"])
+                if inferred:
+                    x["_looker_type"] = inferred
+                else:
+                    x["_looker_type"] = type_info.get("looker_type") or "number"
+
+        # 3) Resolution map for formula refs: two_step -> ${field_name_measure}, one_step/dimension -> ${field_name}
         resolution_map: dict[str, str] = {}
         for x in table_fields:
             orig = (x.get("name") or "").strip()
-            if orig and orig not in resolution_map:
-                resolution_map[orig] = x.get("field_name") or ""
+            if not orig or orig in resolution_map:
+                continue
+            fname = x.get("field_name") or ""
+            resolution_map[orig] = fname + "_measure" if x.get("_measure_pattern") == "two_step" else fname
 
-        # 3) Build ArtifactField for each
+        # 4) Pass 2: Build ArtifactField for each (formula translation uses resolution_map)
         artifact_fields: list[ArtifactField] = []
         for x in table_fields:
             fname = x.get("field_name") or ""
             orig_name = (x.get("name") or "").strip()
-            data_type = x.get("data_type")
-            aggregation = x.get("aggregation")
             formula_ast = x.get("formula_ast")
             formula = x.get("formula")
             source_column = (x.get("source_column") or "").strip()
             is_calculated = x.get("is_calculated") or False
-
-            type_info = map_field_type(data_type, aggregation, orig_name)
-            field_type = type_info["field_type"]
-            looker_type = type_info["looker_type"]
-            timeframes = type_info.get("timeframes")
-            value_format = type_info.get("value_format")
-            conversion_status = type_info.get("conversion_status") or "auto"
+            field_type = x["_field_type"]
+            measure_pattern = x.get("_measure_pattern")
+            looker_type = x["_looker_type"]
+            if measure_pattern == "one_step":
+                looker_type = "number"
+            timeframes = x.get("_timeframes")
+            value_format = x.get("_value_format")
+            conversion_status = x.get("_conversion_status") or "auto"
             message = None
             sql = ""
             bq_formula = None
@@ -162,10 +193,11 @@ def build_views(
                     message=message,
                     original_formula=formula,
                     bq_formula=bq_formula,
+                    measure_pattern=measure_pattern,
                 )
             )
 
-        # 4) Field ordering: dimensions -> dimension_groups -> measures; alphabetical within group
+        # 5) Field ordering: dimensions -> dimension_groups -> measures
         def _order_key(f: ArtifactField) -> tuple[int, str]:
             if f.field_type == "dimension":
                 return (0, f.field_name)
@@ -175,7 +207,7 @@ def build_views(
 
         artifact_fields.sort(key=_order_key)
 
-        # 5) View-level sql_table_name / derived_table_sql
+        # 6) View-level sql_table_name / derived_table_sql
         sql_table_name = None
         derived_table_sql = None
         conversion_status = "auto"

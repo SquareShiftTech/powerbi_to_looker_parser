@@ -36,13 +36,21 @@ def _comment_dax_lines(text: str | None) -> str:
     return "\n# ".join(lines)
 
 
+def _description_quote_escape(text: str | None) -> str:
+    """Escape a string for use inside a double-quoted LookML/YAML scalar so no embedded #, :, or [] are interpreted."""
+    if not text:
+        return ""
+    s = text.replace("\r\n", "\n").replace("\r", "\n")
+    return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+
+
 def write(artifact: "SemanticLayerArtifact", output_dir: str | Path) -> list[str]:
     """Render artifact to LookML files. Returns list of written file paths.
 
     Writes:
       - views/{view_name}.view.lkml for each view
       - models/{project_name}.model.lkml
-      - manifest.lkml
+      - (manifest.lkml temporarily disabled)
     """
     output_dir = Path(output_dir)
     env = Environment(
@@ -51,6 +59,7 @@ def write(artifact: "SemanticLayerArtifact", output_dir: str | Path) -> list[str
     )
     env.filters["sql_quote_table_column"] = _sql_quote_table_column
     env.filters["comment_dax_lines"] = _comment_dax_lines
+    env.filters["description_quote_escape"] = _description_quote_escape
     written: list[str] = []
 
     # Views
@@ -72,11 +81,11 @@ def write(artifact: "SemanticLayerArtifact", output_dir: str | Path) -> list[str
     model_path.write_text(model_content, encoding="utf-8")
     written.append(str(model_path))
 
-    # Manifest
-    manifest_tpl = env.get_template("manifest.lkml.j2")
-    manifest_content = manifest_tpl.render(artifact=artifact)
-    manifest_path = output_dir / "manifest.lkml"
-    manifest_path.write_text(manifest_content, encoding="utf-8")
-    written.append(str(manifest_path))
+    # Manifest — temporarily disabled (has issues)
+    # manifest_tpl = env.get_template("manifest.lkml.j2")
+    # manifest_content = manifest_tpl.render(artifact=artifact)
+    # manifest_path = output_dir / "manifest.lkml"
+    # manifest_path.write_text(manifest_content, encoding="utf-8")
+    # written.append(str(manifest_path))
 
     return written

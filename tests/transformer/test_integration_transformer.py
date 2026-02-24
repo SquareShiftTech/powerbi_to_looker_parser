@@ -52,3 +52,47 @@ def test_conversion_summary_totals_correct():
     artifact = run_transformer(MINIMAL_METADATA)
     s = artifact.conversion_summary
     assert s.auto + s.partial + s.manual == s.total_fields
+
+
+def test_canonical_measure_without_aggregation_becomes_artifact_measure():
+    """Model measures (field_type=measure, aggregation=null) use canonical field_type and infer looker_type from formula AST."""
+    metadata_with_model_measure = {
+        "metadata_version": "1.0",
+        "source_system": "powerbi",
+        "extracted_at": "2026-01-01T00:00:00Z",
+        "datasources": [
+            {
+                "id": "ds1",
+                "name": "TestDS",
+                "source_system": "powerbi",
+                "datasource_type": "embedded",
+                "connection": {"type": "import", "database": "p", "schema": "s", "connection_provider": "bigquery"},
+                "tables": [
+                    {"id": "t1", "name": "t", "schema": "s", "table_name": "t", "table_type": "physical", "formula": None},
+                ],
+                "table_relationships": [],
+                "fields": [
+                    {
+                        "id": "m1",
+                        "name": "Total Enrollments",
+                        "field_type": "measure",
+                        "data_type": "number",
+                        "source_table": "t",
+                        "source_column": None,
+                        "aggregation": None,
+                        "formula": "COUNT(t[enrollment_id])",
+                        "formula_ast": {"type": "FunctionCall", "name": "COUNT", "args": []},
+                        "is_calculated": True,
+                    },
+                ],
+            }
+        ],
+    }
+    artifact = run_transformer(metadata_with_model_measure)
+    assert len(artifact.views) == 1
+    view = artifact.views[0]
+    measure_fields = [f for f in view.fields if f.field_type == "measure"]
+    assert len(measure_fields) == 1
+    assert measure_fields[0].field_name == "total_enrollments"
+    # One-step measures (aggregation=null) get looker_type forced to "number"
+    assert measure_fields[0].looker_type == "number"

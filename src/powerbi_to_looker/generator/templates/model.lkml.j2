@@ -1,8 +1,10 @@
 # Model: {{ artifact.project_name }}
 
-include: "*.view.lkml"
+include: "/views/*.view.lkml"                # include all views in the views/ folder in this project
+include: "/**/*.view.lkml"
+include: "*.dashboard.lookml"
 
-connection: "t2l"
+connection: "p2l"
 
 {%- for explore in artifact.explores %}
 explore: {{ explore.explore_name }} {

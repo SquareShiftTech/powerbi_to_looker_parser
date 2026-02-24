@@ -2,7 +2,7 @@
 
 import pytest
 
-from powerbi_to_looker.transformer.views.field_type_mapping import map_field_type
+from powerbi_to_looker.transformer.views.field_type_mapping import infer_measure_type_from_formula_ast, map_field_type
 
 
 def test_string_maps_to_dimension():
@@ -39,3 +39,19 @@ def test_unknown_data_type_falls_back_to_string():
     result = map_field_type(data_type="exotic_type", aggregation=None)
     assert result["looker_type"] == "string"
     assert result["conversion_status"] == "partial"
+
+
+def test_infer_measure_type_from_formula_ast_count():
+    ast = {"type": "FunctionCall", "name": "COUNT", "args": []}
+    assert infer_measure_type_from_formula_ast(ast) == "count"
+
+
+def test_infer_measure_type_from_formula_ast_sum():
+    ast = {"name": "SUM"}
+    assert infer_measure_type_from_formula_ast(ast) == "sum"
+
+
+def test_infer_measure_type_from_formula_ast_unknown_returns_none():
+    assert infer_measure_type_from_formula_ast({"name": "SOMETHING"}) is None
+    assert infer_measure_type_from_formula_ast(None) is None
+    assert infer_measure_type_from_formula_ast([]) is None

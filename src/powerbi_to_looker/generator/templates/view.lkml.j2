@@ -1,4 +1,4 @@
-{# View: one view per artifact view. Measures use two-step: dimension {field_name}_measure then measure {field_name}. #}
+{# View: one view per artifact view. Measures: two_step = hidden dimension + measure; one_step = single measure (type: number, sql: formula). #}
 view: {{ view.view_name }} {
 
   {%- if view.sql_table_name %}
@@ -10,17 +10,14 @@ view: {{ view.view_name }} {
   {%- endif %}
 
   {%- for field in view.fields %}
-  {%- if field.field_type == 'measure' %}
-  {# Two-step measure: dimension _measure then measure #}
+  {%- if field.field_type == 'measure' and field.measure_pattern == 'two_step' %}
+  {# Two-step: hidden dimension with sql, measure points to it with type from aggregation #}
   dimension: {{ field.field_name }}_measure {
-    type: {{ field.looker_type }}
+    type: number
+    hidden: yes
     {%- if field.conversion_status == 'manual' %}
-    description: |
-      Original DAX: {{ field.original_formula | comment_dax_lines }}
-      [MANUAL REVIEW REQUIRED]
-      {%- if field.message %}
-      Reason: {{ field.message }}
-      {%- endif %}
+    {%- set _manual_desc = "Original DAX: " ~ (field.original_formula | comment_dax_lines) ~ "\n" ~ "[MANUAL REVIEW REQUIRED]" ~ ("\nReason: " ~ field.message if field.message else "") %}
+    description: "{{ _manual_desc | description_quote_escape }}"
     sql: NULL ;;
     {%- else %}
     {%- if field.original_formula %}
@@ -38,8 +35,31 @@ view: {{ view.view_name }} {
 
   measure: {{ field.field_name }} {
     type: {{ field.looker_type }}
-    {%- set measure_ref = '${' ~ field.field_name ~ '_measure}' %}
-    sql: {{ measure_ref }} ;;
+    sql: ${ {{- field.field_name -}}_measure} ;;
+    {%- if field.value_format %}
+    value_format_name: {{ field.value_format }}
+    {%- endif %}
+    {%- if field.label %}
+    label: "{{ field.label | replace('"', '\\"') }}"
+    {%- endif %}
+  }
+  {%- elif field.field_type == 'measure' %}
+  {# One-step measure (or fallback when measure_pattern not set): type number, sql = translated DAX #}
+  measure: {{ field.field_name }} {
+    type: number
+    {%- if field.conversion_status == 'manual' %}
+    {%- set _manual_desc = "Original DAX: " ~ (field.original_formula | comment_dax_lines) ~ "\n" ~ "[MANUAL REVIEW REQUIRED]" ~ ("\nReason: " ~ field.message if field.message else "") %}
+    description: "{{ _manual_desc | description_quote_escape }}"
+    sql: NULL ;;
+    {%- else %}
+    {%- if field.original_formula %}
+    # Original DAX: {{ field.original_formula | comment_dax_lines }}
+    {%- if field.conversion_status == 'partial' %}
+    # Converted: {{ field.conversion_status }}
+    {%- endif %}
+    {%- endif %}
+    sql: {{ (field.sql if field.sql else '""') | sql_quote_table_column }} ;;
+    {%- endif %}
     {%- if field.value_format %}
     value_format_name: {{ field.value_format }}
     {%- endif %}
@@ -60,14 +80,9 @@ view: {{ view.view_name }} {
   dimension: {{ field.field_name }} {
     type: {{ field.looker_type }}
     {%- if field.conversion_status == 'manual' %}
-    description: |
-      {%- if field.original_formula %}
-      Original DAX: {{ field.original_formula | comment_dax_lines }}
-      {%- endif %}
-      [MANUAL REVIEW REQUIRED]
-      {%- if field.message %}
-      Reason: {{ field.message }}
-      {%- endif %}
+    {%- set _dax_bit = ("Original DAX: " ~ (field.original_formula | comment_dax_lines) ~ "\n") if field.original_formula else "" %}
+    {%- set _manual_desc = _dax_bit ~ "[MANUAL REVIEW REQUIRED]" ~ ("\nReason: " ~ field.message if field.message else "") %}
+    description: "{{ _manual_desc | description_quote_escape }}"
     sql: NULL ;;
     {%- else %}
     {%- if field.original_formula %}
