@@ -39,6 +39,41 @@ def _sql_table_name(database: str, schema: str, table_name: str) -> str:
     return f"`{t}`"
 
 
+def _prepare_table_fields(table_fields: list[dict[str, Any]], reserved: set[str]) -> None:
+    """Clean, dedupe, and classify fields (field_name, _measure_pattern, _field_type, etc.). Mutates in place."""
+    for x in table_fields:
+        x["field_name"] = clean_field_name(x.get("name") or "", reserved)
+    deduplicate_field_names(table_fields, name_key="name", id_key="id", reserved_words=reserved)
+    for x in table_fields:
+        data_type = x.get("data_type")
+        aggregation = x.get("aggregation")
+        orig_name = (x.get("name") or "").strip()
+        type_info = map_field_type(data_type, aggregation, orig_name)
+        canonical_field_type = (x.get("field_type") or "").strip().lower()
+        if canonical_field_type in ("measure", "dimension", "dimension_group"):
+            field_type = canonical_field_type
+        else:
+            field_type = type_info["field_type"]
+        dt_lower = (data_type or "").strip().lower()
+        if field_type == "dimension" and dt_lower in ("datetime", "date", "time"):
+            field_type = "dimension_group"
+        if field_type == "measure":
+            x["_measure_pattern"] = "two_step" if aggregation else "one_step"
+        else:
+            x["_measure_pattern"] = None
+        x["_field_type"] = field_type
+        x["_looker_type"] = type_info["looker_type"]
+        x["_timeframes"] = type_info.get("timeframes")
+        x["_value_format"] = type_info.get("value_format")
+        x["_conversion_status"] = type_info.get("conversion_status") or "auto"
+        if field_type == "measure" and not aggregation and x.get("formula_ast"):
+            inferred = infer_measure_type_from_formula_ast(x["formula_ast"])
+            if inferred:
+                x["_looker_type"] = inferred
+            else:
+                x["_looker_type"] = type_info.get("looker_type") or "number"
+
+
 def build_views(
     tables: list[dict[str, Any]],
     fields: list[dict[str, Any]],
@@ -58,6 +93,41 @@ def build_views(
             by_table[st] = []
         by_table[st].append(dict(f))
 
+    # Pre-pass: build table_view_info and global_resolution for cross-table formula refs
+    table_view_info: dict[str, dict[str, Any]] = {}
+    global_resolution: dict[str, str] = {}
+    for t in tables:
+        table_name = (t.get("table_name") or t.get("name") or "").strip()
+        if not table_name:
+            continue
+        extended_props = t.get("extended_properties") or {}
+        if extended_props.get("isHidden", False):
+            continue
+        view_name = _clean_table_name(table_name, reserved)
+        table_fields_copy = [dict(x) for x in (by_table.get(table_name) or [])]
+        _prepare_table_fields(table_fields_copy, reserved)
+        table_view_info[table_name] = {
+            "view_name": view_name,
+            "fields": [
+                {
+                    "name": (x.get("name") or "").strip(),
+                    "field_name": (x.get("field_name") or "").strip(),
+                    "_measure_pattern": x.get("_measure_pattern"),
+                }
+                for x in table_fields_copy
+            ],
+        }
+        for f in table_view_info[table_name]["fields"]:
+            display_name = f["name"]
+            if not display_name:
+                continue
+            fname = f["field_name"]
+            if not fname:
+                continue
+            resolved = fname + "_measure" if f.get("_measure_pattern") == "two_step" else fname
+            if display_name not in global_resolution:
+                global_resolution[display_name] = f"{view_name}.{resolved}"
+
     views: list[ArtifactView] = []
     for t in tables:
         table_name = (t.get("table_name") or t.get("name") or "").strip()
@@ -74,42 +144,10 @@ def build_views(
         view_name = _clean_table_name(table_name, reserved)
         table_fields = by_table.get(table_name) or []
 
-        # 1) Clean + deduplicate to get final field_name on each
-        for x in table_fields:
-            x["field_name"] = clean_field_name(x.get("name") or "", reserved)
-        deduplicate_field_names(table_fields, name_key="name", id_key="id", reserved_words=reserved)
+        # 1) Clean + dedupe + classify (field_name, _measure_pattern, _field_type, etc.)
+        _prepare_table_fields(table_fields, reserved)
 
-        # 2) Pass 1: Classify each field (two_step vs one_step measure vs dimension/dimension_group)
-        for x in table_fields:
-            data_type = x.get("data_type")
-            aggregation = x.get("aggregation")
-            orig_name = (x.get("name") or "").strip()
-            type_info = map_field_type(data_type, aggregation, orig_name)
-            canonical_field_type = (x.get("field_type") or "").strip().lower()
-            if canonical_field_type in ("measure", "dimension", "dimension_group"):
-                field_type = canonical_field_type
-            else:
-                field_type = type_info["field_type"]
-            dt_lower = (data_type or "").strip().lower()
-            if field_type == "dimension" and dt_lower in ("datetime", "date", "time"):
-                field_type = "dimension_group"
-            if field_type == "measure":
-                x["_measure_pattern"] = "two_step" if aggregation else "one_step"
-            else:
-                x["_measure_pattern"] = None
-            x["_field_type"] = field_type
-            x["_looker_type"] = type_info["looker_type"]
-            x["_timeframes"] = type_info.get("timeframes")
-            x["_value_format"] = type_info.get("value_format")
-            x["_conversion_status"] = type_info.get("conversion_status") or "auto"
-            if field_type == "measure" and not aggregation and x.get("formula_ast"):
-                inferred = infer_measure_type_from_formula_ast(x["formula_ast"])
-                if inferred:
-                    x["_looker_type"] = inferred
-                else:
-                    x["_looker_type"] = type_info.get("looker_type") or "number"
-
-        # 3) Resolution map for formula refs: two_step -> ${field_name_measure}, one_step/dimension -> ${field_name}
+        # 2) Resolution map for formula refs: same-view first, then cross-table from global_resolution
         resolution_map: dict[str, str] = {}
         for x in table_fields:
             orig = (x.get("name") or "").strip()
@@ -117,8 +155,11 @@ def build_views(
                 continue
             fname = x.get("field_name") or ""
             resolution_map[orig] = fname + "_measure" if x.get("_measure_pattern") == "two_step" else fname
+        for k, v in global_resolution.items():
+            if k not in resolution_map:
+                resolution_map[k] = v
 
-        # 4) Pass 2: Build ArtifactField for each (formula translation uses resolution_map)
+        # 3) Build ArtifactField for each (formula translation uses resolution_map)
         artifact_fields: list[ArtifactField] = []
         for x in table_fields:
             fname = x.get("field_name") or ""
@@ -197,7 +238,7 @@ def build_views(
                 )
             )
 
-        # 5) Field ordering: dimensions -> dimension_groups -> measures
+        # 4) Field ordering: dimensions -> dimension_groups -> measures
         def _order_key(f: ArtifactField) -> tuple[int, str]:
             if f.field_type == "dimension":
                 return (0, f.field_name)
@@ -207,7 +248,7 @@ def build_views(
 
         artifact_fields.sort(key=_order_key)
 
-        # 6) View-level sql_table_name / derived_table_sql
+        # 5) View-level sql_table_name / derived_table_sql
         sql_table_name = None
         derived_table_sql = None
         conversion_status = "auto"

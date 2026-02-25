@@ -96,3 +96,94 @@ def test_canonical_measure_without_aggregation_becomes_artifact_measure():
     assert measure_fields[0].field_name == "total_enrollments"
     # One-step measures (aggregation=null) get looker_type forced to "number"
     assert measure_fields[0].looker_type == "number"
+
+
+def test_cross_table_formula_resolution():
+    """Unqualified refs in a formula (e.g. [Total Course Capacity]) resolve to other view when field lives on another table."""
+    # Table A: dim_courses with measure "Total Course Capacity" (two-step: aggregation set)
+    # Table B: fact_enrollments with measure "Utilization" = DIVIDE([Total Enrollments], [Total Course Capacity], 0)*100
+    # Total Enrollments is on fact_enrollments; Total Course Capacity is on dim_courses.
+    # Expect: formula sql contains ${dim_courses.total_course_capacity_measure} (or total_course_capacity) for cross-table ref.
+    metadata = {
+        "metadata_version": "1.0",
+        "source_system": "powerbi",
+        "extracted_at": "2026-01-01T00:00:00Z",
+        "datasources": [
+            {
+                "id": "ds1",
+                "name": "TestDS",
+                "source_system": "powerbi",
+                "datasource_type": "embedded",
+                "connection": {"type": "import", "database": "p", "schema": "s", "connection_provider": "bigquery"},
+                "tables": [
+                    {"id": "t1", "name": "dim_courses", "schema": "s", "table_name": "dim_courses", "table_type": "physical", "formula": None},
+                    {"id": "t2", "name": "fact_enrollments", "schema": "s", "table_name": "fact_enrollments", "table_type": "physical", "formula": None},
+                ],
+                "table_relationships": [],
+                "fields": [
+                    {
+                        "id": "f1",
+                        "name": "Total Course Capacity",
+                        "field_type": "measure",
+                        "data_type": "number",
+                        "source_table": "dim_courses",
+                        "source_column": "capacity",
+                        "aggregation": "SUM",
+                        "formula": None,
+                        "formula_ast": None,
+                        "is_calculated": False,
+                    },
+                    {
+                        "id": "f2",
+                        "name": "Total Enrollments",
+                        "field_type": "measure",
+                        "data_type": "number",
+                        "source_table": "fact_enrollments",
+                        "source_column": "enrollment_id",
+                        "aggregation": "COUNT",
+                        "formula": None,
+                        "formula_ast": None,
+                        "is_calculated": False,
+                    },
+                    {
+                        "id": "f3",
+                        "name": "Utilization",
+                        "field_type": "measure",
+                        "data_type": "number",
+                        "source_table": "fact_enrollments",
+                        "source_column": None,
+                        "aggregation": None,
+                        "formula": "DIVIDE([Total Enrollments], [Total Course Capacity], 0) * 100",
+                        "formula_ast": {
+                            "type": "BinOp",
+                            "op": "*",
+                            "left": {
+                                "type": "FunctionCall",
+                                "name": "DIVIDE",
+                                "args": [
+                                    {"type": "ColumnRef", "table": None, "column": "Total Enrollments"},
+                                    {"type": "ColumnRef", "table": None, "column": "Total Course Capacity"},
+                                    {"type": "Number", "value": 0},
+                                ],
+                            },
+                            "right": {"type": "Number", "value": 100},
+                        },
+                        "is_calculated": True,
+                    },
+                ],
+            }
+        ],
+    }
+    artifact = run_transformer(metadata)
+    assert len(artifact.views) >= 2
+    fact_view = next((v for v in artifact.views if v.view_name == "fact_enrollments"), None)
+    assert fact_view is not None
+    utilization = next((f for f in fact_view.fields if f.field_name == "utilization"), None)
+    assert utilization is not None, "expected measure utilization on fact_enrollments"
+    # Cross-table ref to Total Course Capacity (on dim_courses) must be view-qualified
+    assert "dim_courses." in utilization.sql, (
+        f"Expected cross-view ref (dim_courses.) in formula sql, got: {utilization.sql}"
+    )
+    assert "total_course_capacity" in utilization.sql
+    # Same-view ref to Total Enrollments can be unqualified or qualified; both valid
+    assert "total_enrollments" in utilization.sql or "Total Enrollments" in utilization.sql

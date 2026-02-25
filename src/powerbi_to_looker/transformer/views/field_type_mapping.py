@@ -7,9 +7,6 @@ from powerbi_to_looker.common.yaml_loader import load_yaml
 
 _CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "field_type_mapping.yaml"
 
-# Keywords that suggest datetime -> dimension_group
-_DATETIME_NAME_KEYWORDS = ("date", "time", "timestamp", "created", "updated", "modified")
-
 
 def _get_config() -> dict[str, Any]:
     try:
@@ -49,7 +46,6 @@ def map_field_type(
 
     dt = (data_type or "").lower().strip()
     agg = (aggregation or "").upper().strip() if aggregation else None
-    name_lower = (field_name or "").lower()
 
     # Measure: has aggregation
     if agg and agg in agg_to_measure:
@@ -75,8 +71,8 @@ def map_field_type(
             "conversion_status": "auto",
         }
 
-    # Datetime or name suggests date -> dimension_group
-    if dt == "datetime" or any(k in name_lower for k in _DATETIME_NAME_KEYWORDS):
+    # Dimension_group only when data_type is datetime/date/time (no inference from field name)
+    if dt in ("datetime", "date", "time"):
         return {
             "field_type": "dimension_group",
             "looker_type": data_type_map.get("datetime") or "time",
