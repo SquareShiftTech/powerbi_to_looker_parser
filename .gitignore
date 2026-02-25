@@ -30,3 +30,5 @@ htmlcov/
 .DS_Store
 Thumbs.db
 .cursor/debug.log
+formula_*.csv
+validation/formula_*.ods
