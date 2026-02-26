@@ -10,6 +10,7 @@ uv sync
 # or: pip install -r requirements.txt
 
 # Set environment variables (never commit real tokens; use a placeholder or set in your shell only)
+# Test
 $env:GITHUB_TOKEN="<your-github-token>"
 $env:GITHUB_REPO_URL="https://github.com/SquareShiftTech/looker_demo_repository.git"
 $env:GITHUB_BRANCH="feat/looker-demo-phase1"
