@@ -1,5 +1,6 @@
 # Collector output (downloaded .pbix, etc.)
 collector_output/
+#collector_output_v2/
 parsed_output/
 canonical_output/
 generator_output/
