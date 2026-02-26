@@ -9,14 +9,12 @@ End-to-end demo: run integration pipeline → push LookML to GitHub.
 uv sync
 # or: pip install -r requirements.txt
 
-# Set environment variables
-$env:GITHUB_TOKEN="your_github_token_here"
+# Set environment variables (never commit real tokens; use a placeholder or set in your shell only)
+$env:GITHUB_TOKEN="<your-github-token>"
 $env:GITHUB_REPO_URL="https://github.com/SquareShiftTech/looker_demo_repository.git"
 $env:GITHUB_BRANCH="feat/looker-demo-phase1"
 $env:GITHUB_FOLDER="Education_24b04535"
 python scripts/push_to_github.py --verbose
-
-folder
 ```
 
 ## Demo Steps
@@ -70,6 +68,7 @@ uv run python scripts/push_to_github.py --folder Education_24b04535 --verbose
 
 ## Troubleshooting
 
+- **Never commit** `GITHUB_TOKEN` or any secret to the repo. Set it in your environment or a local `.env` (and keep `.env` in `.gitignore`).
 - **Missing token**: Set `GITHUB_TOKEN` environment variable
 - **Branch not found**: Create branch in GitHub or use existing branch name
 - **Folder not found**: Check folder name matches exactly (case-sensitive)

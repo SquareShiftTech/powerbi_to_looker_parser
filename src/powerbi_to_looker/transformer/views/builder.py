@@ -180,6 +180,9 @@ def build_views(
             sql = ""
             bq_formula = None
 
+            if fname == 'revenue_keep_filters':
+                print(f"formula_ast: I am here")
+
             # SQL for dimension/dimension_group: ${TABLE}.column or expression
             if field_type in ("dimension", "dimension_group"):
                 if formula_ast and is_calculated:

@@ -439,7 +439,7 @@ def step3_canonical(
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Integration: download → parse → canonical.")
-    p.add_argument("--output-dir", type=Path, default=Path("collector_output"), help=".pbix folder (default: collector_output)")
+    p.add_argument("--output-dir", type=Path, default=Path("collector_output_v2"), help=".pbix folder (default: collector_output)")
     p.add_argument("--parsed-output-dir", type=Path, default=Path("parsed_output"), help="Parsed output folder (default: parsed_output)")
     p.add_argument("--canonical-output-dir", type=Path, default=Path("canonical_output"), help="Canonical output folder (default: canonical_output)")
     p.add_argument("--transformer-output-dir", type=Path, default=Path("transformer_output"), help="Transformer output folder (default: transformer_output)")
@@ -450,7 +450,7 @@ def main() -> None:
     p.add_argument("--skip-generator", action="store_true", help="Stop after step 4 (skip generator)")
     p.add_argument("--workspace-name", type=str, default=os.environ.get("PBI_WORKSPACE_NAME") or DEFAULT_WORKSPACE_NAME)
     p.add_argument("--skip-name-contains", type=str, action="append", default=[], metavar="TEXT")
-    p.add_argument("--report", type=str, default="Education_24b04535", metavar="NAME",
+    p.add_argument("--report", type=str, default="Aggregate Functions dashboard_3951c5e9", metavar="NAME",
                    help="Run only for this report (report name, .pbix stem, or report folder name)")
     args = p.parse_args()
 
@@ -477,6 +477,9 @@ def main() -> None:
             print(f"Output dir missing: {output_dir}. Use --output-dir or pass --download to run step 1.", file=sys.stderr)
             sys.exit(1)
         print("Step 1: Skipped (use --download to list and download).")
+    
+    if args.download:
+       sys.exit(0)
 
     # Step 2 — Parse
     print("Step 2: Parse .pbix -> parsed output ...")

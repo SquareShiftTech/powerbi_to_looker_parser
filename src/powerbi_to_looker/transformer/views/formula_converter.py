@@ -787,6 +787,10 @@ def _classify_calculate_filter(node: dict[str, Any]) -> str:
         return "all_table" if not col_args else "unknown"
     if name == "ALLEXCEPT":
         return "allexcept"
+    if name == "ALLSELECTED":
+        return "allselected"
+    if name == "KEEPFILTERS":
+        return "keepfilters"
     if name == "FILTER":
         return "filter_condition"
     if node_type == "binop" and (node.get("op") or "") in (
@@ -894,6 +898,22 @@ def _convert_calculate(args, res_map, cfg, convert_fn):
         expr_sql = convert_fn(expr_node, res_map, cfg)
         return f"{expr_sql} OVER (PARTITION BY {', '.join(partition_cols)})"
 
+    if filter_types == ["allselected"]:
+        allselected_args = filter_args[0].get("args") or []
+        if not allselected_args:
+            raise ValueError("ALLSELECTED requires at least one column argument")
+        partition_cols = [convert_fn(c, res_map, cfg) for c in allselected_args]
+        expr_sql = convert_fn(expr_node, res_map, cfg)
+        return f"SUM({expr_sql}) OVER()"
+    
+    if filter_types == ["keepfilters"]:
+        keepfilters_args = filter_args[0].get("args") or []
+        if not keepfilters_args:
+            raise ValueError("KEEPFILTERS requires at least one column argument")
+        # KEEPFILTERS(condition) -> CASE WHEN condition THEN expr END (same as FILTER/simple)
+        condition_sql = _extract_calculate_condition(keepfilters_args[0], res_map, cfg, convert_fn)
+        return _wrap_with_case_when(expr_node, condition_sql, res_map, cfg, convert_fn)
+
     # Pattern 4, 5, 6 — FILTER / binop conditions
     if all(t in ("filter_condition", "simple_condition") for t in filter_types):
         conditions = [
@@ -907,10 +927,6 @@ def _convert_calculate(args, res_map, cfg, convert_fn):
         f"CALCULATE has mixed filter types {filter_types} — pattern not supported. Rewrite manually."
     )
 
-
-# ============================================================
-# HANDLER REGISTRY
-# ============================================================
 
 _HANDLERS: dict[str, Any] = {
     "SWITCH":               _convert_switch,
@@ -1095,24 +1111,24 @@ def convert_with_status(
         out["bq_formula"] = "NULL"
         return out
 
-    # Fast path: top-level unsupported function
-    if _normalize_node_type(ast) == "func":
-        name = (ast.get("name") or "").upper().strip()
-        if name in unsupported:
-            out["conversion_status"] = "manual"
-            out["message"] = unsupported[name]
+    try:
+        # Fast path: top-level unsupported function
+        if _normalize_node_type(ast) == "func":
+            name = (ast.get("name") or "").upper().strip()
+            if name in unsupported:
+                out["conversion_status"] = "manual"
+                out["message"] = unsupported[name]
+                return out
+
+        # VAR/RETURN — handle separately to capture partial status
+        if _normalize_node_type(ast) == "var_expr":
+            result = _convert_var_expr(ast, res_map, cfg)
+            out["conversion_status"] = result.status
+            out["message"] = result.message
+            out["bq_formula"] = result.sql if result.status != "manual" else None
             return out
 
-    # VAR/RETURN — handle separately to capture partial status
-    if _normalize_node_type(ast) == "var_expr":
-        result = _convert_var_expr(ast, res_map, cfg)
-        out["conversion_status"] = result.status
-        out["message"] = result.message
-        out["bq_formula"] = result.sql if result.status != "manual" else None
-        return out
-
-    # All other nodes — use _convert_function to catch ConversionResult.partial
-    try:
+        # All other nodes — use _convert_function to catch ConversionResult.partial
         node_type = _normalize_node_type(ast)
         if node_type == "func":
             raw = _convert_function(ast, res_map, cfg, _convert_node)
